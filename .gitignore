@@ -106,6 +106,7 @@ dist
 
 # dependencies
 /node_modules
+/node_modules.old
 /.pnp
 .pnp.js
 

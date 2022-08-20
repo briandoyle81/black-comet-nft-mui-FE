@@ -18,7 +18,7 @@ import { EthereumAddressFromSignedMessageResponse } from '@coinbase/wallet-sdk/d
 import TileBack from "./assets/img/tile_back.png"
 import { roomDisplayDataList } from './components/RoomTiles';
 
-const APP_NAME = 'My Awesome App'
+const APP_NAME = 'Black Comet'
 const APP_LOGO_URL = 'https://example.com/logo.png'
 const DEFAULT_ETH_JSONRPC_URL = 'https://mainnet.infura.io/v3/<YOUR_INFURA_API_KEY>'
 const DEFAULT_CHAIN_ID = 1
@@ -63,7 +63,7 @@ function App() {
 
       // Await make wait until that
       // promise settles and return its result
-      const roomTile = await roomTilesContract.methods.roomTiles(0).call()
+      const roomTile = await roomTilesContract.methods.roomTiles(2).call()
       const baseArtLink = roomDisplayDataList[parseInt(roomTile.roomBase)].art
       console.log("Base art link", baseArtLink)
       // After fetching data stored it in posts state.
