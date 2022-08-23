@@ -101,7 +101,14 @@ function App() {
   }
 
   function renderMap() {
-    // TODO:
+    const rows = gameBoard.map((rowData, rowIndex) => {
+      return (
+        <Grid container spacing={1}>
+          {renderRow(rowIndex)}
+        </Grid>
+      )
+    })
+    return rows;
   }
 
 
@@ -115,33 +122,7 @@ function App() {
       <Paper>
         <Card>
           <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2}>
-              {renderRow(0)}
-            </Grid>
-            <Grid container spacing={2}>
-              {renderRow(1)}
-            </Grid>
-            <Grid container spacing={2}>
-              {renderRow(2)}
-            </Grid>
-            <Grid container spacing={2}>
-              {renderRow(3)}
-            </Grid>
-            <Grid container spacing={2}>
-              {renderRow(4)}
-            </Grid>
-            <Grid container spacing={2}>
-              {renderRow(5)}
-            </Grid>
-            <Grid container spacing={2}>
-              {renderRow(6)}
-            </Grid>
-            <Grid container spacing={2}>
-              {renderRow(7)}
-            </Grid>
-            <Grid container spacing={2}>
-              {renderRow(8)}
-            </Grid>
+            {renderMap()}
           </Box>
         </Card>
       </Paper>
