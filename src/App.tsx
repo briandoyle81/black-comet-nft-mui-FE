@@ -1,7 +1,11 @@
-import { Card, Paper } from '@mui/material';
+import { Card, CardMedia } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import GamePanel from './components/GamePanel';
+import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
 
 import { ethers } from 'ethers';
 
@@ -24,44 +28,121 @@ const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.
 const roomTilesContract_read = new ethers.Contract(ROOM_TILES_CONTRACT_ADDRESS, roomTilesContractDeployData.abi, provider);
 const gameContract_read = new ethers.Contract(GAME_CONTRACT_ADDRESS, gameContractDeployData.abi, provider);
 
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+}));
 
 function App() {
   // const tempLink = require("./assets/img/Auxiliary Reactor[face].png")
+  const n = 9; // TODO: Hardcoded board size, can't use await here
 
   const [loading, setLoading] = useState(false)
   const [artLink, setArtLink] = useState(TileBack);
+  const [gameBoard, setGameBoard] =  useState(Array.from({length: n},()=> Array.from({length: n}, () => 0)));
+
+  const updateBoard = (row: number, column: number, id: number) => {
+    let copy = [...gameBoard];
+    copy[row][column] = id;
+    setGameBoard(copy);
+
+    // console.log(gameBoard);
+  };
 
   useEffect(() => {
-
-
     const loadGameBoard = async () => {
       setLoading(true);
       const roomTile = await roomTilesContract_read.roomTiles(2);
       console.log(roomTile);
 
-      const boardSize = await gameContract_read.BOARD_SIZE(); // TODO: Figure out why automatic getters don't work
+      const boardSize = await gameContract_read.BOARD_SIZE();
       console.log(boardSize);
 
 
       const board = await gameContract_read.extGetBoard(0); // TODO: hardcoded game number
       console.log(board);
 
+      const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => 0));
+
+      for (let row = 0; row < n; row++) {
+        for (let col = 0; col < n; col++) {
+          const { roomId, nDoor, sDoor, eDoor, wDoor } = board[row][col];
+          localBoard[row][col] = roomId;
+        }
+      }
+
+      setGameBoard(localBoard);
+      console.log("loaded board", gameBoard);
+
       setLoading(false);
     }
 
     // Call the function
     loadGameBoard();
-    }, []);
+  }, []);
+
+  function renderRow(row: number) {
+    const renderedRow = gameBoard[row].map((val) => {
+      return (
+        <Grid item xs={1}>
+          <Card>
+            <CardMedia
+              image={roomDisplayDataList[val].art}
+              component="img"
+            />
+          </Card>
+        </Grid>
+      )
+    })
+    return renderedRow;
+  }
+
+  function renderMap() {
+    // TODO:
+  }
+
+
+  // function renderBoard() {
+  //   gameBoard.forEach( (row) => )
+  // }
 
 
   return (
     <div className="App">
       <Paper>
         <Card>
-          <GamePanel />
-          <div>
-            {loading ? (<h4>Loading...</h4>) : (<img src={artLink} alt="whatever"/>)}
-          </div>
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={2}>
+              {renderRow(0)}
+            </Grid>
+            <Grid container spacing={2}>
+              {renderRow(1)}
+            </Grid>
+            <Grid container spacing={2}>
+              {renderRow(2)}
+            </Grid>
+            <Grid container spacing={2}>
+              {renderRow(3)}
+            </Grid>
+            <Grid container spacing={2}>
+              {renderRow(4)}
+            </Grid>
+            <Grid container spacing={2}>
+              {renderRow(5)}
+            </Grid>
+            <Grid container spacing={2}>
+              {renderRow(6)}
+            </Grid>
+            <Grid container spacing={2}>
+              {renderRow(7)}
+            </Grid>
+            <Grid container spacing={2}>
+              {renderRow(8)}
+            </Grid>
+          </Box>
         </Card>
       </Paper>
     </div>
