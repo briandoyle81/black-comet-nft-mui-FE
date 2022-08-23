@@ -3,78 +3,54 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import GamePanel from './components/GamePanel';
 
+import { ethers } from 'ethers';
+
 // import { Image } from 'mui-image';
 
-import CoinbaseWalletSDK from '@coinbase/wallet-sdk'
-import Web3 from 'web3'
-
-import { AbiItem } from 'web3-utils'
-
-// IMPORTANT:  ABI is in another folder!!!
-// TODO: Move to .env
-import roomTilesContractDeployData from "./RoomTiles.json"
-import { EthereumAddressFromSignedMessageResponse } from '@coinbase/wallet-sdk/dist/relay/Web3Response';
+// TODO: Figure out how to manage this
+import roomTilesContractDeployData from "./RoomTiles.json";
+import gameContractDeployData from "./BCGames.json";
 
 import TileBack from "./assets/img/tile_back.png"
 import { roomDisplayDataList } from './components/RoomTiles';
 
-const APP_NAME = 'Black Comet'
-const APP_LOGO_URL = 'https://example.com/logo.png'
-const DEFAULT_ETH_JSONRPC_URL = 'https://mainnet.infura.io/v3/<YOUR_INFURA_API_KEY>'
-const DEFAULT_CHAIN_ID = 1
+// TODO: Figure out where to keep
+const ROOM_TILES_CONTRACT_ADDRESS = "0xe51B0ab24F6dec7cEe150D65ce61C9d05E5657CB";
+const GAME_CONTRACT_ADDRESS = "0x98b081cB4828ecc00500b3688450f8c3759DC613";
 
-// TODO: Move to .env
-const ROOM_TILES_CONTRACT_ADDRESS = "0x034d0C06516D2c2E6ea4Ca1d6d2877722Dc7A685";
+const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/RQa3QfZULvNhxYAurC0GyfvIdvi-elje");
+// const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
 
+const roomTilesContract_read = new ethers.Contract(ROOM_TILES_CONTRACT_ADDRESS, roomTilesContractDeployData.abi, provider);
+const gameContract_read = new ethers.Contract(GAME_CONTRACT_ADDRESS, gameContractDeployData.abi, provider);
 
-
-// Initialize Coinbase Wallet SDK
-export const coinbaseWallet = new CoinbaseWalletSDK({
-  appName: APP_NAME,
-  appLogoUrl: APP_LOGO_URL,
-  darkMode: false
-})
-
-// Initialize a Web3 Provider object
-export const ethereum = coinbaseWallet.makeWeb3Provider(DEFAULT_ETH_JSONRPC_URL, DEFAULT_CHAIN_ID)
-
-// Initialize a Web3 object
-export const web3 = new Web3(ethereum as any)
-
-const roomTilesContract = new web3.eth.Contract(roomTilesContractDeployData.abi as AbiItem[], ROOM_TILES_CONTRACT_ADDRESS)
-
-async function getTileInformation(id: number) {
-  const roomTile = await roomTilesContract.methods.roomTiles(id).call()
-  const roomBase = await roomTilesContract.methods.roomBases(roomTile.roomBase).call()
-  console.log("roomTile", roomTile);
-  console.log("roomBase", roomBase);
-  return roomBase.art
-}
 
 function App() {
-  const tempLink = require("./assets/img/Auxiliary Reactor[face].png")
+  // const tempLink = require("./assets/img/Auxiliary Reactor[face].png")
 
   const [loading, setLoading] = useState(false)
   const [artLink, setArtLink] = useState(TileBack);
 
   useEffect(() => {
-    const loadImageLink = async () => {
+
+
+    const loadGameBoard = async () => {
       setLoading(true);
+      const roomTile = await roomTilesContract_read.roomTiles(2);
+      console.log(roomTile);
 
-      // Await make wait until that
-      // promise settles and return its result
-      const roomTile = await roomTilesContract.methods.roomTiles(2).call()
-      const baseArtLink = roomDisplayDataList[parseInt(roomTile.roomBase)].art
-      console.log("Base art link", baseArtLink)
-      // After fetching data stored it in posts state.
-      setArtLink(baseArtLink);
+      const boardSize = await gameContract_read.BOARD_SIZE(); // TODO: Figure out why automatic getters don't work
+      console.log(boardSize);
 
-      // Closed the loading page
+
+      const board = await gameContract_read.extGetBoard(0); // TODO: hardcoded game number
+      console.log(board);
+
       setLoading(false);
     }
 
     // Call the function
-    loadImageLink();
+    loadGameBoard();
     }, []);
 
 
@@ -84,7 +60,7 @@ function App() {
         <Card>
           <GamePanel />
           <div>
-            {loading ? (<h4>Loading...</h4>) : (<img src={artLink} alt="temp"/>)}
+            {loading ? (<h4>Loading...</h4>) : (<img src={artLink} alt="whatever"/>)}
           </div>
         </Card>
       </Paper>
