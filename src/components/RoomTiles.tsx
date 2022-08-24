@@ -1,37 +1,37 @@
 import { constants } from "crypto";
 
-import Space from "../assets/img/space.png";
-import Unexplored from "../assets/img/tile_back.png";
+import Space from "../assets/img/room-bg/space.png";
+import Unexplored from "../assets/img/room-bg/tile_back.png";
 
-import Donghaijiu from "../assets/img/donghaijiu.png";
+import Donghaijiu from "../assets/img/room-bg/donghaijiu.png";
 
-import Armory from "../assets/img/Armory[face].png";
-import AuxiliaryReactor from "../assets/img/Auxiliary Reactor[face].png";
-import BreachedReactor from "../assets/img/Breached Reactor[face].png";
-import Bridge from "../assets/img/Bridge[face].png";
-import BugNest from "../assets/img/Bug Nest[face].png";
-import CaptainsQuarters from "../assets/img/Captain_s Quarters[face].png";
-import CargoHold from "../assets/img/Cargo Hold[face].png";
-import CloneRoom from "../assets/img/Clone Room[face].png";
-import ComputerMainframe from "../assets/img/Computer Mainframe[face].png";
-import Crossroads from "../assets/img/Crossroads[face].png";
-import EngCatwalk from "../assets/img/Eng. Catwalk[face].png";
-import EscapePods from "../assets/img/Escape Pods[face].png";
-import Galley from "../assets/img/Galley[face].png";
-import HullBreach from "../assets/img/Hull Breach[face].png";
-import LHallway from "../assets/img/L Hallway[face].png";
-import MainReactor from "../assets/img/Main Reactor[face].png";
-import Medbay from "../assets/img/Medbay[face].png";
-import Observation from "../assets/img/Observation[face].png";
-import OfficersBunk from "../assets/img/Officer_s Bunk[face].png";
-import Pantry from "../assets/img/Pantry[face].png";
-import PumpRoom from "../assets/img/Pump Room[face].png";
-import ReactorControl from "../assets/img/Reactor Control[face].png";
-import ScavengersDen from "../assets/img/Scavenger_s Den[face].png";
-import Scullery from "../assets/img/Scullery[face].png";
-import Showers from "../assets/img/Showers[face].png";
-import TorpedoTube from "../assets/img/Torpedo Tube[face].png";
-import TrashCompactor from "../assets/img/Trash Compactor[face].png";
+import Armory from "../assets/img/room-bg/Armory[face].png";
+import AuxiliaryReactor from "../assets/img/room-bg/Auxiliary Reactor[face].png";
+import BreachedReactor from "../assets/img/room-bg/Breached Reactor[face].png";
+import Bridge from "../assets/img/room-bg/Bridge[face].png";
+import BugNest from "../assets/img/room-bg/Bug Nest[face].png";
+import CaptainsQuarters from "../assets/img/room-bg/Captain_s Quarters[face].png";
+import CargoHold from "../assets/img/room-bg/Cargo Hold[face].png";
+import CloneRoom from "../assets/img/room-bg/Clone Room[face].png";
+import ComputerMainframe from "../assets/img/room-bg/Computer Mainframe[face].png";
+import Crossroads from "../assets/img/room-bg/Crossroads[face].png";
+import EngCatwalk from "../assets/img/room-bg/Eng. Catwalk[face].png";
+import EscapePods from "../assets/img/room-bg/Escape Pods[face].png";
+import Galley from "../assets/img/room-bg/Galley[face].png";
+import HullBreach from "../assets/img/room-bg/Hull Breach[face].png";
+import LHallway from "../assets/img/room-bg/L Hallway[face].png";
+import MainReactor from "../assets/img/room-bg/Main Reactor[face].png";
+import Medbay from "../assets/img/room-bg/Medbay[face].png";
+import Observation from "../assets/img/room-bg/Observation[face].png";
+import OfficersBunk from "../assets/img/room-bg/Officer_s Bunk[face].png";
+import Pantry from "../assets/img/room-bg/Pantry[face].png";
+import PumpRoom from "../assets/img/room-bg/Pump Room[face].png";
+import ReactorControl from "../assets/img/room-bg/Reactor Control[face].png";
+import ScavengersDen from "../assets/img/room-bg/Scavenger_s Den[face].png";
+import Scullery from "../assets/img/room-bg/Scullery[face].png";
+import Showers from "../assets/img/room-bg/Showers[face].png";
+import TorpedoTube from "../assets/img/room-bg/Torpedo Tube[face].png";
+import TrashCompactor from "../assets/img/room-bg/Trash Compactor[face].png";
 
 
 
