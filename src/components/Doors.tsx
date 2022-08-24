@@ -10,16 +10,18 @@ import { Card, CardMedia, Grid } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 
-export enum DoorStatus { NO_DOOR = 0, CLOSED, OPEN, BREACHED, WINDOW }
+export enum DoorStatus { NO_DOOR = 0, CLOSED, OPEN, BREACHED, WINDOW, PLACEHOLDER }
 
 export interface DoorInterface {
   vsBreach: number;
   vsHack: number;
   status: DoorStatus;
+  rotate: boolean;
 }
 
 const Rotated = styled(Card)(({ theme }) => ({
-    transform: `rotate(90deg)`
+  // transform: `rotate(90deg)`,
+  scale: `50%`
 }));
 
 const ArtMap = {
@@ -27,7 +29,8 @@ const ArtMap = {
   [DoorStatus.CLOSED]: Red,
   [DoorStatus.OPEN]: Open,
   [DoorStatus.BREACHED]: Breached,
-  [DoorStatus.WINDOW]: Window
+  [DoorStatus.WINDOW]: Window,
+  [DoorStatus.PLACEHOLDER]: Wall
 }
 
 export default function Door(props: DoorInterface) {
@@ -46,12 +49,12 @@ export default function Door(props: DoorInterface) {
 
   return (
     <Grid item xs={1}>
-      <Card>
+      <Rotated>
         <CardMedia
           image={getDoorArt()}
           component="img"
         />
-      </Card>
+      </Rotated>
     </Grid>
   )
 }

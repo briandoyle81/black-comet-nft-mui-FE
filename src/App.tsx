@@ -1,5 +1,5 @@
 import { Card, CardMedia } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import './App.css';
 import GamePanel from './components/GamePanel';
 import { styled } from '@mui/material/styles';
@@ -104,7 +104,7 @@ function App() {
       let newDoors: Array<DoorInterface> = [];
 
       remoteDoors.forEach((door: DoorInterface) => {
-        newDoors.push({vsBreach: door.vsBreach, vsHack: door.vsHack, status: door.status});
+        newDoors.push({vsBreach: door.vsBreach, vsHack: door.vsHack, status: door.status, rotate: false});
       });
 
       setDoors(newDoors); // TODO: WHy does hitting refresh break this?
@@ -124,9 +124,26 @@ function App() {
     loadGameBoard();
   }, []);
 
-  function renderRow(row: number) {
-    const renderedRow = gameTiles[row].map((tile, col) => {
-      return (
+  // function renderRow(row: number) {
+  //   const renderedRow = gameTiles[row].map((tile, col) => {
+  //     return (
+  //       <Grid item xs={1}>
+  //         <Card>
+  //           <CardMedia
+  //             image={roomDisplayDataList[tile.roomId].art}
+  //             component="img"
+  //           />
+  //         </Card>
+  //       </Grid>
+  //     )
+  //   })
+  //   return renderedRow;
+  // }
+// <Door vsBreach={doors[tile.eDoor].vsBreach} vsHack={doors[tile.eDoor].vsHack} status={doors[tile.eDoor].status} />
+  function renderRowWithDoors(row: number) {
+    const rowWithDoors: ReactNode[] = [];
+    gameTiles[row].forEach((tile: GameTileInterface, col) => {
+      rowWithDoors.push((
         <Grid item xs={1}>
           <Card>
             <CardMedia
@@ -135,18 +152,38 @@ function App() {
             />
           </Card>
         </Grid>
-      )
+      ));
+
+      rowWithDoors.push(<Door vsBreach={doors[tile.eDoor].vsBreach} vsHack={doors[tile.eDoor].vsHack} status={doors[tile.eDoor].status} rotate={true} />);
     })
-    return renderedRow;
+    return rowWithDoors;
   }
 
-  function renderMap() {
-    const rows = gameTiles.map((rowData, rowIndex) => {
-      return (
-        <Grid container spacing={1}>
-          {renderRow(rowIndex)}
+  // Render N/S doors based on the south door of each tile
+  function renderRowOfDoors(row: number) {
+    const rowOfDoors: ReactNode[] = [];
+    gameTiles[row].forEach((tile: GameTileInterface, col) => {
+      rowOfDoors.push(<Door vsBreach={doors[tile.sDoor].vsBreach} vsHack={doors[tile.sDoor].vsHack} status={doors[tile.sDoor].status } rotate={false} />);
+
+
+      // Push an "empty" door for the grid
+      rowOfDoors.push((
+        <Door vsBreach={0} vsHack={0} status={DoorStatus.PLACEHOLDER} rotate={false} />
+      ));
+    })
+
+    return rowOfDoors;
+  }
+
+  function renderMapWithDoors() {
+    const rows: ReactNode[] = [];
+    gameTiles.forEach((rowData: GameTileInterface[], row) => {
+      rows.push(
+        <Grid container spacing={0}>
+          {renderRowWithDoors(row)}
+          {renderRowOfDoors(row)}
         </Grid>
-      )
+      );
     })
     return rows;
   }
@@ -156,7 +193,7 @@ function App() {
       <Paper>
         <Card>
           <Box sx={{ flexGrow: 1 }}>
-            {renderMap()}
+            {renderMapWithDoors()}
           </Box>
         </Card>
       </Paper>
@@ -172,7 +209,6 @@ function App() {
   return (
     <div className="App">
       {renderMapArea()}
-      <Door vsBreach={0} vsHack={0} status={DoorStatus.BREACHED} />
     </div>
   );
 }
