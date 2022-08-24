@@ -40,21 +40,57 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
+// TODO: Move interfaces to util file?
+interface GameTileInterface {
+  roomId: number,
+  parentId: number,
+
+  nDoor: number,
+  sDoor: number,
+  eDoor: number,
+  wDoor: number,
+
+  explored: boolean,
+  looted: boolean,
+  hasVent: boolean
+}
+
+const EmptyTile: GameTileInterface = {
+  roomId: 0,
+  parentId: 0,
+
+  nDoor: 0,
+  sDoor: 0,
+  eDoor: 0,
+  wDoor: 0,
+
+  explored: false,
+  looted: false,
+  hasVent: false
+}
+
 const DEBUG_GAME_NUMBER = 0;  // TODO hardcoded game number
 
 function App() {
   // const tempLink = require("./assets/img/Auxiliary Reactor[face].png")
   const n = 9; // TODO: Hardcoded board size, can't use await here
 
-  const [loading, setLoading] = useState(false)
-  const [gameBoard, setGameBoard] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => 0)));
+  const [loading, setLoading] = useState(false);
+  const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
   const [doors, setDoors] = useState<DoorInterface[]>([]);
 
-  const updateBoard = (row: number, column: number, id: number) => {
-    let copy = [...gameBoard];
-    copy[row][column] = id;
-    setGameBoard(copy);
-  };
+
+  function updateBoardFromChain(remoteBoard: any[]) {
+    const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile));
+
+    remoteBoard.forEach((rowData: GameTileInterface[], row) => {
+      rowData.forEach((gameTile: GameTileInterface, col) => {
+        localBoard[row][col] = gameTile;
+      })
+    })
+
+    setGameTiles(localBoard);
+  }
 
   useEffect(() => {
     const loadGameBoard = async () => {
@@ -77,18 +113,9 @@ function App() {
       // console.log("Locally, doors are", doors);
 
 
-      const board = await gameContract_read.extGetBoard(gameNumber);
+      const remoteBoard = await gameContract_read.extGetBoard(gameNumber);
       // console.log(board);
-
-      const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => 0));
-
-      for (let row = 0; row < n; row++) {
-        for (let col = 0; col < n; col++) {
-          const { roomId, nDoor, sDoor, eDoor, wDoor } = board[row][col];
-          localBoard[row][col] = roomId;
-        }
-      }
-      setGameBoard(localBoard);
+      updateBoardFromChain(remoteBoard);
 
       setLoading(false);
     }
@@ -98,12 +125,12 @@ function App() {
   }, []);
 
   function renderRow(row: number) {
-    const renderedRow = gameBoard[row].map((val, col) => {
+    const renderedRow = gameTiles[row].map((tile, col) => {
       return (
         <Grid item xs={1}>
           <Card>
             <CardMedia
-              image={roomDisplayDataList[val].art}
+              image={roomDisplayDataList[tile.roomId].art}
               component="img"
             />
           </Card>
@@ -114,7 +141,7 @@ function App() {
   }
 
   function renderMap() {
-    const rows = gameBoard.map((rowData, rowIndex) => {
+    const rows = gameTiles.map((rowData, rowIndex) => {
       return (
         <Grid container spacing={1}>
           {renderRow(rowIndex)}
