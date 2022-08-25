@@ -16,7 +16,7 @@ export interface DoorInterface {
   vsBreach: number;
   vsHack: number;
   status: DoorStatus;
-  rotate: boolean;
+  rotate: boolean
 }
 
 const Rotated = styled(Card)(({ theme }) => ({
@@ -48,13 +48,13 @@ export default function Door(props: DoorInterface) {
   }
 
   return (
-    <Grid item xs={1}>
-      <Rotated>
+    <Grid item xs={.5}>
+      <Card>
         <CardMedia
           image={getDoorArt()}
           component="img"
         />
-      </Rotated>
+      </Card>
     </Grid>
   )
 }

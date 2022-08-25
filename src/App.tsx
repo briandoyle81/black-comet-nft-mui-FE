@@ -165,10 +165,14 @@ function App() {
       rowOfDoors.push(<Door vsBreach={doors[tile.sDoor].vsBreach} vsHack={doors[tile.sDoor].vsHack} status={doors[tile.sDoor].status} rotate={false} />);
 
 
-      // Push an "empty" door for the grid, except the last
+      // Push an "empty" card to maintain grid, except the last
       if (col < n - 1) {
         rowOfDoors.push((
-          <Door vsBreach={255} vsHack={255} status={DoorStatus.PLACEHOLDER} rotate={false} />
+          <Grid item xs={1}>
+            <Card>
+
+            </Card>
+          </Grid>
         ));
       }
 
@@ -186,10 +190,10 @@ function App() {
       if (row < n - 1) {
         rows.push(
           <>
-            <Grid container spacing={.1} columns={(n*2)-1}>
+            <Grid container spacing={0} columns={(n*2)-1}>
               {renderRowWithDoors(row)}
             </Grid>
-            <Grid container spacing={.1} columns={(n*2)-1}>
+            <Grid container spacing={0} columns={(n*2)-1}>
               {renderRowOfDoors(row)}
             </Grid>
           </>
@@ -197,7 +201,7 @@ function App() {
       } else { // Don't print a row of doors at the bottom
         rows.push(
           <>
-            <Grid container spacing={.1} columns={(n*2)-1}>
+            <Grid container spacing={0} columns={(n*2)-1}>
               {renderRowWithDoors(row)}
             </Grid>
           </>
