@@ -79,8 +79,6 @@ const EmptyDoor: DoorInterface = {
 const DEBUG_GAME_NUMBER = 0;  // TODO hardcoded game number
 
 function App() {
-  console.log("Appppp")
-  // const tempLink = require("./assets/img/Auxiliary Reactor[face].png")
   const n = 9; // TODO: Hardcoded board size, can't use await here
 
   const [loading, setLoading] = useState(false);
@@ -102,20 +100,15 @@ function App() {
   }
 
   function updateDoorsFromChain(remoteDoors: any[]) {
-    console.log("Updating doors");
-    // const newDoors = Array.from({ length: remoteDoors.length }, () => EmptyDoor);
     const newDoors: DoorInterface[] = [];
 
     remoteDoors.forEach((door: DoorInterface, index) => {
-      console.log("index of door", index)
       const newDoor: DoorInterface = { vsBreach: door.vsBreach, vsHack: door.vsHack, status: door.status, rotate: false };
       // newDoors[index] = newDoor;
       newDoors.push(newDoor);
     });
 
-    setDoors(newDoors); // TODO: WHy does hitting refresh break this?
-    console.log("New doors", doors);
-    console.log("State doors", doors);
+    setDoors(newDoors);
   }
 
   useEffect(() => {
@@ -128,9 +121,6 @@ function App() {
 
       const remoteDoors = await gameContract_read.extGetDoors(gameNumber);
 
-      // // TODO:  DO NOT COMMENT OUT THE CONSOLE LOG!!!
-      // // TODO:  WHY!?!?!? Why won't it load without this!?
-      console.log("Remote Doors", remoteDoors)
 
       updateDoorsFromChain(remoteDoors);
       // console.log("Locally, doors are", doors);
@@ -147,27 +137,9 @@ function App() {
     loadGameBoard();
   }, []);
 
-  function renderRow(row: number) {
-    const renderedRow = gameTiles[row].map((tile, col) => {
-      return (
-        <Grid item xs={1}>
-          <Card>
-            <CardMedia
-              image={roomDisplayDataList[tile.roomId].art}
-              component="img"
-            />
-          </Card>
-        </Grid>
-      )
-    })
-    return renderedRow;
-  }
-// <Door vsBreach={doors[tile.eDoor].vsBreach} vsHack={doors[tile.eDoor].vsHack} status={doors[tile.eDoor].status} />
   function renderRowWithDoors(row: number) {
     const rowWithDoors: ReactNode[] = [];
     gameTiles[row].forEach((tile: GameTileInterface, col) => {
-      console.log(tile)
-      // rowWithDoors.push(<Door vsBreach={doors[tile.eDoor].vsBreach} vsHack={doors[tile.eDoor].vsHack} status={doors[tile.eDoor].status} rotate={true} />);
       rowWithDoors.push((
         <Grid item xs={1}>
           <Card>
@@ -178,8 +150,10 @@ function App() {
           </Card>
         </Grid>
       ));
-      // console.log("east", tile.eDoor)
-      rowWithDoors.push(<Door vsBreach={doors[tile.eDoor].vsBreach} vsHack={doors[tile.eDoor].vsHack} status={doors[tile.eDoor].status} rotate={true} />);
+
+      if (col < n - 1) {
+        rowWithDoors.push(<Door vsBreach={doors[tile.eDoor].vsBreach} vsHack={doors[tile.eDoor].vsHack} status={doors[tile.eDoor].status} rotate={true} />);
+      }
     })
     return rowWithDoors;
   }
@@ -188,13 +162,16 @@ function App() {
   function renderRowOfDoors(row: number) {
     const rowOfDoors: ReactNode[] = [];
     gameTiles[row].forEach((tile: GameTileInterface, col) => {
-      rowOfDoors.push(<Door vsBreach={doors[tile.sDoor].vsBreach} vsHack={doors[tile.sDoor].vsHack} status={doors[tile.sDoor].status } rotate={false} />);
+      rowOfDoors.push(<Door vsBreach={doors[tile.sDoor].vsBreach} vsHack={doors[tile.sDoor].vsHack} status={doors[tile.sDoor].status} rotate={false} />);
 
 
-      // Push an "empty" door for the grid
-      rowOfDoors.push((
-        <Door vsBreach={0} vsHack={0} status={DoorStatus.PLACEHOLDER} rotate={false} />
-      ));
+      // Push an "empty" door for the grid, except the last
+      if (col < n - 1) {
+        rowOfDoors.push((
+          <Door vsBreach={255} vsHack={255} status={DoorStatus.PLACEHOLDER} rotate={false} />
+        ));
+      }
+
     })
 
     return rowOfDoors;
@@ -206,12 +183,26 @@ function App() {
       return "Waiting for doors";
     }
     gameTiles.forEach((rowData: GameTileInterface[], row) => {
-      rows.push(
-        <Grid container spacing={1}>
-          {renderRowWithDoors(row)}
-          {renderRowOfDoors(row)}
-        </Grid>
-      );
+      if (row < n - 1) {
+        rows.push(
+          <>
+            <Grid container spacing={.1} columns={(n*2)-1}>
+              {renderRowWithDoors(row)}
+            </Grid>
+            <Grid container spacing={.1} columns={(n*2)-1}>
+              {renderRowOfDoors(row)}
+            </Grid>
+          </>
+        );
+      } else { // Don't print a row of doors at the bottom
+        rows.push(
+          <>
+            <Grid container spacing={.1} columns={(n*2)-1}>
+              {renderRowWithDoors(row)}
+            </Grid>
+          </>
+        );
+      }
     })
     return rows;
   }
