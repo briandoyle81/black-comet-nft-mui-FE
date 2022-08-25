@@ -21,6 +21,8 @@ import { DoorInterface, DoorStatus } from './components/Doors';
 
 import Door from "./components/Doors";
 
+import Vent from "./assets/img/overlays/vent.png";
+
 // TODO: Figure out where to keep
 const ROOM_TILES_CONTRACT_ADDRESS = roomTilesContractDeployData.address;
 // const GAME_CONTRACT_ADDRESS = "0x7AA55498C31a4a399f525D1e8BD9e68531535966";
@@ -77,6 +79,14 @@ const EmptyDoor: DoorInterface = {
 }
 
 const DEBUG_GAME_NUMBER = 0;  // TODO hardcoded game number
+
+// TODO: Why does it need negative, and why does it change size/scale
+const VentOverlay = styled(Card)(({ theme }) => ({
+  position: 'absolute',
+  left: '-55%',
+  bottom: '-55%',
+  scale: '15%'
+}));
 
 function App() {
   const n = 9; // TODO: Hardcoded board size, can't use await here
@@ -137,16 +147,32 @@ function App() {
     loadGameBoard();
   }, []);
 
+  function renderVent(vent: boolean) {
+    if (vent) {
+      return (
+        <VentOverlay>
+          <CardMedia
+            image={Vent}
+            component="img"
+          />
+        </VentOverlay>
+      )
+    } else {
+      return (<></>)
+    }
+  }
+
   function renderRowWithDoors(row: number) {
     const rowWithDoors: ReactNode[] = [];
     gameTiles[row].forEach((tile: GameTileInterface, col) => {
       rowWithDoors.push((
         <Grid item xs={1}>
-          <Card>
+          <Card sx={{ position: 'relative' }}>
             <CardMedia
               image={roomDisplayDataList[tile.roomId].art}
               component="img"
             />
+            {renderVent(tile.hasVent)}
           </Card>
         </Grid>
       ));
