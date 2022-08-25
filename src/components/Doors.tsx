@@ -20,8 +20,7 @@ export interface DoorInterface {
 }
 
 const Rotated = styled(Card)(({ theme }) => ({
-  // transform: `rotate(90deg)`,
-  scale: `50%`
+  transform: `rotate(90deg)`
 }));
 
 const ArtMap = {
@@ -47,14 +46,27 @@ export default function Door(props: DoorInterface) {
     return ArtMap[props.status];
   }
 
-  return (
-    <Grid item xs={.5}>
-      <Card>
-        <CardMedia
-          image={getDoorArt()}
-          component="img"
-        />
-      </Card>
-    </Grid>
-  )
+  if (props.rotate) {
+    return (
+      <Grid item xs={.5} sx={{display: 'flex', alignItems: 'center'}}>
+        <Card sx={{transform: `rotate(90deg)`}}>
+          <CardMedia
+            image={getDoorArt()}
+            component="img"
+          />
+        </Card>
+      </Grid>
+    )
+  } else {
+    return (
+      <Grid item xs={.5}>
+        <Card>
+          <CardMedia
+            image={getDoorArt()}
+            component="img"
+          />
+        </Card>
+      </Grid>
+    )
+  }
 }
