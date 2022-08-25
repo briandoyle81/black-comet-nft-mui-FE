@@ -6,7 +6,7 @@ import Open from "../assets/img/doors/breached.png";
 import Red from "../assets/img/doors/red.png";
 import Wall from "../assets/img/doors/wall.png";
 import Window from "../assets/img/doors/window.png";
-import { Card, CardMedia, Grid } from '@mui/material';
+import { Card, CardMedia, Grid, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 
@@ -22,6 +22,39 @@ export interface DoorInterface {
 const Rotated = styled(Card)(({ theme }) => ({
   transform: `rotate(90deg)`
 }));
+
+const H_vsHack = styled(Typography)(({ theme }) => ({
+  position: 'absolute',
+  top: '0px',
+  left: '6px',
+  color: 'white',
+  fontSize: 12
+}));
+
+const H_vsBreach = styled(Typography)(({ theme }) => ({
+  position: 'absolute',
+  top: '0px',
+  right: '6px',
+  color: 'white',
+  fontSize: 12
+}));
+
+// TODO: Make text not sideways
+// const V_vsHack = styled(Typography)(({ theme }) => ({
+//   position: 'absolute',
+//   top: '0px',
+//   left: '0px',
+//   color: 'white',
+//   fontSize: 12
+// }));
+
+// const V_vsBreach = styled(Typography)(({ theme }) => ({
+//   position: 'absolute',
+//   bottom: '0px',
+//   right: '0px',
+//   color: 'white',
+//   fontSize: 12
+// }));
 
 const ArtMap = {
   [DoorStatus.NO_DOOR]: Wall,
@@ -45,26 +78,30 @@ export default function Door(props: DoorInterface) {
     // Otherwise, go with state
     return ArtMap[props.status];
   }
-
+  // TODO: This method of rotation is adding padding and putting drop shadow in incorrect orientation
   if (props.rotate) {
     return (
       <Grid item xs={.5} sx={{display: 'flex', alignItems: 'center'}}>
-        <Card sx={{transform: `rotate(90deg)`}}>
+        <Card sx={{transform: `rotate(90deg)`, position: 'relative'}}>
           <CardMedia
             image={getDoorArt()}
             component="img"
           />
+          <H_vsHack>{props.vsHack}</H_vsHack>
+          <H_vsBreach>{props.vsBreach}</H_vsBreach>
         </Card>
       </Grid>
     )
   } else {
     return (
       <Grid item xs={.5}>
-        <Card>
+        <Card sx={{ position: 'relative' }}>
           <CardMedia
             image={getDoorArt()}
             component="img"
           />
+          <H_vsHack>{props.vsHack}</H_vsHack>
+          <H_vsBreach>{props.vsBreach}</H_vsBreach>
         </Card>
       </Grid>
     )

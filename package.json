@@ -6,6 +6,7 @@
     "@coinbase/wallet-sdk": "^3.3.0",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
+    "@fontsource/roboto": "^4.5.8",
     "@maticnetwork/maticjs": "^3.4.0",
     "@maticnetwork/maticjs-web3": "^1.0.1",
     "@mui/material": "^5.9.0",
