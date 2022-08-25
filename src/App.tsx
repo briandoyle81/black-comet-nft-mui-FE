@@ -161,6 +161,14 @@ function App() {
   // Render N/S doors based on the south door of each tile
   function renderRowOfDoors(row: number) {
     const rowOfDoors: ReactNode[] = [];
+    // Start with a small, empty item to offset doors for alignment
+    rowOfDoors.push((
+      <Grid item xs={.25}>
+        <Card>
+
+        </Card>
+      </Grid>
+    ));
     gameTiles[row].forEach((tile: GameTileInterface, col) => {
       rowOfDoors.push(<Door vsBreach={doors[tile.sDoor].vsBreach} vsHack={doors[tile.sDoor].vsHack} status={doors[tile.sDoor].status} rotate={false} />);
 
