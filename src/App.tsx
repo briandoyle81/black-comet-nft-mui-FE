@@ -69,9 +69,17 @@ const EmptyTile: GameTileInterface = {
   hasVent: false
 }
 
+const EmptyDoor: DoorInterface = {
+  vsBreach: 0,
+  vsHack: 0,
+  status: DoorStatus.NO_DOOR,
+  rotate: false
+}
+
 const DEBUG_GAME_NUMBER = 0;  // TODO hardcoded game number
 
 function App() {
+  console.log("Appppp")
   // const tempLink = require("./assets/img/Auxiliary Reactor[face].png")
   const n = 9; // TODO: Hardcoded board size, can't use await here
 
@@ -79,6 +87,7 @@ function App() {
   const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
   const [doors, setDoors] = useState<DoorInterface[]>([]);
 
+  // setLoading(false);
 
   function updateBoardFromChain(remoteBoard: any[]) {
     const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile));
@@ -92,24 +101,38 @@ function App() {
     setGameTiles(localBoard);
   }
 
-  useEffect(() => {
-    const loadGameBoard = async () => {
-      const gameNumber = DEBUG_GAME_NUMBER;
-      setLoading(true);
+  function updateDoorsFromChain(remoteDoors: any[]) {
+    console.log("Updating doors");
+    // const newDoors = Array.from({ length: remoteDoors.length }, () => EmptyDoor);
+    const newDoors: DoorInterface[] = [];
 
+    remoteDoors.forEach((door: DoorInterface, index) => {
+      console.log("index of door", index)
+      const newDoor: DoorInterface = { vsBreach: door.vsBreach, vsHack: door.vsHack, status: door.status, rotate: false };
+      // newDoors[index] = newDoor;
+      newDoors.push(newDoor);
+    });
+
+    setDoors(newDoors); // TODO: WHy does hitting refresh break this?
+    console.log("New doors", doors);
+    console.log("State doors", doors);
+  }
+
+  useEffect(() => {
+    console.log("Start of useEffect");
+    const loadGameBoard = async () => {
+      setLoading(true);
+      const gameNumber = DEBUG_GAME_NUMBER;
       // const boardSize = await gameContract_read.BOARD_SIZE();
       // console.log(boardSize);
 
       const remoteDoors = await gameContract_read.extGetDoors(gameNumber);
-      let newDoors: Array<DoorInterface> = [];
 
-      remoteDoors.forEach((door: DoorInterface) => {
-        newDoors.push({vsBreach: door.vsBreach, vsHack: door.vsHack, status: door.status, rotate: false});
-      });
+      // // TODO:  DO NOT COMMENT OUT THE CONSOLE LOG!!!
+      // // TODO:  WHY!?!?!? Why won't it load without this!?
+      console.log("Remote Doors", remoteDoors)
 
-      setDoors(newDoors); // TODO: WHy does hitting refresh break this?
-
-      // console.log("newDoors", newDoors);
+      updateDoorsFromChain(remoteDoors);
       // console.log("Locally, doors are", doors);
 
 
@@ -124,25 +147,27 @@ function App() {
     loadGameBoard();
   }, []);
 
-  // function renderRow(row: number) {
-  //   const renderedRow = gameTiles[row].map((tile, col) => {
-  //     return (
-  //       <Grid item xs={1}>
-  //         <Card>
-  //           <CardMedia
-  //             image={roomDisplayDataList[tile.roomId].art}
-  //             component="img"
-  //           />
-  //         </Card>
-  //       </Grid>
-  //     )
-  //   })
-  //   return renderedRow;
-  // }
+  function renderRow(row: number) {
+    const renderedRow = gameTiles[row].map((tile, col) => {
+      return (
+        <Grid item xs={1}>
+          <Card>
+            <CardMedia
+              image={roomDisplayDataList[tile.roomId].art}
+              component="img"
+            />
+          </Card>
+        </Grid>
+      )
+    })
+    return renderedRow;
+  }
 // <Door vsBreach={doors[tile.eDoor].vsBreach} vsHack={doors[tile.eDoor].vsHack} status={doors[tile.eDoor].status} />
   function renderRowWithDoors(row: number) {
     const rowWithDoors: ReactNode[] = [];
     gameTiles[row].forEach((tile: GameTileInterface, col) => {
+      console.log(tile)
+      // rowWithDoors.push(<Door vsBreach={doors[tile.eDoor].vsBreach} vsHack={doors[tile.eDoor].vsHack} status={doors[tile.eDoor].status} rotate={true} />);
       rowWithDoors.push((
         <Grid item xs={1}>
           <Card>
@@ -153,7 +178,7 @@ function App() {
           </Card>
         </Grid>
       ));
-
+      // console.log("east", tile.eDoor)
       rowWithDoors.push(<Door vsBreach={doors[tile.eDoor].vsBreach} vsHack={doors[tile.eDoor].vsHack} status={doors[tile.eDoor].status} rotate={true} />);
     })
     return rowWithDoors;
@@ -177,9 +202,12 @@ function App() {
 
   function renderMapWithDoors() {
     const rows: ReactNode[] = [];
+    if (doors.length === 0) {
+      return "Waiting for doors";
+    }
     gameTiles.forEach((rowData: GameTileInterface[], row) => {
       rows.push(
-        <Grid container spacing={0}>
+        <Grid container spacing={1}>
           {renderRowWithDoors(row)}
           {renderRowOfDoors(row)}
         </Grid>
@@ -199,12 +227,6 @@ function App() {
       </Paper>
     )
   }
-
-
-  // function renderBoard() {
-  //   gameBoard.forEach( (row) => )
-  // }
-
 
   return (
     <div className="App">
