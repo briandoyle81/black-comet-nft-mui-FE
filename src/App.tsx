@@ -11,9 +11,15 @@ import { ethers } from 'ethers';
 
 // import { Image } from 'mui-image';
 
-// TODO: Figure out how to manage this
-import roomTilesContractDeployData from "./RoomTiles.json";
-import gameContractDeployData from "./BCGames.json";
+// TODO: Figure out how to manage this automatically
+import eventsDeployData from "./deployments/BCEvents.json";
+import roomTilesContractDeployData from "./deployments/RoomTiles.json";
+import charContractDeployData from "./deployments/BCChars.json";
+import itemsContractDeployData from "./deployments/BCItems.json";
+import gameContractDeployData from "./deployments/BCGames.json";
+import utilsContractDeployData from "./deployments/BCGames.json";
+import mapsContractDeployData from "./deployments/Maps.json";
+import lobbiesContractDeployData from "./deployments/Lobby.json";
 
 import { roomDisplayDataList } from './components/RoomTiles';
 
@@ -23,16 +29,14 @@ import Door from "./components/Doors";
 
 import Vent from "./assets/img/overlays/vent.png";
 
-// TODO: Figure out where to keep
-const ROOM_TILES_CONTRACT_ADDRESS = roomTilesContractDeployData.address;
-// const GAME_CONTRACT_ADDRESS = "0x7AA55498C31a4a399f525D1e8BD9e68531535966";
-const GAME_CONTRACT_ADDRESS = gameContractDeployData.address;
-
 const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/RQa3QfZULvNhxYAurC0GyfvIdvi-elje");
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
 
-const roomTilesContract_read = new ethers.Contract(ROOM_TILES_CONTRACT_ADDRESS, roomTilesContractDeployData.abi, provider);
-const gameContract_read = new ethers.Contract(GAME_CONTRACT_ADDRESS, gameContractDeployData.abi, provider);
+const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.address, roomTilesContractDeployData.abi, provider);
+// const gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
+const lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
+const mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
+
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -47,10 +51,7 @@ interface GameTileInterface {
   roomId: number,
   parentId: number,
 
-  nDoor: number,
-  sDoor: number,
-  eDoor: number,
-  wDoor: number,
+  doors: number[],
 
   explored: boolean,
   looted: boolean,
@@ -61,10 +62,7 @@ const EmptyTile: GameTileInterface = {
   roomId: 0,
   parentId: 0,
 
-  nDoor: 0,
-  sDoor: 0,
-  eDoor: 0,
-  wDoor: 0,
+  doors: [],
 
   explored: false,
   looted: false,
@@ -129,15 +127,15 @@ function App() {
       // const boardSize = await gameContract_read.BOARD_SIZE();
       // console.log(boardSize);
 
-      const remoteDoors = await gameContract_read.extGetDoors(gameNumber);
-
+      const remoteDoors = await mapContract_read.extGetDoors(gameNumber);
+      // console.log(remoteDoors);
 
       updateDoorsFromChain(remoteDoors);
       // console.log("Locally, doors are", doors);
 
 
-      const remoteBoard = await gameContract_read.extGetBoard(gameNumber);
-      // console.log(board);
+      const remoteBoard = await mapContract_read.extGetBoard(gameNumber);
+      // console.log(remoteBoard);
       updateBoardFromChain(remoteBoard);
 
       setLoading(false);
@@ -172,13 +170,14 @@ function App() {
               image={roomDisplayDataList[tile.roomId].art}
               component="img"
             />
+            {/* {tile.roomId} */}
             {renderVent(tile.hasVent)}
           </Card>
         </Grid>
       ));
 
       if (col < n - 1) {
-        rowWithDoors.push(<Door vsBreach={doors[tile.eDoor].vsBreach} vsHack={doors[tile.eDoor].vsHack} status={doors[tile.eDoor].status} rotate={true} />);
+        rowWithDoors.push(<Door vsBreach={doors[tile.doors[2]].vsBreach} vsHack={doors[tile.doors[2]].vsHack} status={doors[tile.doors[2]].status} rotate={true} />);
       }
     })
     return rowWithDoors;
@@ -196,7 +195,7 @@ function App() {
       </Grid>
     ));
     gameTiles[row].forEach((tile: GameTileInterface, col) => {
-      rowOfDoors.push(<Door vsBreach={doors[tile.sDoor].vsBreach} vsHack={doors[tile.sDoor].vsHack} status={doors[tile.sDoor].status} rotate={false} />);
+      rowOfDoors.push(<Door vsBreach={doors[tile.doors[1]].vsBreach} vsHack={doors[tile.doors[1]].vsHack} status={doors[tile.doors[1]].status} rotate={false} />);
 
 
       // Push an "empty" card to maintain grid, except the last
