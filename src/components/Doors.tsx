@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import Breached from "../assets/img/doors/breached.png";
 import Green from "../assets/img/doors/green.png";
-import Open from "../assets/img/doors/breached.png";
+import Open from "../assets/img/doors/open.png";
 import Red from "../assets/img/doors/red.png";
 import Wall from "../assets/img/doors/wall.png";
 import Window from "../assets/img/doors/window.png";
@@ -78,6 +78,19 @@ export default function Door(props: DoorInterface) {
     // Otherwise, go with state
     return ArtMap[props.status];
   }
+
+  function renderDoorStats(door: DoorInterface) {
+    if (door.status === DoorStatus.OPEN || door.status === DoorStatus.CLOSED) {
+      return (
+        <>
+          <H_vsHack>{props.vsHack}</H_vsHack>
+          <H_vsBreach>{props.vsBreach}</H_vsBreach>
+        </>
+      )
+    } else {
+      return(<></>)
+    }
+  }
   // TODO: This method of rotation is adding padding and putting drop shadow in incorrect orientation
   if (props.rotate) {
     return (
@@ -87,8 +100,7 @@ export default function Door(props: DoorInterface) {
             image={getDoorArt()}
             component="img"
           />
-          <H_vsHack>{props.vsHack}</H_vsHack>
-          <H_vsBreach>{props.vsBreach}</H_vsBreach>
+          {renderDoorStats(props)}
         </Card>
       </Grid>
     )
@@ -100,8 +112,7 @@ export default function Door(props: DoorInterface) {
             image={getDoorArt()}
             component="img"
           />
-          <H_vsHack>{props.vsHack}</H_vsHack>
-          <H_vsBreach>{props.vsBreach}</H_vsBreach>
+          {renderDoorStats(props)}
         </Card>
       </Grid>
     )

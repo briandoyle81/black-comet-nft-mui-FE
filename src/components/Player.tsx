@@ -44,6 +44,7 @@ export default function Player(props: PlayerInterface) {
 
   function getArtFromId() {
     // TODO: Create and get real NFT art
+    // TODO: Handle more than four players
     if (props.remoteId == 0) {
       return Player0;
     } else if (props.remoteId == 1) {

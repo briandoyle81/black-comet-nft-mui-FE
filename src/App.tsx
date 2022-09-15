@@ -198,9 +198,10 @@ function App() {
     }
   }
 
+  // TODO: Rewrite to put players in a row
   function renderPlayers(position: Position) {
     const playerRenders: ReactNode[] = [];
-    console.log(players.length || "no players")
+    // console.log(players.length || "no players")
     // TODO: Why isn't the loading mechanism catching no players?
     if (players.length > 0) {
       players.forEach((player: PlayerInterface) => { // TODO: any
