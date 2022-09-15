@@ -45,13 +45,14 @@ export default function Player(props: PlayerInterface) {
   function getArtFromId() {
     // TODO: Create and get real NFT art
     // TODO: Handle more than four players
-    if (props.remoteId == 0) {
+    const tempId = props.remoteId % 4;
+    if (tempId == 0) { // DO NOT USE ===!  Comparing number to bigNumber
       return Player0;
-    } else if (props.remoteId == 1) {
+    } else if (tempId == 1) {
       return Player1;
-    } else if (props.remoteId == 2) {
+    } else if (tempId == 2) {
       return Player2;
-    } else if (props.remoteId == 3) {
+    } else if (tempId == 3) {
       return Player3;
     } else {
       console.log("Bad Character ID:", props.remoteId)

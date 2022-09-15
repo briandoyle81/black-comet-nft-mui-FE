@@ -1,7 +1,7 @@
 import { Card, CardMedia } from '@mui/material';
 import React, { ReactNode, useEffect, useState } from 'react';
 import './App.css';
-import GamePanel from './components/GamePanel';
+import GamePanel, { GameInterface } from './components/GamePanel';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -30,6 +30,7 @@ import Door from "./components/Doors";
 import Vent from "./assets/img/overlays/vent.png";
 import Player, { PlayerInterface } from './components/Player';
 import { Position } from './components/Utils';
+import GameInfo from './components/GameInfo';
 
 const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/RQa3QfZULvNhxYAurC0GyfvIdvi-elje");
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
@@ -71,6 +72,19 @@ const EmptyTile: GameTileInterface = {
   hasVent: false
 }
 
+const EmptyGame: GameInterface = {
+  active: false,
+
+  playerIndexes: [0, 0, 0, 0],
+  currentPlayerTurnIndex: 0,
+  numPlayers: 0,
+
+  turnsTaken: 0,
+
+  mapContract: "",
+  mapId: 0
+}
+
 const EmptyDoor: DoorInterface = {
   vsBreach: 0,
   vsHack: 0,
@@ -91,10 +105,14 @@ const VentOverlay = styled(Card)(({ theme }) => ({
 function App() {
   const n = 9; // TODO: Hardcoded board size, can't use await here
 
+
   const [loading, setLoading] = useState(false);
+  const [game, setGame] = useState(EmptyGame);
+  const [currentGame, setCurrentGame] = useState(0);
   const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
   const [doors, setDoors] = useState<DoorInterface[]>([]);
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
+
 
   // setLoading(false);
 
@@ -159,22 +177,24 @@ function App() {
     console.log("Start of useEffect");
     const loadGameBoard = async () => {
       setLoading(true);
-      const gameNumber = DEBUG_GAME_NUMBER;
       // const boardSize = await gameContract_read.BOARD_SIZE();
       // console.log(boardSize);
 
-      const remoteDoors = await mapContract_read.extGetDoors(gameNumber);
+      const remoteGame = await gameContract_read.games(currentGame);
+      setGame(remoteGame);
+      console.log(game);
+
+      const remoteDoors = await mapContract_read.extGetDoors(currentGame); // TODO: Get game first and get board number from it
       // console.log(remoteDoors);
 
       updateDoorsFromChain(remoteDoors);
       // console.log("Locally, doors are", doors);
 
-
-      const remoteBoard = await mapContract_read.extGetBoard(gameNumber);
+      const remoteBoard = await mapContract_read.extGetBoard(currentGame);
       // console.log(remoteBoard);
       updateBoardFromChain(remoteBoard);
 
-      await updateRemotePlayers(gameNumber);
+      await updateRemotePlayers(currentGame);
 
       setLoading(false);
     }
@@ -319,13 +339,24 @@ function App() {
             {renderMapWithDoors()}
           </Box>
         </Card>
+
       </Paper>
     )
   }
 
   return (
     <div className="App">
-      {renderMapArea()}
+      <Grid container spacing={0} columns={12}>
+        <Grid item xs={9}>
+           {renderMapArea()}
+        </Grid>
+        <Grid item xs={3}>
+          <Card>
+            <GamePanel />
+          </Card>
+        </Grid>
+      </Grid>
+
     </div>
   );
 }
