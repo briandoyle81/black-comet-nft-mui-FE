@@ -28,12 +28,14 @@ import { DoorInterface, DoorStatus } from './components/Doors';
 import Door from "./components/Doors";
 
 import Vent from "./assets/img/overlays/vent.png";
+import Player, { PlayerInterface } from './components/Player';
+import { Position } from './components/Utils';
 
 const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/RQa3QfZULvNhxYAurC0GyfvIdvi-elje");
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
 
 const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.address, roomTilesContractDeployData.abi, provider);
-// const gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
+const gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
 const lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
 const mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
 
@@ -92,6 +94,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
   const [doors, setDoors] = useState<DoorInterface[]>([]);
+  const [players, setPlayers] = useState<PlayerInterface[]>([]);
 
   // setLoading(false);
 
@@ -119,6 +122,39 @@ function App() {
     setDoors(newDoors);
   }
 
+  async function updateRemotePlayers(gameId: number) {
+    const newPlayers: PlayerInterface[] = [];
+
+    const playerIndexes = await gameContract_read.extGetGamePlayerIndexes(gameId);
+
+    for (let i = 0; i < playerIndexes.length; i++) {
+      const remotePlayer = await gameContract_read.players(playerIndexes[i]);
+      const { position } = remotePlayer;
+      const newPlayer: PlayerInterface = {
+        remoteId: playerIndexes[i],
+
+        owner: remotePlayer.owner,
+        charContractAddress: remotePlayer.charContractAddress,
+        characterId: remotePlayer.characterId,
+
+        position: position,
+
+        healthDmgTaken: remotePlayer.healthDmgTaken,
+        armorDmgTaken: remotePlayer.armorDmgTaken,
+        actionsTaken: remotePlayer.actionsTaken,
+
+        dataTokens: remotePlayer.dataTokens,
+        currentEffects: remotePlayer.currentEffects,
+        inventoryIDs: remotePlayer.inventoryIDs,
+
+        canHarmOthers: remotePlayer.canHarmOthers,
+        dead: remotePlayer.dead
+      }
+      newPlayers.push(newPlayer);
+    }
+    setPlayers(newPlayers);
+  }
+
   useEffect(() => {
     console.log("Start of useEffect");
     const loadGameBoard = async () => {
@@ -137,6 +173,8 @@ function App() {
       const remoteBoard = await mapContract_read.extGetBoard(gameNumber);
       // console.log(remoteBoard);
       updateBoardFromChain(remoteBoard);
+
+      await updateRemotePlayers(gameNumber);
 
       setLoading(false);
     }
@@ -160,6 +198,26 @@ function App() {
     }
   }
 
+  function renderPlayers(position: Position) {
+    const playerRenders: ReactNode[] = [];
+    console.log(players.length || "no players")
+    // TODO: Why isn't the loading mechanism catching no players?
+    if (players.length > 0) {
+      players.forEach((player: PlayerInterface) => { // TODO: any
+        // console.log(position, player.position)
+        if (position.row === player.position.row && position.col === player.position.col) {
+          playerRenders.push(
+            <>
+              <Player {...player} />
+            </>)
+            ;
+        }
+      });
+    }
+
+    return playerRenders;
+  }
+
   function renderRowWithDoors(row: number) {
     const rowWithDoors: ReactNode[] = [];
     gameTiles[row].forEach((tile: GameTileInterface, col) => {
@@ -172,6 +230,7 @@ function App() {
             />
             {/* {tile.roomId} */}
             {renderVent(tile.hasVent)}
+            {renderPlayers({row: row, col: col})}
           </Card>
         </Grid>
       ));
@@ -215,10 +274,17 @@ function App() {
   }
 
   function renderMapWithDoors() {
-    const rows: ReactNode[] = [];
+    // TODO: WHY DOESN"T THE "loading" STATE DO THIS????
     if (doors.length === 0) {
       return "Waiting for doors";
     }
+    if (players.length === 0) {
+      return "Waiting for players";
+    }
+    if (gameTiles.length === 0) {
+      return "Waiting for gameTiles"
+    }
+    const rows: ReactNode[] = [];
     gameTiles.forEach((rowData: GameTileInterface[], row) => {
       if (row < n - 1) {
         rows.push(
