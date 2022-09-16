@@ -18,7 +18,19 @@ export default function GameInfo(props: GameInfoInterface) {
         Current Player: {props.currentGame.currentPlayerTurnIndex.toString()}
         <Player {...{ player: props.currentPlayer, portrait: true }} />
         <Typography variant="body1">
-          Actions Taken: {props.currentPlayer.actionsTaken}
+          Owner: {props.currentPlayer.owner.toString()}
+        </Typography>
+        <Typography variant="body1">
+          ID Number: {props.currentPlayer.characterId.toString()}
+        </Typography>
+        <Typography variant="body1">
+          Actions Taken: {props.currentPlayer.actionsTaken.toString()}
+        </Typography>
+        <Typography variant="body1">
+          Data Tokens: {props.currentPlayer.dataTokens.toString()}
+        </Typography>
+        <Typography variant="body1">
+          Health Remaining: {props.currentPlayer.healthDmgTaken.toString()}
         </Typography>
       </Card>
     </Card>
