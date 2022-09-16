@@ -15,7 +15,7 @@ export default function GameInfo(props: GameInfoInterface) {
         Game Number: {props.currentGameNumber}
       </Typography>
       <Card>
-        Current Player: {props.currentGame.currentPlayerTurnIndex.toString()}
+        Current Player: {props.currentGameProps.currentPlayerTurnIndex.toString()}
         <Player {...{ player: props.currentPlayer, portrait: true }} />
         <Typography variant="body1">
           Owner: {props.currentPlayer.owner.toString()}

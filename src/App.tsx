@@ -37,6 +37,9 @@ declare var window: any;
 
 const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/RQa3QfZULvNhxYAurC0GyfvIdvi-elje");
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
+let playerSigner: any; //TODO: any
+let gameContract_write: any; // TODO: any
+let playerAddress: string;
 
 const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.address, roomTilesContractDeployData.abi, provider);
 const gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
@@ -94,8 +97,6 @@ const EmptyDoor: DoorInterface = {
   status: DoorStatus.NO_DOOR,
   rotate: false
 }
-
-const DEBUG_GAME_NUMBER = 0;  // TODO hardcoded game number
 
 // TODO: Why does it need negative, and why does it change size/scale
 const VentOverlay = styled(Card)(({ theme }) => ({
@@ -183,10 +184,10 @@ function App() {
       const provider2 = new ethers.providers.Web3Provider(window.ethereum, "any");
       // Prompt user for account connections
       await provider2.send("eth_requestAccounts", []);
-      var playerSigner = provider2.getSigner();
-      console.log("Account:", await playerSigner.getAddress());
+      playerSigner = provider2.getSigner();
+      playerAddress = await playerSigner.getAddress();
 
-      var gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
+      gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
     }
     const loadGameBoard = async () => {
       setLoading(true);
@@ -376,6 +377,9 @@ function App() {
     if (currentGame.mapContract === "") {
       return "Waiting for game"
     }
+    if (playerAddress === undefined) {
+      return "Waiting for game"
+    }
     return (loading ? "Loading..." :
       <Grid container spacing={0} columns={12}>
         <Grid item xs={9}>
@@ -385,8 +389,10 @@ function App() {
           <Card>
             <GamePanel
               currentPlayer={players[currentGame.currentPlayerTurnIndex]}
-              currentGame={currentGame}
+              currentGameProps={currentGame}
               currentGameNumber={currentGameNumber}
+              playerSignerAddress={playerAddress}
+              gameContract_write={gameContract_write}
             />
           </Card>
         </Grid>

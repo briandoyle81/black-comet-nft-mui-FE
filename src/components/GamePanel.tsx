@@ -5,6 +5,7 @@ import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import GameInfo from './GameInfo';
 import { PlayerInterface } from './Player';
+import ActionPicker from './ActionPicker';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -15,9 +16,11 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export interface GameInfoInterface {
-    currentPlayer: PlayerInterface,
-    currentGame: GameInterface,
-    currentGameNumber: number
+  currentPlayer: PlayerInterface,
+  currentGameProps: GameInterface,
+  currentGameNumber: number,
+  playerSignerAddress: string,
+  gameContract_write: any // TODO: Any
 }
 
 export interface GameInterface {
@@ -48,7 +51,7 @@ export default function GamePanel(props: GameInfoInterface) {
           <GameInfo {...props}/>
         </Grid>
         <Grid item xs={12}>
-          <Item>xs=4</Item>
+          <ActionPicker {...props}/>
         </Grid>
         <Grid item xs={12}>
           <Item>xs=4</Item>

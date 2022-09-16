@@ -33,7 +33,7 @@ export interface PlayerInterface {
   position: Position;
   // 20,000 to write a word vs. 3 to add numbers, will not store updated characteristics
   healthDmgTaken: number;
-  armorDmgTaken: number;
+  armorDmgTaken: number; // TODO: revise this system
   actionsTaken: number;
 
   dataTokens: number;
