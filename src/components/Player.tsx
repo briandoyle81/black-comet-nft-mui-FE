@@ -10,9 +10,18 @@ const PlayerOverlay = styled(Card)(({ theme }) => ({
   position: 'absolute',
   left: '-55%',
   bottom: '-55%',
-  scale: '15%',
+  scale: '20%',
   background: 'transparent'
 }));
+
+const Portrait = styled(Card)(({ theme }) => ({
+  // scale: '50%',
+  background: 'white'
+}));
+
+const ImageStyle = {
+  height: 150
+}
 
 export interface PlayerInterface {
   remoteId: number;
@@ -36,16 +45,17 @@ export interface PlayerInterface {
   dead: boolean;
 }
 
-export interface playerProps {
-  player: PlayerInterface
+export interface PlayerProps {
+  player: PlayerInterface,
+  portrait: boolean
 }
 
-export default function Player(props: PlayerInterface) {
+export default function Player(props: PlayerProps) {
 
   function getArtFromId() {
     // TODO: Create and get real NFT art
     // TODO: Handle more than four players
-    const tempId = props.remoteId % 4;
+    const tempId = props.player.remoteId % 4;
     if (tempId == 0) { // DO NOT USE ===!  Comparing number to bigNumber
       return Player0;
     } else if (tempId == 1) {
@@ -55,18 +65,35 @@ export default function Player(props: PlayerInterface) {
     } else if (tempId == 3) {
       return Player3;
     } else {
-      console.log("Bad Character ID:", props.remoteId)
+      console.log("Bad Character ID:", props.player.remoteId)
       throw ("Bad Character ID");
     }
   }
 
-  return (
-    <PlayerOverlay>
-      <CardMedia
-        image={getArtFromId()}
-        component="img"
-      />
-    </PlayerOverlay>
-  )
+  function renderPlayer(portrait: boolean) {
+    if (!portrait) {
+      return (
+        <PlayerOverlay>
+          <CardMedia
+            image={getArtFromId()}
+            component="img"
+          />
+        </PlayerOverlay>
+      )
+    } else {
+      return (
+        <Portrait>
+          <CardMedia>
+            <img src={getArtFromId()} style={ImageStyle} alt="TODO"/>
+          </CardMedia>
+        </Portrait>
+      )
+    }
+  }
 
+  return (
+    <>
+      { renderPlayer(props.portrait) }
+    </>
+  )
 }

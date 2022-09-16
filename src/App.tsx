@@ -32,6 +32,9 @@ import Player, { PlayerInterface } from './components/Player';
 import { Position } from './components/Utils';
 import GameInfo from './components/GameInfo';
 
+// TODO: Internet suggested hack to stop window.ethereum from being broken
+declare var window: any;
+
 const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/RQa3QfZULvNhxYAurC0GyfvIdvi-elje");
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
 
@@ -39,7 +42,7 @@ const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.a
 const gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
 const lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
 const mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
-
+// myContract_write = new ethers.Contract(address, abi, signer)    // Write only
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -107,8 +110,8 @@ function App() {
 
 
   const [loading, setLoading] = useState(false);
-  const [game, setGame] = useState(EmptyGame);
-  const [currentGame, setCurrentGame] = useState(0);
+  const [currentGame, setCurrentGame] = useState(EmptyGame);
+  const [currentGameNumber, setCurrentGameNumber] = useState(0);
   const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
   const [doors, setDoors] = useState<DoorInterface[]>([]);
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
@@ -175,32 +178,44 @@ function App() {
 
   useEffect(() => {
     console.log("Start of useEffect");
+    const loadWallet = async () => {
+      // TODO: Cleanup
+      const provider2 = new ethers.providers.Web3Provider(window.ethereum, "any");
+      // Prompt user for account connections
+      await provider2.send("eth_requestAccounts", []);
+      var playerSigner = provider2.getSigner();
+      console.log("Account:", await playerSigner.getAddress());
+
+      var gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
+    }
     const loadGameBoard = async () => {
       setLoading(true);
       // const boardSize = await gameContract_read.BOARD_SIZE();
       // console.log(boardSize);
 
-      const remoteGame = await gameContract_read.games(currentGame);
-      setGame(remoteGame);
-      console.log(game);
+      const remoteGame = await gameContract_read.games(currentGameNumber);
+      setCurrentGame(remoteGame);
+      // console.log(currentGame);
 
-      const remoteDoors = await mapContract_read.extGetDoors(currentGame); // TODO: Get game first and get board number from it
+      const remoteDoors = await mapContract_read.extGetDoors(currentGameNumber); // TODO: Get game first and get board number from it
       // console.log(remoteDoors);
 
       updateDoorsFromChain(remoteDoors);
       // console.log("Locally, doors are", doors);
 
-      const remoteBoard = await mapContract_read.extGetBoard(currentGame);
+      const remoteBoard = await mapContract_read.extGetBoard(currentGameNumber);
       // console.log(remoteBoard);
       updateBoardFromChain(remoteBoard);
 
-      await updateRemotePlayers(currentGame);
+      await updateRemotePlayers(currentGameNumber);
 
       setLoading(false);
     }
 
     // Call the function
+    loadWallet();
     loadGameBoard();
+
   }, []);
 
   function renderVent(vent: boolean) {
@@ -229,7 +244,7 @@ function App() {
         if (position.row === player.position.row && position.col === player.position.col) {
           playerRenders.push(
             <>
-              <Player {...player} />
+              <Player {...{ player: player, portrait: false }} />
             </>)
             ;
         }
@@ -251,7 +266,7 @@ function App() {
             />
             {/* {tile.roomId} */}
             {renderVent(tile.hasVent)}
-            {renderPlayers({row: row, col: col})}
+            {renderPlayers({ row: row, col: col })}
           </Card>
         </Grid>
       ));
@@ -305,15 +320,18 @@ function App() {
     if (gameTiles.length === 0) {
       return "Waiting for gameTiles"
     }
+    if (currentGame.mapContract === "") {
+      return "Waiting for game"
+    }
     const rows: ReactNode[] = [];
     gameTiles.forEach((rowData: GameTileInterface[], row) => {
       if (row < n - 1) {
         rows.push(
           <>
-            <Grid container spacing={0} columns={(n*2)-1}>
+            <Grid container spacing={0} columns={(n * 2) - 1}>
               {renderRowWithDoors(row)}
             </Grid>
-            <Grid container spacing={0} columns={(n*2)-1}>
+            <Grid container spacing={0} columns={(n * 2) - 1}>
               {renderRowOfDoors(row)}
             </Grid>
           </>
@@ -321,7 +339,7 @@ function App() {
       } else { // Don't print a row of doors at the bottom
         rows.push(
           <>
-            <Grid container spacing={0} columns={(n*2)-1}>
+            <Grid container spacing={0} columns={(n * 2) - 1}>
               {renderRowWithDoors(row)}
             </Grid>
           </>
@@ -344,19 +362,41 @@ function App() {
     )
   }
 
-  return (
-    <div className="App">
+  function renderGameArea() {
+    // TODO: WHY DOESN"T THE "loading" STATE DO THIS????
+    if (doors.length === 0) {
+      return "Waiting for doors";
+    }
+    if (players.length === 0) {
+      return "Waiting for players";
+    }
+    if (gameTiles.length === 0) {
+      return "Waiting for gameTiles"
+    }
+    if (currentGame.mapContract === "") {
+      return "Waiting for game"
+    }
+    return (loading ? "Loading..." :
       <Grid container spacing={0} columns={12}>
         <Grid item xs={9}>
-           {renderMapArea()}
+          {renderMapArea()}
         </Grid>
         <Grid item xs={3}>
           <Card>
-            <GamePanel />
+            <GamePanel
+              currentPlayer={players[currentGame.currentPlayerTurnIndex]}
+              currentGame={currentGame}
+              currentGameNumber={currentGameNumber}
+            />
           </Card>
         </Grid>
       </Grid>
+    )
+  }
 
+  return ( loading ? <div>"Loading..."</div> :
+    <div className="App">
+      {renderGameArea()}
     </div>
   );
 }

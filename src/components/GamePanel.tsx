@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import GameInfo from './GameInfo';
+import { PlayerInterface } from './Player';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -12,6 +13,12 @@ const Item = styled(Paper)(({ theme }) => ({
   textAlign: 'center',
   color: theme.palette.text.secondary,
 }));
+
+export interface GameInfoInterface {
+    currentPlayer: PlayerInterface,
+    currentGame: GameInterface,
+    currentGameNumber: number
+}
 
 export interface GameInterface {
   // TODO: Should games just always be 3 or 4 players???
@@ -33,21 +40,20 @@ export interface GameInterface {
   // uint8 startPlayerIndex;
 }
 
-export default function GamePanel() {
+export default function GamePanel(props: GameInfoInterface) {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <GameInfo />
-      <Grid container spacing={2}>
-        <Grid item xs={8}>
-          <Item>xs=8</Item>
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          <GameInfo {...props}/>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12}>
           <Item>xs=4</Item>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12}>
           <Item>xs=4</Item>
         </Grid>
-        <Grid item xs={8}>
+        <Grid item xs={12}>
           <Item>xs=8</Item>
         </Grid>
       </Grid>
