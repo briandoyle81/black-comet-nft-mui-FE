@@ -68,10 +68,10 @@ const ArtMap = {
 export default function Door(props: DoorInterface) {
 
   function getDoorArt() {
-    if (props.vsBreach === 0) {
-      return Breached;
-    }
-    if (props.vsHack === 0) {
+    // if (props.vsBreach === 0) {
+    //   return Breached;
+    // }
+    if (props.vsHack === 0 && props.status != DoorStatus.BREACHED) {
       return Green;
     }
 

@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 
 // import { Image } from 'mui-image';
 
@@ -46,6 +46,31 @@ const gameContract_read = new ethers.Contract(gameContractDeployData.address, ga
 const lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
 const mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
 // myContract_write = new ethers.Contract(address, abi, signer)    // Write only
+
+// const gameEventFilter = {
+//   address: gameContractDeployData.address,
+//   topics: [
+//     utils.id("DiceRollEvent(uint,uint)"),
+//     utils.id("ActionCompleteEvent(BCTypes.Player,BCTypes.Action)")
+//   ]
+// }
+
+gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
+  console.log("Event Player", player);
+  console.log("Event Action", action);
+  // console.log("Event", event);
+  // updateDoorsFromChain();
+
+  // updateBoardFromChain();
+
+  // updateRemotePlayers(currentGameNumber);
+})
+
+gameContract_read.on("DiceRollEvent", (roll, against, event) => {
+  console.log("Roll Event Setter", roll);
+  console.log("Roll Event Data", against);
+  console.log("Roll Event", event);
+})
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -110,20 +135,41 @@ function App() {
   const n = 9; // TODO: Hardcoded board size, can't use await here
 
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [currentGame, setCurrentGame] = useState(EmptyGame);
   const [currentGameNumber, setCurrentGameNumber] = useState(0);
   const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
   const [doors, setDoors] = useState<DoorInterface[]>([]);
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
+  const [debugRerender, setDebugRerender] = useState(false);
 
 
   // setLoading(false);
 
-  function updateBoardFromChain(remoteBoard: any[]) {
+
+
+
+
+  useEffect(() => {
+    console.log("Start of useEffect");
+
+    const loadWallet = async () => {
+      // TODO: Cleanup
+      const provider2 = new ethers.providers.Web3Provider(window.ethereum, "any");
+      // Prompt user for account connections
+      await provider2.send("eth_requestAccounts", []);
+      playerSigner = provider2.getSigner();
+      playerAddress = await playerSigner.getAddress();
+
+      gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
+    }
+
+
+    async function updateBoardFromChain() {
+    const remoteBoard = await mapContract_read.extGetBoard(currentGameNumber);
     const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile));
 
-    remoteBoard.forEach((rowData: GameTileInterface[], row) => {
+    remoteBoard.forEach((rowData: GameTileInterface[], row: number) => {
       rowData.forEach((gameTile: GameTileInterface, col) => {
         localBoard[row][col] = gameTile;
       })
@@ -132,10 +178,13 @@ function App() {
     setGameTiles(localBoard);
   }
 
-  function updateDoorsFromChain(remoteDoors: any[]) {
+  async function updateDoorsFromChain() {
+    const remoteDoors = await mapContract_read.extGetDoors(currentGameNumber); // TODO: Get game first and get board number from it
+      // console.log(remoteDoors);
+
     const newDoors: DoorInterface[] = [];
 
-    remoteDoors.forEach((door: DoorInterface, index) => {
+    remoteDoors.forEach((door: DoorInterface, index: number) => {
       const newDoor: DoorInterface = { vsBreach: door.vsBreach, vsHack: door.vsHack, status: door.status, rotate: false };
       // newDoors[index] = newDoor;
       newDoors.push(newDoor);
@@ -177,18 +226,6 @@ function App() {
     setPlayers(newPlayers);
   }
 
-  useEffect(() => {
-    console.log("Start of useEffect");
-    const loadWallet = async () => {
-      // TODO: Cleanup
-      const provider2 = new ethers.providers.Web3Provider(window.ethereum, "any");
-      // Prompt user for account connections
-      await provider2.send("eth_requestAccounts", []);
-      playerSigner = provider2.getSigner();
-      playerAddress = await playerSigner.getAddress();
-
-      gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
-    }
     const loadGameBoard = async () => {
       setLoading(true);
       // const boardSize = await gameContract_read.BOARD_SIZE();
@@ -198,26 +235,24 @@ function App() {
       setCurrentGame(remoteGame);
       // console.log(currentGame);
 
-      const remoteDoors = await mapContract_read.extGetDoors(currentGameNumber); // TODO: Get game first and get board number from it
-      // console.log(remoteDoors);
+      await updateDoorsFromChain();
 
-      updateDoorsFromChain(remoteDoors);
-      // console.log("Locally, doors are", doors);
-
-      const remoteBoard = await mapContract_read.extGetBoard(currentGameNumber);
-      // console.log(remoteBoard);
-      updateBoardFromChain(remoteBoard);
+      await updateBoardFromChain();
 
       await updateRemotePlayers(currentGameNumber);
 
+      // Maybe need to have await tx.await() here?
       setLoading(false);
     }
+
+
+
 
     // Call the function
     loadWallet();
     loadGameBoard();
 
-  }, []);
+  }, [currentGameNumber]);
 
   function renderVent(vent: boolean) {
     if (vent) {
