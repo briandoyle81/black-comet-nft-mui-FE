@@ -21,6 +21,9 @@ export interface GameInfoInterface {
   currentGameNumber: number,
   playerSignerAddress: string,
   gameContract_write: any // TODO: Any
+  updateBoardFromChain: Function,
+  updateDoorsFromChain: Function,
+  updateRemotePlayers: Function
 }
 
 export interface GameInterface {

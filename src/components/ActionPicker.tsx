@@ -33,8 +33,8 @@ export default function ActionPicker(props: GameInfoInterface) {
     setSecondDir(+secondDir);
   };
 
-  const submitAction = () => {
-    props.gameContract_write.doAction(
+  const submitAction = async () => {
+    const actionTx = await props.gameContract_write.doAction(
       props.currentGameNumber,
       props.currentPlayer.remoteId,
       action,
@@ -42,6 +42,11 @@ export default function ActionPicker(props: GameInfoInterface) {
       firstDir,
       secondDir
     );
+
+    await actionTx.wait();
+    props.updateBoardFromChain();
+    props.updateDoorsFromChain();
+    props.updateRemotePlayers();
   };
 
   function isPlayerTurn(walletAddress: string, charOwner: string) {

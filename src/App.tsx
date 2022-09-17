@@ -55,23 +55,6 @@ const mapContract_read = new ethers.Contract(mapsContractDeployData.address, map
 //   ]
 // }
 
-gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
-  console.log("Event Player", player);
-  console.log("Event Action", action);
-  // console.log("Event", event);
-  // updateDoorsFromChain();
-
-  // updateBoardFromChain();
-
-  // updateRemotePlayers(currentGameNumber);
-})
-
-gameContract_read.on("DiceRollEvent", (roll, against, event) => {
-  console.log("Roll Event Setter", roll);
-  console.log("Roll Event Data", against);
-  console.log("Roll Event", event);
-})
-
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -136,47 +119,28 @@ function App() {
 
 
   const [loading, setLoading] = useState(true);
+  const [walletLoaded, setWalletLoaded] = useState(false);
   const [currentGame, setCurrentGame] = useState(EmptyGame);
   const [currentGameNumber, setCurrentGameNumber] = useState(0);
   const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
   const [doors, setDoors] = useState<DoorInterface[]>([]);
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
-  const [debugRerender, setDebugRerender] = useState(false);
 
 
   // setLoading(false);
 
+  async function updateBoardFromChain() {
+      const remoteBoard = await mapContract_read.extGetBoard(currentGameNumber);
+      const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile));
 
-
-
-
-  useEffect(() => {
-    console.log("Start of useEffect");
-
-    const loadWallet = async () => {
-      // TODO: Cleanup
-      const provider2 = new ethers.providers.Web3Provider(window.ethereum, "any");
-      // Prompt user for account connections
-      await provider2.send("eth_requestAccounts", []);
-      playerSigner = provider2.getSigner();
-      playerAddress = await playerSigner.getAddress();
-
-      gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
-    }
-
-
-    async function updateBoardFromChain() {
-    const remoteBoard = await mapContract_read.extGetBoard(currentGameNumber);
-    const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile));
-
-    remoteBoard.forEach((rowData: GameTileInterface[], row: number) => {
-      rowData.forEach((gameTile: GameTileInterface, col) => {
-        localBoard[row][col] = gameTile;
+      remoteBoard.forEach((rowData: GameTileInterface[], row: number) => {
+        rowData.forEach((gameTile: GameTileInterface, col) => {
+          localBoard[row][col] = gameTile;
+        })
       })
-    })
 
-    setGameTiles(localBoard);
-  }
+      setGameTiles(localBoard);
+    }
 
   async function updateDoorsFromChain() {
     const remoteDoors = await mapContract_read.extGetDoors(currentGameNumber); // TODO: Get game first and get board number from it
@@ -226,6 +190,40 @@ function App() {
     setPlayers(newPlayers);
   }
 
+  useEffect(() => {
+    console.log("Start of useEffect");
+
+    const loadWallet = async () => {
+      // TODO: Cleanup
+      console.log("Loading wallet");
+      const provider2 = new ethers.providers.Web3Provider(window.ethereum, "any");
+      // Prompt user for account connections
+      await provider2.send("eth_requestAccounts", []);
+      playerSigner = provider2.getSigner();
+      playerAddress = await playerSigner.getAddress();
+
+      gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
+      setWalletLoaded(true);
+
+      // TODO: Find appropriate home
+      gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
+        console.log("Event Player", player);
+        console.log("Event Action", action);
+        // console.log("Event", event);
+        updateDoorsFromChain();
+
+        updateBoardFromChain();
+        console.log("CurrentGameNumber", currentGameNumber);
+        updateRemotePlayers(currentGameNumber);
+      })
+
+      gameContract_read.on("DiceRollEvent", (roll, against, event) => {
+        console.log("Roll Event Setter", roll);
+        console.log("Roll Event Data", against);
+        console.log("Roll Event", event);
+      })
+    }
+
     const loadGameBoard = async () => {
       setLoading(true);
       // const boardSize = await gameContract_read.BOARD_SIZE();
@@ -243,16 +241,21 @@ function App() {
 
       // Maybe need to have await tx.await() here?
       setLoading(false);
+
     }
 
 
 
 
     // Call the function
-    loadWallet();
+    if (!walletLoaded) {
+      loadWallet();
+    }
+
     loadGameBoard();
 
   }, [currentGameNumber]);
+
 
   function renderVent(vent: boolean) {
     if (vent) {
@@ -428,6 +431,9 @@ function App() {
               currentGameNumber={currentGameNumber}
               playerSignerAddress={playerAddress}
               gameContract_write={gameContract_write}
+              updateBoardFromChain={updateBoardFromChain}
+              updateDoorsFromChain={updateDoorsFromChain}
+              updateRemotePlayers={updateRemotePlayers}
             />
           </Card>
         </Grid>

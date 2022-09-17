@@ -195,25 +195,25 @@ roomDisplayDataList.push({
   desc: "You think something just touched your leg!",
   art: TrashCompactor
 });
-roomDisplayDataList.push({
-  name: "Trash Compactor",
-  desc: "You think something just touched your leg!",
-  art: TrashCompactor
-});
-roomDisplayDataList.push({
-  name: "Trash Compactor",
-  desc: "You think something just touched your leg!",
-  art: TrashCompactor
-});
-roomDisplayDataList.push({
-  name: "Trash Compactor",
-  desc: "You think something just touched your leg!",
-  art: TrashCompactor
-});
-roomDisplayDataList.push({
-  name: "Trash Compactor",
-  desc: "You think something just touched your leg!",
-  art: TrashCompactor
-});
+// roomDisplayDataList.push({
+//   name: "Trash Compactor",
+//   desc: "You think something just touched your leg!",
+//   art: TrashCompactor
+// });
+// roomDisplayDataList.push({
+//   name: "Trash Compactor",
+//   desc: "You think something just touched your leg!",
+//   art: TrashCompactor
+// });
+// roomDisplayDataList.push({
+//   name: "Trash Compactor",
+//   desc: "You think something just touched your leg!",
+//   art: TrashCompactor
+// });
+// roomDisplayDataList.push({
+//   name: "Trash Compactor",
+//   desc: "You think something just touched your leg!",
+//   art: TrashCompactor
+// });
 
 export { roomDisplayDataList }
