@@ -45,6 +45,7 @@ let playerAddress: string;
 const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.address, roomTilesContractDeployData.abi, provider);
 const gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
 const lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
+const charContract_read = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
 const mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
 // myContract_write = new ethers.Contract(address, abi, signer)    // Write only
 
@@ -72,23 +73,7 @@ const Item = styled(Paper)(({ theme }) => ({
 // }
 
 
-// TODO: Find appropriate home
-// gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
-//   console.log("Event Player", player);
-//   console.log("Event Action", action);
-//   // console.log("Event", event);
-//   // updateDoorsFromChain();
 
-//   // updateBoardFromChain();
-//   // console.log("CurrentGameNumber", currentGameNumber);
-//   // updateRemotePlayers(currentGameNumber);
-// })
-
-// gameContract_read.on("DiceRollEvent", (roll, against, event) => {
-//   console.log("Roll Event Setter", roll);
-//   console.log("Roll Event Data", against);
-//   console.log("Roll Event", event);
-// })
 
 function App() {
 
@@ -98,10 +83,18 @@ function App() {
 
   const [currentGameNumber, setCurrentGameNumber] = useState(0);
 
+  const [eventFlipper, setEventFlipper] = useState(true);
+  const [lastDieRoll, setLastDieRoll] = useState(0);
+
   // setLoading(false);
+
+  function resetEventFlipper() {
+    setEventFlipper(false);
+  }
 
   useEffect(() => {
     console.log("Start of useEffect");
+
 
     const loadWallet = async () => {
       // TODO: Cleanup
@@ -114,14 +107,37 @@ function App() {
       playerAddress = await playerSigner.getAddress();
 
       gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
+
+
+      // TODO: Find appropriate home
+      gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
+        console.log("Event Player", player);
+        console.log("Event Action", action);
+        // console.log("Event", event);
+        // updateDoorsFromChain();
+
+        // updateBoardFromChain();
+        // console.log("CurrentGameNumber", currentGameNumber);
+        // updateRemotePlayers(currentGameNumber);
+        setEventFlipper(true);
+      })
+
+      gameContract_read.on("DiceRollEvent", (roll, against, event) => {
+        console.log("Roll Event roll", roll);
+        // console.log("Roll Event against", against);
+        // console.log("Roll Event", event);
+        setLastDieRoll(roll);
+      })
+
+
       setWalletLoaded(true);
       setLoading(false);
     }
 
     // Call the function
-    if (!walletLoaded) {
+
       loadWallet();
-    }
+
 
   },[]);
 
@@ -131,8 +147,12 @@ function App() {
         currentGameNumber={currentGameNumber}
         mapContract_read={mapContract_read}
         gameContract_read={gameContract_read}
+        charContract_read={charContract_read}
         playerSignerAddress={playerAddress}
         gameContract_write={gameContract_write}
+        eventFlipper={eventFlipper}
+        resetEventFlipper={resetEventFlipper}
+        lastDieRoll={lastDieRoll}
       />
     </div>
   );

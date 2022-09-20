@@ -42,11 +42,12 @@ export default function ActionPicker(props: GameInfoInterface) {
       firstDir,
       secondDir
     );
-
-    await actionTx.wait();
-    props.updateBoardFromChain();
-    props.updateDoorsFromChain();
-    props.updateRemotePlayers();
+    // Below works for the acting client, but not a hook, so others
+    // won't get the update
+    // await actionTx.wait();
+    // props.updateBoardFromChain();
+    // props.updateDoorsFromChain();
+    // props.updateRemotePlayers();
   };
 
   function isPlayerTurn(walletAddress: string, charOwner: string) {

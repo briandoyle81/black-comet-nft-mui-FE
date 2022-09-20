@@ -59,8 +59,33 @@ export interface GameBoardProps {
   currentGameNumber: number;
   mapContract_read: any;  // TODO anys
   gameContract_read: any;
+  charContract_read: any;
   playerSignerAddress: string;
   gameContract_write: any; // TODO: Any
+  eventFlipper: boolean;
+  resetEventFlipper: Function;
+  lastDieRoll: number
+}
+
+export interface TraitsInterface {
+  health: number;
+  carry: number;
+  defense: number;
+  hack: number;
+  breach: number;
+  shoot: number;
+  melee: number;
+}
+
+export interface CharInterface {
+  genHash: string; // TODO: Tie to universal inventory
+  traits: TraitsInterface;
+  cloneNumber: number;  // High but possibly reachable limit
+  maxClones: number; // Eventually exit them from the economy??
+  ability: number;
+  flaw: number;
+  inGame: boolean;
+  dead: boolean;
 }
 
 // TODO: Why does it need negative, and why does it change size/scale
@@ -80,8 +105,25 @@ export default function GameBoard(props: GameBoardProps) {
   const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
   const [doors, setDoors] = useState<DoorInterface[]>([]);
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
+  const [chars, setChars] = useState<CharInterface[]>([]);
 
-  async function updateBoardFromChain() {
+
+
+  useEffect(() => {
+    console.log("Start of useEffect in Board");
+    async function updateCharsFromChain() {
+      const updatedChars: CharInterface[] = [];
+      for (let i = 0; i < 4; i++) { // TODO: Hardcoded playernums
+        // const currentIndex = currentGame.playerIndexes[i];
+        // const remoteChar = await props.charContract_read.characters(players[currentIndex].characterId);
+        // console.log("Remote char", remoteChar)
+        // updatedChars.push(remoteChar);
+      }
+
+      setChars(updatedChars);
+    }
+
+    async function updateBoardFromChain() {
       const remoteBoard = await props.mapContract_read.extGetBoard(props.currentGameNumber);
       const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile));
 
@@ -94,70 +136,67 @@ export default function GameBoard(props: GameBoardProps) {
       setGameTiles(localBoard);
     }
 
-  async function updateDoorsFromChain() {
-    const remoteDoors = await props.mapContract_read.extGetDoors(props.currentGameNumber); // TODO: Get game first and get board number from it
+    async function updateDoorsFromChain() {
+      const remoteDoors = await props.mapContract_read.extGetDoors(props.currentGameNumber); // TODO: Get game first and get board number from it
       // console.log(remoteDoors);
 
-    const newDoors: DoorInterface[] = [];
+      const newDoors: DoorInterface[] = [];
 
-    remoteDoors.forEach((door: DoorInterface, index: number) => {
-      const newDoor: DoorInterface = { vsBreach: door.vsBreach, vsHack: door.vsHack, status: door.status, rotate: false };
-      // newDoors[index] = newDoor;
-      newDoors.push(newDoor);
-    });
+      remoteDoors.forEach((door: DoorInterface, index: number) => {
+        const newDoor: DoorInterface = { vsBreach: door.vsBreach, vsHack: door.vsHack, status: door.status, rotate: false };
+        // newDoors[index] = newDoor;
+        newDoors.push(newDoor);
+      });
 
-    setDoors(newDoors);
-  }
-
-  async function updateRemotePlayers() {
-    const newPlayers: PlayerInterface[] = [];
-
-    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
-
-    for (let i = 0; i < playerIndexes.length; i++) {
-      const remotePlayer = await props.gameContract_read.players(playerIndexes[i]);
-      const { position } = remotePlayer;
-      const newPlayer: PlayerInterface = {
-        remoteId: playerIndexes[i],
-
-        owner: remotePlayer.owner,
-        charContractAddress: remotePlayer.charContractAddress,
-        characterId: remotePlayer.characterId,
-
-        position: position,
-
-        healthDmgTaken: remotePlayer.healthDmgTaken,
-        armorDmgTaken: remotePlayer.armorDmgTaken,
-        actionsTaken: remotePlayer.actionsTaken,
-
-        dataTokens: remotePlayer.dataTokens,
-        currentEffects: remotePlayer.currentEffects,
-        inventoryIDs: remotePlayer.inventoryIDs,
-
-        canHarmOthers: remotePlayer.canHarmOthers,
-        dead: remotePlayer.dead
-      }
-      newPlayers.push(newPlayer);
+      setDoors(newDoors);
     }
-    setPlayers(newPlayers);
-  }
 
-  useEffect(() => {
-    console.log("Start of useEffect in Board");
+    async function updateRemotePlayers() {
+      const newPlayers: PlayerInterface[] = [];
+
+      const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
+
+      for (let i = 0; i < playerIndexes.length; i++) {
+        const remotePlayer = await props.gameContract_read.players(playerIndexes[i]);
+        const { position } = remotePlayer;
+        const newPlayer: PlayerInterface = {
+          remoteId: playerIndexes[i],
+
+          owner: remotePlayer.owner,
+          charContractAddress: remotePlayer.charContractAddress,
+          characterId: remotePlayer.characterId,
+
+          position: position,
+
+          healthDmgTaken: remotePlayer.healthDmgTaken,
+          armorDmgTaken: remotePlayer.armorDmgTaken,
+          actionsTaken: remotePlayer.actionsTaken,
+
+          dataTokens: remotePlayer.dataTokens,
+          currentEffects: remotePlayer.currentEffects,
+          inventoryIDs: remotePlayer.inventoryIDs,
+
+          canHarmOthers: remotePlayer.canHarmOthers,
+          dead: remotePlayer.dead
+        }
+        newPlayers.push(newPlayer);
+      }
+      setPlayers(newPlayers);
+    }
     const loadGameBoard = async () => {
-      setLoading(true);
-      // const boardSize = await gameContract_read.BOARD_SIZE();
-      // console.log(boardSize);
 
-      const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
-      setCurrentGame(remoteGame);
-      // console.log(currentGame);
 
-      await updateDoorsFromChain();
 
-      await updateBoardFromChain();
+      if (props.eventFlipper === true) {
+        const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
+        setCurrentGame(remoteGame);
+        await updateDoorsFromChain();
+        await updateBoardFromChain();
+        await updateRemotePlayers();
+        await updateCharsFromChain();
+        props.resetEventFlipper();
+      }
 
-      await updateRemotePlayers();
 
       // Maybe need to have await tx.await() here?
       setLoading(false);
@@ -167,7 +206,7 @@ export default function GameBoard(props: GameBoardProps) {
 
   }, [props]);
 
-    function renderVent(vent: boolean) {
+  function renderVent(vent: boolean) {
     if (vent) {
       return (
         <VentOverlay>
@@ -328,7 +367,10 @@ export default function GameBoard(props: GameBoardProps) {
     if (props.playerSignerAddress === undefined) {
       return "Waiting for game"
     }
-    return (loading ? "Loading..." :
+    // if (chars.length === 0) {
+    //   return "Waiting for chars";
+    // }
+    return (loading ? "Loading Game Area..." :
       <Grid container spacing={0} columns={12}>
         <Grid item xs={9}>
           {renderMapArea()}
@@ -337,13 +379,12 @@ export default function GameBoard(props: GameBoardProps) {
           <Card>
             <GamePanel
               currentPlayer={players[currentGame.currentPlayerTurnIndex]}
+              currentChar={chars[currentGame.currentPlayerTurnIndex]}
               currentGameProps={currentGame}
               currentGameNumber={props.currentGameNumber}
               playerSignerAddress={props.playerSignerAddress}
               gameContract_write={props.gameContract_write}
-              updateBoardFromChain={updateBoardFromChain}
-              updateDoorsFromChain={updateDoorsFromChain}
-              updateRemotePlayers={updateRemotePlayers}
+              lastDieRoll={props.lastDieRoll}
             />
           </Card>
         </Grid>
@@ -351,7 +392,7 @@ export default function GameBoard(props: GameBoardProps) {
     )
   }
 
-  return ( loading ? <div>"Loading..."</div> :
+  return ( loading ? <div>"Loading Board..."</div> :
     <div className="App">
       {renderGameArea()}
     </div>

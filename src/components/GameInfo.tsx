@@ -1,22 +1,41 @@
-import { Card, Typography } from "@mui/material";
+import { Card, Grid, Typography } from "@mui/material";
 import { GameInterface, GameInfoInterface } from "./GamePanel";
 import Player, { PlayerInterface } from "./Player";
-
-
 
 export default function GameInfo(props: GameInfoInterface) {
 
   return (
     <Card>
-      <Typography variant="h5">
-        Game Info
-      </Typography>
-      <Typography variant="body1">
-        Game Number: {props.currentGameNumber}
-      </Typography>
+      <Grid container spacing={0}>
+        <Grid item xs={12}>
+          <Typography variant="h5">
+            Game Info
+          </Typography>
+          <Typography variant="body1">
+            Game Number: {props.currentGameNumber}
+          </Typography>
+          <Typography variant="body1">
+            Current Player: {props.currentGameProps.currentPlayerTurnIndex.toString()}
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Grid container spacing={0}>
+            <Grid item xs={6}>
+              <Player {...{ player: props.currentPlayer, portrait: true }} />
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1">
+                Stat1: {1}
+              </Typography>
+              <Typography variant="body1">
+                {/* Damage Taken: {props.currentPlayer.healthDmgTaken.toString()} / {props.currentChar.traits.health} */}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+
       <Card>
-        Current Player: {props.currentGameProps.currentPlayerTurnIndex.toString()}
-        <Player {...{ player: props.currentPlayer, portrait: true }} />
         <Typography variant="body1">
           Owner: {props.currentPlayer.owner.toString()}
         </Typography>
@@ -29,9 +48,7 @@ export default function GameInfo(props: GameInfoInterface) {
         <Typography variant="body1">
           Data Tokens: {props.currentPlayer.dataTokens.toString()}
         </Typography>
-        <Typography variant="body1">
-          Health Remaining: {props.currentPlayer.healthDmgTaken.toString()}
-        </Typography>
+
       </Card>
     </Card>
   )

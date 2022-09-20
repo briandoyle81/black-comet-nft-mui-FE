@@ -6,6 +6,8 @@ import Grid from '@mui/material/Grid';
 import GameInfo from './GameInfo';
 import { PlayerInterface } from './Player';
 import ActionPicker from './ActionPicker';
+import { CharInterface } from './Board';
+import { Typography } from '@mui/material';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -17,13 +19,12 @@ const Item = styled(Paper)(({ theme }) => ({
 
 export interface GameInfoInterface {
   currentPlayer: PlayerInterface,
+  currentChar: CharInterface,
   currentGameProps: GameInterface,
   currentGameNumber: number,
   playerSignerAddress: string,
-  gameContract_write: any // TODO: Any
-  updateBoardFromChain: Function,
-  updateDoorsFromChain: Function,
-  updateRemotePlayers: Function
+  gameContract_write: any, // TODO: Any
+  lastDieRoll: Number
 }
 
 export interface GameInterface {
@@ -60,7 +61,12 @@ export default function GamePanel(props: GameInfoInterface) {
           <Item>xs=4</Item>
         </Grid>
         <Grid item xs={12}>
-          <Item>xs=8</Item>
+          <Typography variant="body1">
+            Last Roll:
+          </Typography>
+          <Typography variant="h3">
+            {props.lastDieRoll.toString()}
+          </Typography>
         </Grid>
       </Grid>
     </Box>
