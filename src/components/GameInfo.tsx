@@ -25,10 +25,25 @@ export default function GameInfo(props: GameInfoInterface) {
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">
-                Stat1: {1}
+                Dmg. Taken: {props.currentPlayer.healthDmgTaken.toString()}/{props.currentChar.traits.health}
               </Typography>
               <Typography variant="body1">
-                {/* Damage Taken: {props.currentPlayer.healthDmgTaken.toString()} / {props.currentChar.traits.health} */}
+                Carrying: TODO/{props.currentChar.traits.carry}
+              </Typography>
+              <Typography variant="body1">
+                Defense: {props.currentChar.traits.defense}
+              </Typography>
+              <Typography variant="body1">
+                Vs. Hack: {props.currentChar.traits.hack}
+              </Typography>
+              <Typography variant="body1">
+                Vs. Breach: {props.currentChar.traits.breach}
+              </Typography>
+              <Typography variant="body1">
+                Shoot: {props.currentChar.traits.shoot}
+              </Typography>
+              <Typography variant="body1">
+                Melee: {props.currentChar.traits.melee}
               </Typography>
             </Grid>
           </Grid>
