@@ -106,18 +106,20 @@ export default function GameBoard(props: GameBoardProps) {
   const [doors, setDoors] = useState<DoorInterface[]>([]);
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
   const [chars, setChars] = useState<CharInterface[]>([]);
-
+  const [gameLoaded, setGameLoaded] = useState(false);
 
 
   useEffect(() => {
     console.log("Start of useEffect in Board");
     async function updateCharsFromChain() {
       const updatedChars: CharInterface[] = [];
-      for (let i = 0; i < 4; i++) { // TODO: Hardcoded playernums
-        // const currentIndex = currentGame.playerIndexes[i];
-        // const remoteChar = await props.charContract_read.characters(players[currentIndex].characterId);
-        // console.log("Remote char", remoteChar)
-        // updatedChars.push(remoteChar);
+      // TODO: Get the cached char id list instead of loading it
+      const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
+
+      for (let i = 0; i < playerIndexes.length; i++) {
+        const remotePlayer = await props.gameContract_read.players(playerIndexes[i]);
+        const remoteChar = await props.charContract_read.characters(remotePlayer.characterId);
+        updatedChars.push(remoteChar);
       }
 
       setChars(updatedChars);
@@ -183,18 +185,22 @@ export default function GameBoard(props: GameBoardProps) {
       }
       setPlayers(newPlayers);
     }
+
     const loadGameBoard = async () => {
 
-
-
       if (props.eventFlipper === true) {
-        const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
-        setCurrentGame(remoteGame);
         await updateDoorsFromChain();
         await updateBoardFromChain();
         await updateRemotePlayers();
-        await updateCharsFromChain();
+
         props.resetEventFlipper();
+      }
+
+      if (gameLoaded === false) {
+        const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
+        setCurrentGame(remoteGame);
+        await updateCharsFromChain();
+        setGameLoaded(true);
       }
 
 

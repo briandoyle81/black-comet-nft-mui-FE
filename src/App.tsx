@@ -122,8 +122,9 @@ function App() {
         setEventFlipper(true);
       })
 
-      gameContract_read.on("DiceRollEvent", (roll, against, event) => {
+      gameContract_read.on("DiceRollEvent", (roll, forValue, against, event) => {
         console.log("Roll Event roll", roll);
+        // console.log("Roll event forValue", forValue);
         // console.log("Roll Event against", against);
         // console.log("Roll Event", event);
         setLastDieRoll(roll);
