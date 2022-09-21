@@ -7,12 +7,17 @@ import { styled } from '@mui/material/styles';
 import { Position } from './Utils';
 
 const PlayerOverlay = styled(Card)(({ theme }) => ({
-  position: 'absolute',
-  left: '-55%',
-  bottom: '-55%',
-  scale: '20%',
+  // position: 'absolute',
+  // left: '-55%',
+  // bottom: '-55%',
+  scale: '30%',
   background: 'transparent'
 }));
+
+const PlayerStyle = {
+  zIndex: 1200, // TODO
+  width: '25%'
+}
 
 const Portrait = styled(Card)(({ theme }) => ({
   // scale: '50%',
@@ -73,12 +78,9 @@ export default function Player(props: PlayerProps) {
   function renderPlayer(portrait: boolean) {
     if (!portrait) {
       return (
-        <PlayerOverlay>
-          <CardMedia
-            image={getArtFromId()}
-            component="img"
-          />
-        </PlayerOverlay>
+
+          <img src={getArtFromId()} style={PlayerStyle} alt="TODO PLAYER"/>
+
       )
     } else {
       return (

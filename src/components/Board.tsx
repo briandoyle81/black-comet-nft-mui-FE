@@ -19,6 +19,13 @@ import Player, { PlayerInterface } from './Player';
 import { Position } from './Utils';
 import GameInfo from './GameInfo';
 
+
+const PlayersBox = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  left: '0',
+  top: '0',
+  background: 'transparent'
+}));
 // TODO: Move interfaces to util file?
 export interface GameTileInterface {
   roomId: number,
@@ -237,15 +244,19 @@ export default function GameBoard(props: GameBoardProps) {
         // console.log(position, player.position)
         if (position.row === player.position.row && position.col === player.position.col) {
           playerRenders.push(
-            <>
+
               <Player {...{ player: player, portrait: false }} />
-            </>)
+            )
             ;
         }
       });
     }
 
-    return playerRenders;
+    return (
+      <PlayersBox>
+        { playerRenders }
+      </PlayersBox>
+    );
   }
 
   function renderRowWithDoors(row: number) {
