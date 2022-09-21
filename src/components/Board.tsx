@@ -19,6 +19,7 @@ import Player, { PlayerInterface } from './Player';
 import { Position } from './Utils';
 import GameInfo from './GameInfo';
 
+const DISPLAY_COLUMNS = 13;
 
 const PlayersBox = styled(Box)(({ theme }) => ({
   position: 'absolute',
@@ -333,10 +334,10 @@ export default function GameBoard(props: GameBoardProps) {
       if (row < n - 1) {
         rows.push(
           <>
-            <Grid container spacing={0} columns={(n * 2) - 1}>
+            <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
               {renderRowWithDoors(row)}
             </Grid>
-            <Grid container spacing={0} columns={(n * 2) - 1}>
+            <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
               {renderRowOfDoors(row)}
             </Grid>
           </>
@@ -344,7 +345,7 @@ export default function GameBoard(props: GameBoardProps) {
       } else { // Don't print a row of doors at the bottom
         rows.push(
           <>
-            <Grid container spacing={0} columns={(n * 2) - 1}>
+            <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
               {renderRowWithDoors(row)}
             </Grid>
           </>
@@ -388,7 +389,7 @@ export default function GameBoard(props: GameBoardProps) {
     //   return "Waiting for chars";
     // }
     return (loading ? "Loading Game Area..." :
-      <Grid container spacing={0} columns={12}>
+      <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
         <Grid item xs={9}>
           {renderMapArea()}
         </Grid>
