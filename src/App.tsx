@@ -32,6 +32,7 @@ import Player, { PlayerInterface } from './components/Player';
 import { Position } from './components/Utils';
 import GameInfo from './components/GameInfo';
 import GameBoard from './components/Board';
+import { render } from '@testing-library/react';
 
 // TODO: Internet suggested hack to stop window.ethereum from being broken
 declare var window: any;
@@ -57,6 +58,8 @@ const mapContract_read = new ethers.Contract(mapsContractDeployData.address, map
 //   ]
 // }
 
+enum AppState { GAMES = 0, LOBBIES, CHARS}
+
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -76,9 +79,8 @@ const Item = styled(Paper)(({ theme }) => ({
 
 
 function App() {
-
-
-  const [loading, setLoading] = useState(true);
+  const [appState, setAppState] = useState(AppState.GAMES);
+  const [appLoading, setAppLoading] = useState(true);
   const [walletLoaded, setWalletLoaded] = useState(false);
 
   const [currentGameNumber, setCurrentGameNumber] = useState(0);
@@ -131,7 +133,7 @@ function App() {
 
 
       setWalletLoaded(true);
-      setLoading(false);
+      setAppLoading(false);
     }
 
     // Call the function
@@ -140,11 +142,14 @@ function App() {
       loadWallet();
     }
 
-  },[currentGameNumber, walletLoaded]);
+  }, [currentGameNumber, walletLoaded]);
 
-  return ( loading ? <div>"Loading Wallet..."</div> :
-    <div className="App">
-      <GameBoard
+
+  function renderApp() {
+    if (appState === AppState.GAMES) {
+      console.log("Rendering game");
+      return (
+        <GameBoard
         currentGameNumber={currentGameNumber}
         mapContract_read={mapContract_read}
         gameContract_read={gameContract_read}
@@ -156,6 +161,15 @@ function App() {
         lastDieRoll={lastDieRoll}
         setCurrentGameNumber={setCurrentGameNumber}
       />
+      );
+    }
+
+    return (<></>)
+  }
+
+  return ( appLoading ? <div>"Loading Wallet..."</div> :
+    <div className="App">
+      {renderApp()}
     </div>
   );
 }
