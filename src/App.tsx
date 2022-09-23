@@ -17,7 +17,7 @@ import roomTilesContractDeployData from "./deployments/RoomTiles.json";
 import charContractDeployData from "./deployments/BCChars.json";
 import itemsContractDeployData from "./deployments/BCItems.json";
 import gameContractDeployData from "./deployments/BCGames.json";
-import utilsContractDeployData from "./deployments/BCGames.json";
+// import utilsContractDeployData from "./deployments/BCGames.json";
 import mapsContractDeployData from "./deployments/Maps.json";
 import lobbiesContractDeployData from "./deployments/Lobby.json";
 
@@ -36,13 +36,13 @@ import GameBoard from './components/Board';
 // TODO: Internet suggested hack to stop window.ethereum from being broken
 declare var window: any;
 
-const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/RQa3QfZULvNhxYAurC0GyfvIdvi-elje");
+const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP");
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
 let playerSigner: any; //TODO: any
 let gameContract_write: any; // TODO: any
 let playerAddress: string;
 
-const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.address, roomTilesContractDeployData.abi, provider);
+// const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.address, roomTilesContractDeployData.abi, provider);
 const gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
 const lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
 const charContract_read = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
@@ -95,10 +95,9 @@ function App() {
   useEffect(() => {
     console.log("Start of useEffect");
 
-
     const loadWallet = async () => {
       // TODO: Cleanup
-      setLoading(true);
+      // setLoading(true);
       console.log("Loading wallet");
       const provider2 = new ethers.providers.Web3Provider(window.ethereum, "any");
       // Prompt user for account connections
@@ -136,11 +135,12 @@ function App() {
     }
 
     // Call the function
-
+    if (!walletLoaded) {
+      console.log("Loading wallet")
       loadWallet();
+    }
 
-
-  },[]);
+  },[currentGameNumber, walletLoaded]);
 
   return ( loading ? <div>"Loading Wallet..."</div> :
     <div className="App">
@@ -154,6 +154,7 @@ function App() {
         eventFlipper={eventFlipper}
         resetEventFlipper={resetEventFlipper}
         lastDieRoll={lastDieRoll}
+        setCurrentGameNumber={setCurrentGameNumber}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import { Card, CardMedia } from '@mui/material';
+import { Button, Card, CardMedia, TextField } from '@mui/material';
 import React, { ReactNode, useEffect, useState } from 'react';
 import GamePanel, { GameInterface } from './GamePanel';
 import { styled } from '@mui/material/styles';
@@ -73,6 +73,7 @@ export interface GameBoardProps {
   eventFlipper: boolean;
   resetEventFlipper: Function;
   lastDieRoll: number
+  setCurrentGameNumber: Function;
 }
 
 export interface TraitsInterface {
@@ -115,7 +116,7 @@ export default function GameBoard(props: GameBoardProps) {
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
   const [chars, setChars] = useState<CharInterface[]>([]);
   const [gameLoaded, setGameLoaded] = useState(false);
-
+  const [formGameNumber, setFormGameNumber] = useState(props.currentGameNumber);
 
   useEffect(() => {
     console.log("Start of useEffect in Board");
@@ -196,12 +197,14 @@ export default function GameBoard(props: GameBoardProps) {
 
     const loadGameBoard = async () => {
 
-      if (props.eventFlipper === true) {
+      if (props.eventFlipper === true || gameLoaded === false) {
         await updateDoorsFromChain();
         await updateBoardFromChain();
         await updateRemotePlayers();
 
-        props.resetEventFlipper();
+        if (props.eventFlipper) {
+          props.resetEventFlipper();
+        }
       }
 
       if (gameLoaded === false) {
@@ -218,7 +221,13 @@ export default function GameBoard(props: GameBoardProps) {
     }
     loadGameBoard();
 
-  }, [props]);
+  }, [props, gameLoaded]);
+
+  function onUpdateGameClick() {
+    setGameLoaded(false);
+    setLoading(true);
+    props.setCurrentGameNumber(formGameNumber);
+  }
 
   function renderVent(vent: boolean) {
     if (vent) {
@@ -246,8 +255,8 @@ export default function GameBoard(props: GameBoardProps) {
         if (position.row === player.position.row && position.col === player.position.col) {
           playerRenders.push(
 
-              <Player {...{ player: player, portrait: false }} />
-            )
+            <Player {...{ player: player, portrait: false }} />
+          )
             ;
         }
       });
@@ -255,7 +264,7 @@ export default function GameBoard(props: GameBoardProps) {
 
     return (
       <PlayersBox>
-        { playerRenders }
+        {playerRenders}
       </PlayersBox>
     );
   }
@@ -395,6 +404,23 @@ export default function GameBoard(props: GameBoardProps) {
         </Grid>
         <Grid item xs={3}>
           <Card>
+            <Box
+              component="form"
+              sx={{
+                '& > :not(style)': { m: 1, width: '25ch' },
+              }}
+              noValidate
+              autoComplete="off"
+            >
+              <TextField
+                id="game-number"
+                label="Game Number"
+                variant="outlined"
+                value={formGameNumber}
+                onChange={(event) => {setFormGameNumber(Number(event.target.value))}}
+              />
+              <Button variant="contained" onClick={onUpdateGameClick}>Submit</Button>
+            </Box>
             <GamePanel
               currentPlayer={players[currentGame.currentPlayerTurnIndex]}
               currentChar={chars[currentGame.currentPlayerTurnIndex]}
@@ -410,7 +436,7 @@ export default function GameBoard(props: GameBoardProps) {
     )
   }
 
-  return ( loading ? <div>"Loading Board..."</div> :
+  return (loading ? <div>"Loading Board..."</div> :
     <div className="App">
       {renderGameArea()}
     </div>
