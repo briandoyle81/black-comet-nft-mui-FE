@@ -6,7 +6,7 @@ import Open from "../assets/img/doors/open.png";
 import Red from "../assets/img/doors/red.png";
 import Wall from "../assets/img/doors/wall.png";
 import Window from "../assets/img/doors/window.png";
-import { Card, CardMedia, Grid, Typography } from '@mui/material';
+import { Box, Card, CardMedia, Grid, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 
@@ -82,13 +82,13 @@ export default function Door(props: DoorInterface) {
   function renderDoorStats(door: DoorInterface) {
     if (door.status === DoorStatus.OPEN || door.status === DoorStatus.CLOSED) {
       return (
-        <>
+        <Box>
           <H_vsHack>{props.vsHack}</H_vsHack>
           <H_vsBreach>{props.vsBreach}</H_vsBreach>
-        </>
+        </Box>
       )
     } else {
-      return(<></>)
+      return(<Box></Box>)
     }
   }
   // TODO: This method of rotation is adding padding and putting drop shadow in incorrect orientation

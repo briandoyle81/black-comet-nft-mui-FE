@@ -2,7 +2,7 @@ import Player0 from "../assets/img/chars/Nellie.png";
 import Player1 from "../assets/img/chars/Amir.png";
 import Player2 from "../assets/img/chars/Brock.png";
 import Player3 from "../assets/img/chars/Doc.png";
-import { Card, CardMedia } from "@mui/material";
+import { Box, Card, CardMedia } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import { Position } from './Utils';
 
@@ -94,8 +94,8 @@ export default function Player(props: PlayerProps) {
   }
 
   return (
-    <>
+    <Box>
       { renderPlayer(props.portrait) }
-    </>
+    </Box>
   )
 }

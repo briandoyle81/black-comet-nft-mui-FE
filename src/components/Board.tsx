@@ -240,22 +240,21 @@ export default function GameBoard(props: GameBoardProps) {
         </VentOverlay>
       )
     } else {
-      return (<></>)
+      return (<Box></Box>)
     }
   }
 
-  // TODO: Rewrite to put players in a row
   function renderPlayers(position: Position) {
     const playerRenders: ReactNode[] = [];
     // console.log(players.length || "no players")
     // TODO: Why isn't the loading mechanism catching no players?
     if (players.length > 0) {
-      players.forEach((player: PlayerInterface) => { // TODO: any
+      players.forEach((player: PlayerInterface, index) => { // TODO: any
         // console.log(position, player.position)
         if (position.row === player.position.row && position.col === player.position.col) {
           playerRenders.push(
 
-            <Player {...{ player: player, portrait: false }} />
+            <Player key={index+"player"} {...{ player: player, portrait: false }} />
           )
             ;
         }
@@ -272,8 +271,9 @@ export default function GameBoard(props: GameBoardProps) {
   function renderRowWithDoors(row: number) {
     const rowWithDoors: ReactNode[] = [];
     gameTiles[row].forEach((tile: GameTileInterface, col) => {
+      const itemKey = row + "," + col;
       rowWithDoors.push((
-        <Grid item xs={1}>
+        <Grid item xs={1} key={itemKey}>
           <Card sx={{ position: 'relative' }}>
             <CardMedia
               image={roomDisplayDataList[tile.roomId].art}
@@ -287,7 +287,14 @@ export default function GameBoard(props: GameBoardProps) {
       ));
 
       if (col < n - 1) {
-        rowWithDoors.push(<Door vsBreach={doors[tile.doors[2]].vsBreach} vsHack={doors[tile.doors[2]].vsHack} status={doors[tile.doors[2]].status} rotate={true} />);
+        rowWithDoors.push(
+          <Door
+            vsBreach={doors[tile.doors[2]].vsBreach}
+            vsHack={doors[tile.doors[2]].vsHack}
+            status={doors[tile.doors[2]].status}
+            rotate={true}
+            key={itemKey+"door"}
+          />);
       }
     })
     return rowWithDoors;
@@ -298,14 +305,22 @@ export default function GameBoard(props: GameBoardProps) {
     const rowOfDoors: ReactNode[] = [];
     // Start with a small, empty item to offset doors for alignment
     rowOfDoors.push((
-      <Grid item xs={.25}>
+      <Grid item xs={.25} key={row+"starter"}>
         <Card>
 
         </Card>
       </Grid>
     ));
     gameTiles[row].forEach((tile: GameTileInterface, col) => {
-      rowOfDoors.push(<Door vsBreach={doors[tile.doors[1]].vsBreach} vsHack={doors[tile.doors[1]].vsHack} status={doors[tile.doors[1]].status} rotate={false} />);
+      const itemKey = row + "," + col;
+      rowOfDoors.push(
+        <Door
+          vsBreach={doors[tile.doors[1]].vsBreach}
+          vsHack={doors[tile.doors[1]].vsHack}
+          status={doors[tile.doors[1]].status}
+          rotate={false}
+          key={itemKey+"door"}
+        />);
 
 
       // Push an "empty" card to maintain grid, except the last
@@ -342,22 +357,22 @@ export default function GameBoard(props: GameBoardProps) {
     gameTiles.forEach((rowData: GameTileInterface[], row) => {
       if (row < n - 1) {
         rows.push(
-          <>
+          <Box key={row}>
             <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
               {renderRowWithDoors(row)}
             </Grid>
             <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
               {renderRowOfDoors(row)}
             </Grid>
-          </>
+          </Box>
         );
       } else { // Don't print a row of doors at the bottom
         rows.push(
-          <>
+          <Box key={row}>
             <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
               {renderRowWithDoors(row)}
             </Grid>
-          </>
+          </Box>
         );
       }
     })
@@ -437,7 +452,7 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   return (loading ? <div>"Loading Board..."</div> :
-    <div className="App">
+    <div>
       {renderGameArea()}
     </div>
   );

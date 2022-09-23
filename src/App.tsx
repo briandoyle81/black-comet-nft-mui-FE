@@ -164,7 +164,7 @@ function App() {
       );
     }
 
-    return (<></>)
+    return (<Box></Box>)
   }
 
   return ( appLoading ? <div>"Loading Wallet..."</div> :
