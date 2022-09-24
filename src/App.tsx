@@ -33,6 +33,7 @@ import { Position } from './components/Utils';
 import GameInfo from './components/GameInfo';
 import GameBoard from './components/Board';
 import { render } from '@testing-library/react';
+import Characters from './components/Characters';
 
 // TODO: Internet suggested hack to stop window.ethereum from being broken
 declare var window: any;
@@ -41,6 +42,7 @@ const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
 let playerSigner: any; //TODO: any
 let gameContract_write: any; // TODO: any
+let charContract_write: any;
 let playerAddress: string;
 
 // const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.address, roomTilesContractDeployData.abi, provider);
@@ -75,11 +77,8 @@ const Item = styled(Paper)(({ theme }) => ({
 //   rotate: false
 // }
 
-
-
-
 function App() {
-  const [appState, setAppState] = useState(AppState.GAMES);
+  const [appState, setAppState] = useState(AppState.CHARS);
   const [appLoading, setAppLoading] = useState(true);
   const [walletLoaded, setWalletLoaded] = useState(false);
 
@@ -108,7 +107,7 @@ function App() {
       playerAddress = await playerSigner.getAddress();
 
       gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
-
+      charContract_write = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, playerSigner);
 
       // TODO: Find appropriate home
       gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
@@ -162,6 +161,14 @@ function App() {
         setCurrentGameNumber={setCurrentGameNumber}
       />
       );
+    } else if (appState === AppState.CHARS) {
+      return (
+        <Characters
+          charContract_read={charContract_read}
+          charContract_write={charContract_write}
+          address={playerAddress}
+        />
+      )
     }
 
     return (<Box></Box>)
