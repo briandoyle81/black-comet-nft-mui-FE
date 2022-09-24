@@ -1,5 +1,6 @@
-import { Card, Typography } from "@mui/material";
+import { Button, Card, Typography } from "@mui/material";
 import { Box } from "@mui/system"
+import { ethers } from "ethers";
 import { ReactNode, useEffect, useState } from "react";
 import { CharInterface } from "./Board";
 
@@ -37,6 +38,13 @@ export default function Characters(props: CharactersDataInterface) {
     }
 
   }, [props.address, charsLoaded, props.charContract_read]);
+
+  async function handleDecantClick() {
+    const tx = await props.charContract_write.decantNewClone({ value: ethers.utils.parseEther(".01") });
+    console.log(tx);
+    await tx.wait();
+    setCharsLoaded(false);
+  }
 
   function renderCharData() {
     const charList: ReactNode[] = []
@@ -83,6 +91,7 @@ export default function Characters(props: CharactersDataInterface) {
 
   return (
     <Box>
+      <Button variant="contained" onClick={handleDecantClick}>Buy New Character NFT</Button>
       <Typography variant="body1">
         Owned Characters: {chars.length}
       </Typography>
