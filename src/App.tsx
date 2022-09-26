@@ -1,15 +1,11 @@
-import { Card, CardMedia, FormControl, InputLabel, MenuItem, Select, Tab, Tabs, Typography } from '@mui/material';
-import React, { ReactNode, useEffect, useState } from 'react';
+import {Tab, Tabs } from '@mui/material';
+import React, { useEffect, useState } from 'react';
 import './App.css';
-import GamePanel, { GameInterface } from './components/GamePanel';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
 
-import { ethers, utils } from 'ethers';
-
-// import { Image } from 'mui-image';
+import { ethers } from 'ethers';
 
 // TODO: Figure out how to manage this automatically
 import eventsDeployData from "./deployments/BCEvents.json";
@@ -21,20 +17,8 @@ import gameContractDeployData from "./deployments/BCGames.json";
 import mapsContractDeployData from "./deployments/Maps.json";
 import lobbiesContractDeployData from "./deployments/Lobby.json";
 
-import { roomDisplayDataList } from './components/RoomTiles';
-
-import { DoorInterface, DoorStatus } from './components/Doors';
-
-import Door from "./components/Doors";
-
-import Vent from "./assets/img/overlays/vent.png";
-import Player, { PlayerInterface } from './components/Player';
-import { Position } from './components/Utils';
-import GameInfo from './components/GameInfo';
 import GameBoard from './components/Board';
-import { render } from '@testing-library/react';
 import Characters from './components/Characters';
-import { setConstantValue } from 'typescript';
 import GameList from './components/GameList';
 
 // TODO: Internet suggested hack to stop window.ethereum from being broken
@@ -63,21 +47,6 @@ const mapContract_read = new ethers.Contract(mapsContractDeployData.address, map
 //   ]
 // }
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}));
-
-// const EmptyDoor: DoorInterface = {
-//   vsBreach: 0,
-//   vsHack: 0,
-//   status: DoorStatus.NO_DOOR,
-//   rotate: false
-// }
-
 function App() {
   const [appLoading, setAppLoading] = useState(true);
   const [walletLoaded, setWalletLoaded] = useState(false);
@@ -88,8 +57,6 @@ function App() {
   const [lastDieRoll, setLastDieRoll] = useState(0);
 
   const [tabValue, setTabValue] = useState(0);
-
-  // setLoading(false);
 
   function resetEventFlipper() {
     setEventFlipper(false);
@@ -116,20 +83,13 @@ function App() {
       gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
         console.log("Event Player", player);
         console.log("Event Action", action);
-        // console.log("Event", event);
-        // updateDoorsFromChain();
 
-        // updateBoardFromChain();
-        // console.log("CurrentGameNumber", currentGameNumber);
-        // updateRemotePlayers(currentGameNumber);
         setEventFlipper(true);
       })
 
       gameContract_read.on("DiceRollEvent", (roll, forValue, against, event) => {
         console.log("Roll Event roll", roll);
-        // console.log("Roll event forValue", forValue);
-        // console.log("Roll Event against", against);
-        // console.log("Roll Event", event);
+
         // TODO: This probably needs to say and filter based on which game number
         setLastDieRoll(roll);
       })
@@ -139,15 +99,12 @@ function App() {
       setAppLoading(false);
     }
 
-    // Call the function
     if (!walletLoaded) {
       console.log("Loading wallet")
       loadWallet();
     }
 
   }, [currentGameNumber, walletLoaded]);
-
-
 
 
   interface TabPanelProps {
@@ -190,7 +147,7 @@ function App() {
     <div className="App">
       <Box>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tabValue} onChange={handleChange} aria-label="basic tabs example">
+          <Tabs value={tabValue} onChange={handleChange} aria-label="App Mode Selection">
             <Tab label="Characters" {...a11yProps(0)} />
             <Tab label="Games List" {...a11yProps(1)} />
             <Tab label="Game" {...a11yProps(2)} />
@@ -231,7 +188,6 @@ function App() {
           <Box>Lobbies</Box>
         </TabPanel>
       </Box>
-
     </div>
   );
 }
