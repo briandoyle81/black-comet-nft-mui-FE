@@ -367,7 +367,7 @@ export default function GameBoard(props: GameBoardProps) {
     gameTiles.forEach((rowData: GameTileInterface[], row) => {
       if (row < n - 1) {
         rows.push(
-          <Box key={row}>
+          <Box key={row+"-withDoors"}>
             <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
               {renderRowWithDoors(row)}
             </Grid>
@@ -378,7 +378,7 @@ export default function GameBoard(props: GameBoardProps) {
         );
       } else { // Don't print a row of doors at the bottom
         rows.push(
-          <Box key={row}>
+          <Box key={row+"-withDoors"}>
             <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
               {renderRowWithDoors(row)}
             </Grid>
@@ -461,9 +461,9 @@ export default function GameBoard(props: GameBoardProps) {
     )
   }
 
-  return (loading ? <div>"Loading Board..."</div> :
-    <div>
+  return (loading ? <Box>"Loading Board..."</Box> :
+    <Box>
       {renderGameArea()}
-    </div>
+    </Box>
   );
 }

@@ -28,7 +28,6 @@ export default function GameList(props: GameListDataInterface) {
 
       for (let i = 0; i < gameIds.length; i++) {
         const newGame = await props.gameContract_read.games(gameIds[i]);
-        console.log(newGame);
         const {
           active,
           currentPlayerTurnIndex,
