@@ -25,7 +25,8 @@ const PlayersBox = styled(Box)(({ theme }) => ({
   position: 'absolute',
   left: '0',
   top: '0',
-  background: 'transparent'
+  zIndex: 2000,
+  background: 'transparent',
 }));
 // TODO: Move interfaces to util file?
 export interface GameTileInterface {
@@ -253,8 +254,9 @@ export default function GameBoard(props: GameBoardProps) {
         // console.log(position, player.position)
         if (position.row === player.position.row && position.col === player.position.col) {
           playerRenders.push(
-
-            <Player key={index+"player"} {...{ player: player, portrait: false }} />
+            <Grid item xs={3} key={index+"player"}>
+              <Player {...{ player: player, portrait: false }} />
+            </Grid>
           )
             ;
         }
@@ -263,7 +265,9 @@ export default function GameBoard(props: GameBoardProps) {
 
     return (
       <PlayersBox>
-        {playerRenders}
+        <Grid container>
+          {playerRenders}
+        </Grid>
       </PlayersBox>
     );
   }

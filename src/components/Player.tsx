@@ -15,8 +15,8 @@ const PlayerOverlay = styled(Card)(({ theme }) => ({
 }));
 
 const PlayerStyle = {
-  zIndex: 1200, // TODO
-  width: '25%'
+  zIndex: 2000, // TODO
+  width: '100%'
 }
 
 const Portrait = styled(Card)(({ theme }) => ({
