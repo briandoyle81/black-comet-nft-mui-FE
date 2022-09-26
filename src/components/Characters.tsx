@@ -22,14 +22,12 @@ export default function Characters(props: CharactersDataInterface) {
 
     async function updateCharsFromChain() {
       const remoteChars = await props.charContract_read.getAllCharsByOwner(props.address);
-      console.log(remoteChars);
 
       const newChars: CharInterface[] = [];
 
       remoteChars.forEach((char: any) => {
         newChars.push(char);
       });
-      console.log(newChars);
       setChars(newChars);
       setCharsLoaded(true);
     }

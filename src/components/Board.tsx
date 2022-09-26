@@ -19,6 +19,8 @@ import Player, { PlayerInterface } from './Player';
 import { Position } from './Utils';
 import GameInfo from './GameInfo';
 
+let timesBoardPulled = 0;
+
 const DISPLAY_COLUMNS = 13;
 
 const PlayersBox = styled(Box)(({ theme }) => ({
@@ -61,7 +63,9 @@ export const EmptyGame: GameInterface = {
   turnsTaken: 0,
 
   mapContract: "",
-  mapId: 0
+  mapId: 0,
+
+  gameNumber: -1
 }
 
 export interface GameBoardProps {
@@ -136,6 +140,8 @@ export default function GameBoard(props: GameBoardProps) {
     }
 
     async function updateBoardFromChain() {
+      timesBoardPulled++;
+      console.log("timesBoardPulled", timesBoardPulled);
       const remoteBoard = await props.mapContract_read.extGetBoard(props.currentGameNumber);
       const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile));
 
@@ -222,7 +228,7 @@ export default function GameBoard(props: GameBoardProps) {
     }
     loadGameBoard();
 
-  }, [props, gameLoaded]);
+  }, [gameLoaded, props]);
 
   function onUpdateGameClick() {
     setGameLoaded(false);

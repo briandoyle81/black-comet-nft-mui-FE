@@ -43,6 +43,8 @@ export interface GameInterface {
   mapContract: string; // TODO: Handle if game contract changes!!!!
   mapId: number;
 
+  gameNumber: number;
+
   // uint8 currentPlayerTurn;
   // uint8 startPlayerIndex;
 }

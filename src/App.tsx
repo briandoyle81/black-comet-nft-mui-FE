@@ -35,6 +35,7 @@ import GameBoard from './components/Board';
 import { render } from '@testing-library/react';
 import Characters from './components/Characters';
 import { setConstantValue } from 'typescript';
+import GameList from './components/GameList';
 
 // TODO: Internet suggested hack to stop window.ethereum from being broken
 declare var window: any;
@@ -62,8 +63,6 @@ const mapContract_read = new ethers.Contract(mapsContractDeployData.address, map
 //   ]
 // }
 
-enum AppState { GAMES = 0, LOBBIES, CHARS}
-
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
   ...theme.typography.body2,
@@ -80,7 +79,6 @@ const Item = styled(Paper)(({ theme }) => ({
 // }
 
 function App() {
-  const [appState, setAppState] = useState(AppState.CHARS);
   const [appLoading, setAppLoading] = useState(true);
   const [walletLoaded, setWalletLoaded] = useState(false);
 
@@ -89,7 +87,7 @@ function App() {
   const [eventFlipper, setEventFlipper] = useState(true);
   const [lastDieRoll, setLastDieRoll] = useState(0);
 
-  const [value, setValue] = useState(0);
+  const [tabValue, setTabValue] = useState(0);
 
   // setLoading(false);
 
@@ -132,6 +130,7 @@ function App() {
         // console.log("Roll event forValue", forValue);
         // console.log("Roll Event against", against);
         // console.log("Roll Event", event);
+        // TODO: This probably needs to say and filter based on which game number
         setLastDieRoll(roll);
       })
 
@@ -185,20 +184,20 @@ function App() {
   }
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+    setTabValue(newValue);
   }
   return (appLoading ? <div>"Loading Wallet..."</div> :
     <div className="App">
       <Box>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+          <Tabs value={tabValue} onChange={handleChange} aria-label="basic tabs example">
             <Tab label="Characters" {...a11yProps(0)} />
             <Tab label="Games List" {...a11yProps(1)} />
             <Tab label="Game" {...a11yProps(2)} />
             <Tab label="Lobbies" {...a11yProps(3)} />
           </Tabs>
         </Box>
-        <TabPanel value={value} index={0}>
+        <TabPanel value={tabValue} index={0}>
           <Characters
             charContract_read={charContract_read}
             charContract_write={charContract_write}
@@ -206,10 +205,15 @@ function App() {
             address={playerAddress}
           />
         </TabPanel>
-        <TabPanel value={value} index={1}>
-          <Box>Games</Box>
+        <TabPanel value={tabValue} index={1}>
+          <GameList
+            gameContract_read={gameContract_read}
+            setCurrentGameNumber={setCurrentGameNumber}
+            setTabValue={setTabValue}
+            address={playerAddress}
+          />
         </TabPanel>
-        <TabPanel value={value} index={2}>
+        <TabPanel value={tabValue} index={2}>
           <GameBoard
             currentGameNumber={currentGameNumber}
             mapContract_read={mapContract_read}
@@ -223,7 +227,7 @@ function App() {
             setCurrentGameNumber={setCurrentGameNumber}
           />
         </TabPanel>
-        <TabPanel value={value} index={3}>
+        <TabPanel value={tabValue} index={3}>
           <Box>Lobbies</Box>
         </TabPanel>
       </Box>
