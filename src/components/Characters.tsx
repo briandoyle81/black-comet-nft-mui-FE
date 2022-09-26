@@ -6,9 +6,10 @@ import { CharInterface } from "./Board";
 
 
 interface CharactersDataInterface {
-    charContract_read: any, // todo any
-    charContract_write: any,
-    address: string
+  charContract_read: any, // todo any
+  charContract_write: any,
+  lobbiesContract_write: any,
+  address: string
 }
 
 export default function Characters(props: CharactersDataInterface) {
@@ -41,9 +42,14 @@ export default function Characters(props: CharactersDataInterface) {
 
   async function handleDecantClick() {
     const tx = await props.charContract_write.decantNewClone({ value: ethers.utils.parseEther(".01") });
-    console.log(tx);
     await tx.wait();
     setCharsLoaded(false);
+  }
+
+  async function handleEnlistClick(id: number) {
+    const tx = await props.lobbiesContract_write.enlistForMission(id, { value: ethers.utils.parseEther(".0001") });
+    // await tx.wait();
+    // setCharsLoaded(false);
   }
 
   function renderCharData() {
@@ -77,12 +83,13 @@ export default function Characters(props: CharactersDataInterface) {
               Breach: {char.traits.breach}
             </Typography>
             <Typography variant="body1">
-              shoot: {char.traits.shoot}
+              Shoot: {char.traits.shoot}
             </Typography>
             <Typography variant="body1">
               Melee: {char.traits.melee}
             </Typography>
           </Card>
+          <Button variant="contained" onClick={() => { handleEnlistClick(index) }}>Enlist for Mission</Button>
         </Card>
       )
     })
@@ -95,7 +102,9 @@ export default function Characters(props: CharactersDataInterface) {
       <Typography variant="body1">
         Owned Characters: {chars.length}
       </Typography>
-      {renderCharData()}
+      <Box>
+        {renderCharData()}
+      </Box>
     </Box>
   )
 }

@@ -1,4 +1,4 @@
-import { Card, CardMedia } from '@mui/material';
+import { Card, CardMedia, FormControl, InputLabel, MenuItem, Select, Tab, Tabs, Typography } from '@mui/material';
 import React, { ReactNode, useEffect, useState } from 'react';
 import './App.css';
 import GamePanel, { GameInterface } from './components/GamePanel';
@@ -34,6 +34,7 @@ import GameInfo from './components/GameInfo';
 import GameBoard from './components/Board';
 import { render } from '@testing-library/react';
 import Characters from './components/Characters';
+import { setConstantValue } from 'typescript';
 
 // TODO: Internet suggested hack to stop window.ethereum from being broken
 declare var window: any;
@@ -42,6 +43,7 @@ const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
 let playerSigner: any; //TODO: any
 let gameContract_write: any; // TODO: any
+let lobbiesContract_write: any;
 let charContract_write: any;
 let playerAddress: string;
 
@@ -87,6 +89,8 @@ function App() {
   const [eventFlipper, setEventFlipper] = useState(true);
   const [lastDieRoll, setLastDieRoll] = useState(0);
 
+  const [value, setValue] = useState(0);
+
   // setLoading(false);
 
   function resetEventFlipper() {
@@ -108,6 +112,7 @@ function App() {
 
       gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
       charContract_write = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, playerSigner);
+      lobbiesContract_write = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, playerSigner);
 
       // TODO: Find appropriate home
       gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
@@ -144,39 +149,85 @@ function App() {
   }, [currentGameNumber, walletLoaded]);
 
 
-  function renderApp() {
-    if (appState === AppState.GAMES) {
-      console.log("Rendering game");
-      return (
-        <GameBoard
-        currentGameNumber={currentGameNumber}
-        mapContract_read={mapContract_read}
-        gameContract_read={gameContract_read}
-        charContract_read={charContract_read}
-        playerSignerAddress={playerAddress}
-        gameContract_write={gameContract_write}
-        eventFlipper={eventFlipper}
-        resetEventFlipper={resetEventFlipper}
-        lastDieRoll={lastDieRoll}
-        setCurrentGameNumber={setCurrentGameNumber}
-      />
-      );
-    } else if (appState === AppState.CHARS) {
-      return (
-        <Characters
-          charContract_read={charContract_read}
-          charContract_write={charContract_write}
-          address={playerAddress}
-        />
-      )
-    }
 
-    return (<Box></Box>)
+
+  interface TabPanelProps {
+    children?: React.ReactNode;
+    index: number;
+    value: number;
   }
 
-  return ( appLoading ? <div>"Loading Wallet..."</div> :
+  function TabPanel(props: TabPanelProps) {
+    const { children, value, index, ...other } = props;
+
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`simple-tabpanel-${index}`}
+        aria-labelledby={`simple-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box sx={{ p: 3 }}>
+            <Box>{children}</Box>
+          </Box>
+        )}
+      </div>
+    );
+  }
+
+  function a11yProps(index: number) {
+    return {
+      id: `simple-tab-${index}`,
+      'aria-controls': `simple-tabpanel-${index}`,
+    };
+  }
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  }
+  return (appLoading ? <div>"Loading Wallet..."</div> :
     <div className="App">
-      {renderApp()}
+      <Box>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+            <Tab label="Characters" {...a11yProps(0)} />
+            <Tab label="Games List" {...a11yProps(1)} />
+            <Tab label="Game" {...a11yProps(2)} />
+            <Tab label="Lobbies" {...a11yProps(3)} />
+          </Tabs>
+        </Box>
+        <TabPanel value={value} index={0}>
+          <Characters
+            charContract_read={charContract_read}
+            charContract_write={charContract_write}
+            lobbiesContract_write={lobbiesContract_write}
+            address={playerAddress}
+          />
+        </TabPanel>
+        <TabPanel value={value} index={1}>
+          <Box>Games</Box>
+        </TabPanel>
+        <TabPanel value={value} index={2}>
+          <GameBoard
+            currentGameNumber={currentGameNumber}
+            mapContract_read={mapContract_read}
+            gameContract_read={gameContract_read}
+            charContract_read={charContract_read}
+            playerSignerAddress={playerAddress}
+            gameContract_write={gameContract_write}
+            eventFlipper={eventFlipper}
+            resetEventFlipper={resetEventFlipper}
+            lastDieRoll={lastDieRoll}
+            setCurrentGameNumber={setCurrentGameNumber}
+          />
+        </TabPanel>
+        <TabPanel value={value} index={3}>
+          <Box>Lobbies</Box>
+        </TabPanel>
+      </Box>
+
     </div>
   );
 }
