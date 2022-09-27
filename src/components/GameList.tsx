@@ -22,7 +22,7 @@ export default function GameList(props: GameListDataInterface) {
     console.log("Start of useEffect in GameList");
 
     async function updateGamesFromChain() {
-      const gameIds = [0];
+      const gameIds = await props.gameContract_read.addressToGame(props.address);
 
       const newGames: GameInterface[] = [];
 

@@ -24,7 +24,10 @@ import GameList from './components/GameList';
 // TODO: Internet suggested hack to stop window.ethereum from being broken
 declare var window: any;
 
-const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP");
+// const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP");
+
+const provider = new ethers.providers.AlchemyWebSocketProvider('maticmum', 'zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP');
+
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
 let playerSigner: any; //TODO: any
 let gameContract_write: any; // TODO: any
