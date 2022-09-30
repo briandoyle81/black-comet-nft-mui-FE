@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 
 import { ethers } from 'ethers';
+import { Network, Alchemy } from 'alchemy-sdk';
 
 // TODO: Figure out how to manage this automatically
 import eventsDeployData from "./deployments/BCEvents.json";
@@ -24,9 +25,33 @@ import GameList from './components/GameList';
 // TODO: Internet suggested hack to stop window.ethereum from being broken
 declare var window: any;
 
+const settings = {
+  apiKey: 'zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP', // Replace with your Alchemy API Key.
+  network: Network.MATIC_MUMBAI, // Replace with your network.
+};
+
+const alchemy = new Alchemy(settings);
+
+let provider: any;
+let gameContract_read: ethers.Contract;
+let lobbiesContract_read: ethers.Contract;
+let charContract_read: ethers.Contract;
+let mapContract_read: ethers.Contract;
+
+
+async function runAlchemy() {
+  provider = await alchemy.config.getProvider();
+  gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
+  lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
+  charContract_read = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
+  mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
+}
+
+runAlchemy();
+
 // const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP");
 
-const provider = new ethers.providers.AlchemyWebSocketProvider('maticmum', 'zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP');
+// const provider = new ethers.providers.AlchemyWebSocketProvider('maticmum', 'zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP');
 // const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.infura.io/v3/357c214d39224c62ba25d2886bdf0a27");
 // const provider = new ethers.providers.InfuraWebSocketProvider('maticmum', '357c214d39224c62ba25d2886bdf0a27')
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
@@ -37,10 +62,10 @@ let charContract_write: any;
 let playerAddress: string;
 
 // const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.address, roomTilesContractDeployData.abi, provider);
-const gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
-const lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
-const charContract_read = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
-const mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
+// const gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
+// const lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
+// const charContract_read = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
+// const mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
 // myContract_write = new ethers.Contract(address, abi, signer)    // Write only
 
 // const gameEventFilter = {
@@ -83,20 +108,20 @@ function App() {
       charContract_write = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, playerSigner);
       lobbiesContract_write = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, playerSigner);
 
-      // TODO: Find appropriate home
-      gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
-        console.log("Event Player", player);
-        console.log("Event Action", action);
+      // // TODO: Find appropriate home
+      // gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
+      //   console.log("Event Player", player);
+      //   console.log("Event Action", action);
 
-        setEventFlipper(true);
-      })
+      //   setEventFlipper(true);
+      // })
 
-      gameContract_read.on("DiceRollEvent", (roll, forValue, against, event) => {
-        console.log("Roll Event roll", roll);
+      // gameContract_read.on("DiceRollEvent", (roll, forValue, against, event) => {
+      //   console.log("Roll Event roll", roll);
 
-        // TODO: This probably needs to say and filter based on which game number
-        setLastDieRoll(roll);
-      })
+      //   // TODO: This probably needs to say and filter based on which game number
+      //   setLastDieRoll(roll);
+      // })
 
 
       setWalletLoaded(true);
