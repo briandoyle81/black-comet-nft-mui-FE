@@ -42,17 +42,6 @@ export interface GameTileInterface {
   hasVent: boolean
 }
 
-export const EmptyTile: GameTileInterface = {
-  roomId: 0,
-  parentId: 0,
-
-  doors: [],
-
-  explored: false,
-  looted: false,
-  hasVent: false
-}
-
 export const EmptyGame: GameInterface = {
   active: false,
 
@@ -103,21 +92,14 @@ export interface CharInterface {
   id: number;
 }
 
-// TODO: Why does it need negative, and why does it change size/scale
-// TODO: Move to component?  Maybe move tiles to component
-const VentOverlay = styled(Card)(({ theme }) => ({
-  position: 'absolute',
-  left: '-55%',
-  bottom: '-55%',
-  scale: '15%'
-}));
+
 
 export default function GameBoard(props: GameBoardProps) {
   const n = 9; // TODO: Hardcoded board size, can't use await here
 
   const [loading, setLoading] = useState(true);
   const [currentGame, setCurrentGame] = useState(EmptyGame);
-  const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
+
   const [doors, setDoors] = useState<DoorInterface[]>([]);
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
   const [chars, setChars] = useState<CharInterface[]>([]);
