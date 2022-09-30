@@ -100,6 +100,7 @@ export interface CharInterface {
   flaw: number;
   inGame: boolean;
   dead: boolean;
+  id: number;
 }
 
 // TODO: Why does it need negative, and why does it change size/scale

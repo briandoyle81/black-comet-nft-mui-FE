@@ -1,4 +1,4 @@
-import { Button, Card, Typography } from "@mui/material";
+import { Button, Card, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system"
 import { ethers } from "ethers";
 import { ReactNode, useEffect, useState } from "react";
@@ -54,55 +54,75 @@ export default function Characters(props: CharactersDataInterface) {
     const charList: ReactNode[] = []
     chars.forEach((char: CharInterface, index) => {
       charList.push(
-        <Card key={index + " Player card"}>
-          <Typography variant="body1">
-            Hash: {char.genHash}
-          </Typography>
-          <Typography variant="body1">
-            Clone: {char.cloneNumber}/{char.maxClones}
-          </Typography>
+        <Grid item xs={3} key={index + " Player card"}>
           <Card>
             <Typography variant="body1">
-              Traits
+              Hash:
             </Typography>
             <Typography variant="body1">
-              Health: {char.traits.health}
+              {char.genHash.slice(2, 34)}
             </Typography>
             <Typography variant="body1">
-              Carry: {char.traits.carry}
+              {char.genHash.slice(34, 66)}
             </Typography>
             <Typography variant="body1">
-              Defense: {char.traits.defense}
+              Clone: {char.cloneNumber}/{char.maxClones}
             </Typography>
-            <Typography variant="body1">
-              Hack: {char.traits.hack}
-            </Typography>
-            <Typography variant="body1">
-              Breach: {char.traits.breach}
-            </Typography>
-            <Typography variant="body1">
-              Shoot: {char.traits.shoot}
-            </Typography>
-            <Typography variant="body1">
-              Melee: {char.traits.melee}
-            </Typography>
+            <Grid container spacing={1}>
+              <Grid item xs={12}>
+                <Card>
+                  <Typography variant="body1">
+                    Traits
+                  </Typography>
+                  <Typography variant="body1">
+                    Health: {char.traits.health}
+                  </Typography>
+                  <Typography variant="body1">
+                    Carry: {char.traits.carry}
+                  </Typography>
+                  <Typography variant="body1">
+                    Defense: {char.traits.defense}
+                  </Typography>
+                  <Typography variant="body1">
+                    Hack: {char.traits.hack}
+                  </Typography>
+                  <Typography variant="body1">
+                    Breach: {char.traits.breach}
+                  </Typography>
+                  <Typography variant="body1">
+                    Shoot: {char.traits.shoot}
+                  </Typography>
+                  <Typography variant="body1">
+                    Melee: {char.traits.melee}
+                  </Typography>
+                </Card>
+              </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              <Button variant="contained" onClick={() => { handleEnlistClick(char.id) }}>Enlist for Mission</Button>
+            </Grid>
           </Card>
-          <Button variant="contained" onClick={() => { handleEnlistClick(index) }}>Enlist for Mission</Button>
-        </Card>
+        </Grid>
       )
     })
     return charList;
   }
 
   return (
-    <Box>
-      <Button variant="contained" onClick={handleDecantClick}>Buy New Character NFT</Button>
-      <Typography variant="body1">
-        Owned Characters in Barracks: {chars.length}
-      </Typography>
-      <Box>
-        {renderCharData()}
-      </Box>
-    </Box>
+    <Grid container spacing={1}>
+      <Grid item xs={12}>
+        <Card>
+          <Button variant="contained" onClick={handleDecantClick}>Buy New Character NFT</Button>
+          <Typography variant="body1">
+            Owned Characters in Barracks: {chars.length}
+          </Typography>
+        </Card>
+      </Grid>
+      <Grid item xs={12}>
+        <Grid container spacing={1}>
+          {renderCharData()}
+        </Grid>
+      </Grid>
+    </Grid>
   )
 }
