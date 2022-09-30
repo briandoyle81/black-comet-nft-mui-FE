@@ -17,6 +17,9 @@ export default function GameInfo(props: GameInfoInterface) {
           <Typography variant="body1">
             Current Player: {props.currentGameProps.currentPlayerTurnIndex.toString()}
           </Typography>
+          <Typography variant="body1">
+              Id Number: {props.currentChar.id.toString()}
+            </Typography>
         </Grid>
         <Grid item xs={12}>
           <Grid container spacing={0}>

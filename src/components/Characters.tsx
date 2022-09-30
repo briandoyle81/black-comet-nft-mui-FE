@@ -68,6 +68,9 @@ export default function Characters(props: CharactersDataInterface) {
             <Typography variant="body1">
               Clone: {char.cloneNumber}/{char.maxClones}
             </Typography>
+            <Typography variant="body1">
+              Id Number: {char.id.toString()}
+            </Typography>
             <Grid container spacing={1}>
               <Grid item xs={12}>
                 <Card>
