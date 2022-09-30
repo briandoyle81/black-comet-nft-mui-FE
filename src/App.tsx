@@ -39,16 +39,6 @@ let charContract_read: ethers.Contract;
 let mapContract_read: ethers.Contract;
 
 
-async function runAlchemy() {
-  provider = await alchemy.config.getProvider();
-  gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
-  lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
-  charContract_read = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
-  mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
-}
-
-runAlchemy();
-
 // const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP");
 
 // const provider = new ethers.providers.AlchemyWebSocketProvider('maticmum', 'zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP');
@@ -98,10 +88,17 @@ function App() {
       // TODO: Cleanup
       // setLoading(true);
       console.log("Loading wallet");
-      const provider2 = new ethers.providers.Web3Provider(window.ethereum, "any");
+
+      provider = await alchemy.config.getProvider();
+      gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
+      lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
+      charContract_read = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
+      mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
+
+      const walletProvider = new ethers.providers.Web3Provider(window.ethereum, "maticmum");
       // Prompt user for account connections
-      await provider2.send("eth_requestAccounts", []);
-      playerSigner = provider2.getSigner();
+      await walletProvider.send("eth_requestAccounts", []);
+      playerSigner = walletProvider.getSigner();
       playerAddress = await playerSigner.getAddress();
 
       gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
@@ -109,19 +106,19 @@ function App() {
       lobbiesContract_write = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, playerSigner);
 
       // // TODO: Find appropriate home
-      // gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
-      //   console.log("Event Player", player);
-      //   console.log("Event Action", action);
+      gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
+        console.log("Event Player", player);
+        console.log("Event Action", action);
 
-      //   setEventFlipper(true);
-      // })
+        setEventFlipper(true);
+      })
 
-      // gameContract_read.on("DiceRollEvent", (roll, forValue, against, event) => {
-      //   console.log("Roll Event roll", roll);
+      gameContract_read.on("DiceRollEvent", (roll, forValue, against, event) => {
+        console.log("Roll Event roll", roll);
 
-      //   // TODO: This probably needs to say and filter based on which game number
-      //   setLastDieRoll(roll);
-      // })
+        // TODO: This probably needs to say and filter based on which game number
+        setLastDieRoll(roll);
+      })
 
 
       setWalletLoaded(true);
