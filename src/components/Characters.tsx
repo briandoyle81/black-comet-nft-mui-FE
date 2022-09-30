@@ -45,9 +45,9 @@ export default function Characters(props: CharactersDataInterface) {
   }
 
   async function handleEnlistClick(id: number) {
-    const tx = await props.lobbiesContract_write.enlistForMission(id, { value: ethers.utils.parseEther(".0001") });
-    // await tx.wait();
-    // setCharsLoaded(false);
+    const tx = await props.charContract_write.enlistChar(id, { value: ethers.utils.parseEther(".0001") });
+    await tx.wait();
+    setCharsLoaded(false);
   }
 
   function renderCharData() {
@@ -98,7 +98,7 @@ export default function Characters(props: CharactersDataInterface) {
     <Box>
       <Button variant="contained" onClick={handleDecantClick}>Buy New Character NFT</Button>
       <Typography variant="body1">
-        Owned Characters: {chars.length}
+        Owned Characters in Barracks: {chars.length}
       </Typography>
       <Box>
         {renderCharData()}
