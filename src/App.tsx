@@ -27,7 +27,8 @@ declare var window: any;
 // const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP");
 
 const provider = new ethers.providers.AlchemyWebSocketProvider('maticmum', 'zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP');
-
+// const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.infura.io/v3/357c214d39224c62ba25d2886bdf0a27");
+// const provider = new ethers.providers.InfuraWebSocketProvider('maticmum', '357c214d39224c62ba25d2886bdf0a27')
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
 let playerSigner: any; //TODO: any
 let gameContract_write: any; // TODO: any
