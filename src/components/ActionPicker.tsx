@@ -3,7 +3,7 @@ import { useState } from "react";
 import { GameInfoInterface } from "./GamePanel";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
-enum Action { HACK=0, BREACH, MOVE, PASS } // TODO: Add rest
+enum Action { HACK=0, BREACH, MOVE, PASS, LOOT } // TODO: Add rest
 enum Followthrough { NONE = 0, MOVE }
 enum Direction { NORTH=0, SOUTH, EAST, WEST}
 
@@ -72,6 +72,7 @@ export default function ActionPicker(props: GameInfoInterface) {
               <MenuItem value={Action.HACK.toString()}>Hack</MenuItem>
               <MenuItem value={Action.BREACH.toString()}>Breach</MenuItem>
               <MenuItem value={Action.MOVE.toString()}>Move</MenuItem>
+              <MenuItem value={Action.LOOT.toString()}>Loot</MenuItem>
               <MenuItem value={Action.PASS.toString()}>Pass</MenuItem>
             </Select>
           </FormControl>

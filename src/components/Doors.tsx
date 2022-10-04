@@ -71,7 +71,7 @@ export default function Door(props: DoorInterface) {
     // if (props.vsBreach === 0) {
     //   return Breached;
     // }
-    if (props.vsHack === 0 && props.status != DoorStatus.BREACHED) {
+    if (props.vsHack === 0 && props.status !== DoorStatus.BREACHED && props.status !== DoorStatus.OPEN) {
       return Green;
     }
 

@@ -18,29 +18,11 @@ import Vent from "../assets/img/overlays/vent.png";
 import Player, { PlayerInterface } from './Player';
 import { Position } from './Utils';
 import GameInfo from './GameInfo';
+import Tile, { EmptyRoomTile, EmptyTile, GameTileInterface, RoomTile } from './Tile';
 
 let timesBoardPulled = 0;
 
 const DISPLAY_COLUMNS = 13;
-
-const PlayersBox = styled(Box)(({ theme }) => ({
-  position: 'absolute',
-  left: '0',
-  top: '0',
-  zIndex: 2000,
-  background: 'transparent',
-}));
-// TODO: Move interfaces to util file?
-export interface GameTileInterface {
-  roomId: number,
-  parentId: number,
-
-  doors: number[],
-
-  explored: boolean,
-  looted: boolean,
-  hasVent: boolean
-}
 
 export const EmptyGame: GameInterface = {
   active: false,
@@ -92,14 +74,13 @@ export interface CharInterface {
   id: number;
 }
 
-
-
 export default function GameBoard(props: GameBoardProps) {
   const n = 9; // TODO: Hardcoded board size, can't use await here
 
   const [loading, setLoading] = useState(true);
   const [currentGame, setCurrentGame] = useState(EmptyGame);
-
+  const [roomTiles, setRoomTiles] = useState<RoomTile[]>([]);
+  const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
   const [doors, setDoors] = useState<DoorInterface[]>([]);
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
   const [chars, setChars] = useState<CharInterface[]>([]);
@@ -125,7 +106,7 @@ export default function GameBoard(props: GameBoardProps) {
     async function updateBoardFromChain() {
       timesBoardPulled++;
       console.log("timesBoardPulled", timesBoardPulled);
-      const remoteBoard = await props.mapContract_read.extGetBoard(props.currentGameNumber);
+      const remoteBoard = await props.mapContract_read.extGetBoard(props.currentGameNumber); // TODO: Confirm that game and map numbers will always match
       const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile));
 
       remoteBoard.forEach((rowData: GameTileInterface[], row: number) => {
@@ -134,7 +115,16 @@ export default function GameBoard(props: GameBoardProps) {
         })
       })
 
+      const remoteRoomTiles = await props.mapContract_read.extGetRoomList(props.currentGameNumber);// TODO: Confirm that game and map numbers will always match
+      const localRoomTiles: RoomTile[] = [];
+
+      remoteRoomTiles.forEach((roomTile: RoomTile) => {
+        localRoomTiles.push(roomTile);
+      });
+
+      // console.log(localRoomTiles);
       setGameTiles(localBoard);
+      setRoomTiles(localRoomTiles);
     }
 
     async function updateDoorsFromChain() {
@@ -219,63 +209,20 @@ export default function GameBoard(props: GameBoardProps) {
     props.setCurrentGameNumber(formGameNumber);
   }
 
-  function renderVent(vent: boolean) {
-    if (vent) {
-      return (
-        <VentOverlay>
-          <CardMedia
-            image={Vent}
-            component="img"
-          />
-        </VentOverlay>
-      )
-    } else {
-      return (<Box></Box>)
-    }
-  }
-
-  function renderPlayers(position: Position) {
-    const playerRenders: ReactNode[] = [];
-    // console.log(players.length || "no players")
-    // TODO: Why isn't the loading mechanism catching no players?
-    if (players.length > 0) {
-      players.forEach((player: PlayerInterface, index) => { // TODO: any
-        // console.log(position, player.position)
-        if (position.row === player.position.row && position.col === player.position.col) {
-          playerRenders.push(
-            <Grid item xs={3} key={index+"player"}>
-              <Player {...{ player: player, portrait: false }} />
-            </Grid>
-          )
-            ;
-        }
-      });
-    }
-
-    return (
-      <PlayersBox>
-        <Grid container>
-          {playerRenders}
-        </Grid>
-      </PlayersBox>
-    );
-  }
-
   function renderRowWithDoors(row: number) {
     const rowWithDoors: ReactNode[] = [];
     gameTiles[row].forEach((tile: GameTileInterface, col) => {
       const itemKey = row + "," + col;
       rowWithDoors.push((
         <Grid item xs={1} key={itemKey}>
-          <Card sx={{ position: 'relative' }}>
-            <CardMedia
-              image={roomDisplayDataList[tile.roomId].art}
-              component="img"
-            />
-            {/* {tile.roomId} */}
-            {renderVent(tile.hasVent)}
-            {renderPlayers({ row: row, col: col })}
-          </Card>
+          <Tile
+            tile={tile}
+            players={players}
+            row={row}
+            col={col}
+            currentGame={currentGame}
+            roomTiles={roomTiles}
+          />
         </Grid>
       ));
 
