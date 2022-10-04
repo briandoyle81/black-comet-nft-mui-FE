@@ -25,10 +25,17 @@ import GameList from './components/GameList';
 // TODO: Internet suggested hack to stop window.ethereum from being broken
 declare var window: any;
 
-const settings = {
-  apiKey: 'zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP', // Replace with your Alchemy API Key.
-  network: Network.MATIC_MUMBAI, // Replace with your network.
-};
+if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+  var settings = {
+    apiKey: 'zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP',
+    network: Network.MATIC_MUMBAI,
+  };
+} else {
+  var settings = {
+    apiKey: 'ZpTrffHTCK4-j10a7fqHRAxXDIpQly2y',
+    network: Network.MATIC_MUMBAI,
+  };
+}
 
 const alchemy = new Alchemy(settings);
 
