@@ -75,7 +75,7 @@ export interface CharInterface {
 }
 
 export default function GameBoard(props: GameBoardProps) {
-  const n = 9; // TODO: Hardcoded board size, can't use await here
+  const n = 11; // TODO: Hardcoded board size, can't use await here
 
   const [loading, setLoading] = useState(true);
   const [currentGame, setCurrentGame] = useState(EmptyGame);
@@ -212,6 +212,9 @@ export default function GameBoard(props: GameBoardProps) {
   function renderRowWithDoors(row: number) {
     const rowWithDoors: ReactNode[] = [];
     gameTiles[row].forEach((tile: GameTileInterface, col) => {
+      if (col === 0 || col === n - 1) {
+        return;
+      }
       const itemKey = row + "," + col;
       rowWithDoors.push((
         <Grid item xs={1} key={itemKey}>
@@ -225,8 +228,8 @@ export default function GameBoard(props: GameBoardProps) {
           />
         </Grid>
       ));
-
-      if (col < n - 1) {
+      // Don't render the last door.  -2 because other process skips outer ring
+      if (col < n - 2) {
         rowWithDoors.push(
           <Door
             vsBreach={doors[tile.doors[2]].vsBreach}
@@ -252,6 +255,9 @@ export default function GameBoard(props: GameBoardProps) {
       </Grid>
     ));
     gameTiles[row].forEach((tile: GameTileInterface, col) => {
+      if (col === 0 || col === n - 1) {
+        return;
+      }
       const itemKey = row + "," + col;
       rowOfDoors.push(
         <Door
@@ -295,6 +301,9 @@ export default function GameBoard(props: GameBoardProps) {
     }
     const rows: ReactNode[] = [];
     gameTiles.forEach((rowData: GameTileInterface[], row) => {
+      if (row === 0) {
+        return;
+      }
       if (row < n - 1) {
         rows.push(
           <Box key={row+"-withDoors"}>
@@ -394,7 +403,6 @@ export default function GameBoard(props: GameBoardProps) {
   return (loading ? <Box>"Loading Board..."</Box> :
     <Box>
       {renderGameArea()}
-      <p>UI/UX is temporary.  Feedback is not required.</p>
     </Box>
   );
 }

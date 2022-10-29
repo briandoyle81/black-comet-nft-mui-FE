@@ -240,15 +240,29 @@ export default function Tile(props: TilePropsInterface) {
     }
   }
 
+  function renderTile() {
+    if (props.tile.roomId === 0) {
+      return (
+        <Box></Box>
+      )
+    } else {
+      return (
+        <Card sx={{ position: 'relative' }}>
+          <CardMedia
+            image={roomDisplayDataList[props.tile.roomId].art}
+            component="img"
+          />
+          <RoomName sx={{ fontSize: '0.5rem', fontWeight: 'bold', textAlign: 'right' }}>{roomDisplayDataList[props.tile.roomId].name}</RoomName>
+          {renderVent(props.tile.hasVent)}
+          {renderOverlays({ row: props.row, col: props.col })}
+        </Card>
+      )
+    }
+  }
+
   return (
-    <Card sx={{ position: 'relative' }}>
-      <CardMedia
-        image={roomDisplayDataList[props.tile.roomId].art}
-        component="img"
-      />
-      <RoomName sx={{ fontSize: '0.5rem', fontWeight: 'bold', textAlign: 'right' }}>{roomDisplayDataList[props.tile.roomId].name}</RoomName>
-      {renderVent(props.tile.hasVent)}
-      {renderOverlays({ row: props.row, col: props.col })}
-    </Card>
+    <Box>
+      { renderTile() }
+    </Box>
   )
 }
