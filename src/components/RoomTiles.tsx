@@ -33,9 +33,6 @@ import Showers from "../assets/img/room-bg/Showers[face].png";
 import TorpedoTube from "../assets/img/room-bg/Torpedo Tube[face].png";
 import TrashCompactor from "../assets/img/room-bg/Trash Compactor[face].png";
 
-
-
-
 interface roomDisplayData {
   name: string;
   desc: string;

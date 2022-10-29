@@ -233,7 +233,7 @@ export default function GameBoard(props: GameBoardProps) {
             vsHack={doors[tile.doors[2]].vsHack}
             status={doors[tile.doors[2]].status}
             rotate={true}
-            key={itemKey+"door"}
+            key={itemKey+"-door-id-"+tile.doors[2]}
           />);
       }
     })
@@ -245,7 +245,7 @@ export default function GameBoard(props: GameBoardProps) {
     const rowOfDoors: ReactNode[] = [];
     // Start with a small, empty item to offset doors for alignment
     rowOfDoors.push((
-      <Grid item xs={.25} key={row+"starter"}>
+      <Grid item xs={.25} key={row+"-starter"}>
         <Card>
 
         </Card>
@@ -259,14 +259,14 @@ export default function GameBoard(props: GameBoardProps) {
           vsHack={doors[tile.doors[1]].vsHack}
           status={doors[tile.doors[1]].status}
           rotate={false}
-          key={itemKey+"door"}
+          key={itemKey+"-door-id-"+tile.doors[1]}
         />);
 
 
       // Push an "empty" card to maintain grid, except the last
       if (col < n - 1) {
         rowOfDoors.push((
-          <Grid item xs={1}>
+          <Grid item xs={1} key={row+','+col+'-empty'}>
             <Card>
 
             </Card>
@@ -394,6 +394,7 @@ export default function GameBoard(props: GameBoardProps) {
   return (loading ? <Box>"Loading Board..."</Box> :
     <Box>
       {renderGameArea()}
+      <p>UI/UX is temporary.  Feedback is not required.</p>
     </Box>
   );
 }
