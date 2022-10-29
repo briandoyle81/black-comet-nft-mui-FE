@@ -14,6 +14,9 @@ import roomTilesContractDeployData from "./deployments/RoomTiles.json";
 import charContractDeployData from "./deployments/BCChars.json";
 import itemsContractDeployData from "./deployments/BCItems.json";
 import gameContractDeployData from "./deployments/BCGames.json";
+import actionsContractDeployData from "./deployments/Actions.json";
+import utilsContractDeployData from "./deployments/BCUtils.json";
+
 // import utilsContractDeployData from "./deployments/BCGames.json";
 import mapsContractDeployData from "./deployments/Maps.json";
 import lobbiesContractDeployData from "./deployments/Lobby.json";
@@ -25,6 +28,7 @@ import GameList from './components/GameList';
 // TODO: Internet suggested hack to stop window.ethereum from being broken
 declare var window: any;
 
+// TODO: Keys are fine here but need to allowlist on Alchemy
 if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
   var settings = {
     apiKey: 'zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP',
@@ -44,7 +48,9 @@ let gameContract_read: ethers.Contract;
 let lobbiesContract_read: ethers.Contract;
 let charContract_read: ethers.Contract;
 let mapContract_read: ethers.Contract;
-let itemsContract_read: any;
+let itemsContract_read: ethers.Contract;
+let actionsContract_read: ethers.Contract;
+let utilsContract_read: ethers.Contract;
 
 
 // const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP");
@@ -54,10 +60,11 @@ let itemsContract_read: any;
 // const provider = new ethers.providers.InfuraWebSocketProvider('maticmum', '357c214d39224c62ba25d2886bdf0a27')
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
 let playerSigner: any; //TODO: any
-let gameContract_write: any; // TODO: any
-let lobbiesContract_write: any;
-let charContract_write: any;
-let actionsContract_write: any;
+let gameContract_write: ethers.Contract;
+let lobbiesContract_write: ethers.Contract;
+let charContract_write: ethers.Contract;
+let actionsContract_write: ethers.Contract;
+let itemsContract_write: ethers.Contract;
 let playerAddress: string;
 
 // const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.address, roomTilesContractDeployData.abi, provider);
@@ -103,6 +110,9 @@ function App() {
       lobbiesContract_read = await new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
       charContract_read = await new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
       mapContract_read = await new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
+      itemsContract_read = await new ethers.Contract(itemsContractDeployData.address, itemsContractDeployData.abi, provider);
+      actionsContract_read = await new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, provider);
+      utilsContract_read = await new ethers.Contract(utilsContractDeployData.address, utilsContractDeployData.abi, provider);
 
       const walletProvider = new ethers.providers.Web3Provider(window.ethereum, "any");
       try {
@@ -141,21 +151,22 @@ function App() {
       gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
       charContract_write = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, playerSigner);
       lobbiesContract_write = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, playerSigner);
+      actionsContract_write = new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, playerSigner);
 
-      // // TODO: Find appropriate home
-      // gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
-      //   console.log("Event Player", player);
-      //   console.log("Event Action", action);
+      // TODO: Find appropriate home
+      actionsContract_read.on("ActionCompleteEvent", (player, action, event) => {
+        console.log("Event Player", player);
+        console.log("Event Action", action);
 
-      //   setEventFlipper(true);
-      // })
+        setEventFlipper(true);
+      })
 
-      // gameContract_read.on("DiceRollEvent", (roll, forValue, against, event) => {
-      //   console.log("Roll Event roll", roll);
+      utilsContract_read.on("DiceRollEvent", (roll, forValue, against, event) => {
+        console.log("Roll Event roll", roll);
 
-      //   // TODO: This probably needs to say and filter based on which game number
-      //   setLastDieRoll(roll);
-      // })
+        // TODO: This probably needs to say and filter based on which game number
+        setLastDieRoll(roll);
+      })
 
 
       setWalletLoaded(true);
