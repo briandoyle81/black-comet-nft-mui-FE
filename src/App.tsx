@@ -56,6 +56,8 @@ let playerSigner: any; //TODO: any
 let gameContract_write: any; // TODO: any
 let lobbiesContract_write: any;
 let charContract_write: any;
+let actionsContract_write: any;
+let itemsContract_read: any;
 let playerAddress: string;
 
 // const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.address, roomTilesContractDeployData.abi, provider);
@@ -102,7 +104,35 @@ function App() {
       charContract_read = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
       mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
 
-      const walletProvider = new ethers.providers.Web3Provider(window.ethereum, "maticmum");
+      const walletProvider = new ethers.providers.Web3Provider(window.ethereum, "any");
+      try {
+        // send a request to the wallet to switch the network and select the Ethereum mainnet
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: ethers.utils.hexValue(80001),
+            rpcUrls: ["https://rpc-mumbai.maticvigil.com"],
+            chainName: "Polygon Testnet Mumbai",
+            nativeCurrency: {
+              name: "tMATIC",
+              symbol: "tMATIC", // 2-6 characters long
+              decimals: 18,
+            },
+            blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
+          }]
+        })
+      } catch (error: any) {
+        if (error.code === 4001) {
+          console.log("the user doesn't want to change the network!")
+        }
+        else if (error.code === 4902) {
+          console.log("this network is not in the user's wallet")
+        }
+        else {
+          console.log(`Error ${error.code}: ${error.message}`)
+        }
+      }
+
       // Prompt user for account connections
       await walletProvider.send("eth_requestAccounts", []);
       playerSigner = walletProvider.getSigner();
@@ -113,19 +143,19 @@ function App() {
       lobbiesContract_write = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, playerSigner);
 
       // // TODO: Find appropriate home
-      gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
-        console.log("Event Player", player);
-        console.log("Event Action", action);
+      // gameContract_read.on("ActionCompleteEvent", (player, action, event) => {
+      //   console.log("Event Player", player);
+      //   console.log("Event Action", action);
 
-        setEventFlipper(true);
-      })
+      //   setEventFlipper(true);
+      // })
 
-      gameContract_read.on("DiceRollEvent", (roll, forValue, against, event) => {
-        console.log("Roll Event roll", roll);
+      // gameContract_read.on("DiceRollEvent", (roll, forValue, against, event) => {
+      //   console.log("Roll Event roll", roll);
 
-        // TODO: This probably needs to say and filter based on which game number
-        setLastDieRoll(roll);
-      })
+      //   // TODO: This probably needs to say and filter based on which game number
+      //   setLastDieRoll(roll);
+      // })
 
 
       setWalletLoaded(true);
