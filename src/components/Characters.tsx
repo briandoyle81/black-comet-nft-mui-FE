@@ -50,6 +50,18 @@ export default function Characters(props: CharactersDataInterface) {
     setCharsLoaded(false);
   }
 
+  function renderEnlistButton(char: CharInterface) {
+    if (char.inGame) {
+      return (
+        <Button variant="contained" disabled>Away on Mission</Button>
+      )
+    } else {
+      return (
+        <Button variant="contained" onClick={() => { handleEnlistClick(char.id) }}>Enlist for Mission</Button>
+      )
+    }
+  }
+
   function renderCharData() {
     const charList: ReactNode[] = []
     chars.forEach((char: CharInterface, index) => {
@@ -102,7 +114,7 @@ export default function Characters(props: CharactersDataInterface) {
               </Grid>
             </Grid>
             <Grid item xs={12}>
-              <Button variant="contained" onClick={() => { handleEnlistClick(char.id) }}>Enlist for Mission</Button>
+              {renderEnlistButton(char)}
             </Grid>
           </Card>
         </Grid>
