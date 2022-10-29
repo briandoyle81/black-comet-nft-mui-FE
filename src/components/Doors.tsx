@@ -91,8 +91,19 @@ export default function Door(props: DoorInterface) {
       return(<Box></Box>)
     }
   }
+
+  // TODO: DRY/CLEANUP
+  function renderDoor() {
+
+  }
   // TODO: This method of rotation is adding padding and putting drop shadow in incorrect orientation
-  if (props.rotate) {
+  if (props.status === DoorStatus.NO_DOOR) {
+    return (
+      <Grid item xs={.5}>
+        <Box></Box>
+      </Grid>
+    )
+  } else if (props.rotate) {
     return (
       <Grid item xs={.5} sx={{display: 'flex', alignItems: 'center'}}>
         <Card sx={{transform: `rotate(90deg)`, position: 'relative'}}>

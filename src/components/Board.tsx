@@ -1,4 +1,4 @@
-import { Button, Card, CardMedia, TextField } from '@mui/material';
+import { Button, Card, CardContent, CardMedia, TextField } from '@mui/material';
 import React, { ReactNode, useEffect, useState } from 'react';
 import GamePanel, { GameInterface } from './GamePanel';
 import { styled } from '@mui/material/styles';
@@ -330,14 +330,13 @@ export default function GameBoard(props: GameBoardProps) {
 
   function renderMapArea() {
     return (loading ? "Loading..." :
-      <Paper>
-        <Card>
+      <Card>
+        <CardContent>
           <Box sx={{ flexGrow: 1 }}>
             {renderMapWithDoors()}
           </Box>
-        </Card>
-
-      </Paper>
+        </CardContent>
+      </Card>
     )
   }
 
