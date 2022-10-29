@@ -45,7 +45,7 @@ export interface GameBoardProps {
   gameContract_read: any;
   charContract_read: any;
   playerSignerAddress: string;
-  gameContract_write: any; // TODO: Any
+  actionsContract_write: any; // TODO: Any
   eventFlipper: boolean;
   resetEventFlipper: Function;
   lastDieRoll: number
@@ -390,7 +390,7 @@ export default function GameBoard(props: GameBoardProps) {
               currentGameProps={currentGame}
               currentGameNumber={props.currentGameNumber}
               playerSignerAddress={props.playerSignerAddress}
-              gameContract_write={props.gameContract_write}
+              actionsContract_write={props.actionsContract_write}
               lastDieRoll={props.lastDieRoll}
             />
           </Card>

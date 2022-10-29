@@ -34,7 +34,7 @@ export default function ActionPicker(props: GameInfoInterface) {
   };
 
   const submitAction = async () => {
-    const actionTx = await props.gameContract_write.doAction(
+    const actionTx = await props.actionsContract_write.doAction(
       props.currentGameNumber,
       props.currentPlayer.remoteId,
       action,

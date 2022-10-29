@@ -1,4 +1,4 @@
-import {Tab, Tabs } from '@mui/material';
+import {Card, Tab, Tabs, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import { styled } from '@mui/material/styles';
@@ -24,6 +24,15 @@ import lobbiesContractDeployData from "./deployments/Lobby.json";
 import GameBoard from './components/Board';
 import Characters from './components/Characters';
 import GameList from './components/GameList';
+
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { grey } from '@mui/material/colors';
+
+const theme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 // TODO: Internet suggested hack to stop window.ethereum from being broken
 declare var window: any;
@@ -60,7 +69,7 @@ let utilsContract_read: ethers.Contract;
 // const provider = new ethers.providers.InfuraWebSocketProvider('maticmum', '357c214d39224c62ba25d2886bdf0a27')
 // const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
 let playerSigner: any; //TODO: any
-let gameContract_write: ethers.Contract;
+// let gameContract_write: ethers.Contract;
 let lobbiesContract_write: ethers.Contract;
 let charContract_write: ethers.Contract;
 let actionsContract_write: ethers.Contract;
@@ -148,7 +157,7 @@ function App() {
       playerSigner = walletProvider.getSigner();
       playerAddress = await playerSigner.getAddress();
 
-      gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
+      // gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
       charContract_write = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, playerSigner);
       lobbiesContract_write = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, playerSigner);
       actionsContract_write = new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, playerSigner);
@@ -167,7 +176,6 @@ function App() {
         // TODO: This probably needs to say and filter based on which game number
         setLastDieRoll(roll);
       })
-
 
       setWalletLoaded(true);
       setAppLoading(false);
@@ -217,53 +225,60 @@ function App() {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   }
-  return (appLoading ? <div>"Loading Wallet..."</div> :
-    <div className="App">
-      <Box>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tabValue} onChange={handleChange} aria-label="App Mode Selection">
-            <Tab label="Characters" {...a11yProps(0)} />
-            <Tab label="Games List" {...a11yProps(1)} />
-            <Tab label="Game" {...a11yProps(2)} />
-            <Tab label="Lobbies" {...a11yProps(3)} />
-          </Tabs>
-        </Box>
-        <TabPanel value={tabValue} index={0}>
-          <Characters
-            charContract_read={charContract_read}
-            charContract_write={charContract_write}
-            lobbiesContract_write={lobbiesContract_write}
-            address={playerAddress}
-          />
-        </TabPanel>
-        <TabPanel value={tabValue} index={1}>
-          <GameList
-            gameContract_read={gameContract_read}
-            setCurrentGameNumber={setCurrentGameNumber}
-            setTabValue={setTabValue}
-            address={playerAddress}
-          />
-        </TabPanel>
-        <TabPanel value={tabValue} index={2}>
-          <GameBoard
-            currentGameNumber={currentGameNumber}
-            mapContract_read={mapContract_read}
-            gameContract_read={gameContract_read}
-            charContract_read={charContract_read}
-            playerSignerAddress={playerAddress}
-            gameContract_write={gameContract_write}
-            eventFlipper={eventFlipper}
-            resetEventFlipper={resetEventFlipper}
-            lastDieRoll={lastDieRoll}
-            setCurrentGameNumber={setCurrentGameNumber}
-          />
-        </TabPanel>
-        <TabPanel value={tabValue} index={3}>
-          <Box>Lobbies</Box>
-        </TabPanel>
-      </Box>
-      <p>UI/UX is temporary.  Feedback is not required.  I know ;)</p>
-    </div>
+  return (
+    appLoading ?
+      <ThemeProvider theme={theme}>
+        <div>"Loading Wallet..."</div>
+      </ThemeProvider>
+      :
+      <ThemeProvider theme={theme}>
+        <div className="App">
+          <Card>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs value={tabValue} onChange={handleChange} aria-label="App Mode Selection">
+                <Tab label="Characters" {...a11yProps(0)} />
+                <Tab label="Games List" {...a11yProps(1)} />
+                <Tab label="Game" {...a11yProps(2)} />
+                <Tab label="Lobbies" {...a11yProps(3)} />
+              </Tabs>
+            </Box>
+            <TabPanel value={tabValue} index={0}>
+              <Characters
+                charContract_read={charContract_read}
+                charContract_write={charContract_write}
+                lobbiesContract_write={lobbiesContract_write}
+                address={playerAddress}
+              />
+            </TabPanel>
+            <TabPanel value={tabValue} index={1}>
+              <GameList
+                gameContract_read={gameContract_read}
+                setCurrentGameNumber={setCurrentGameNumber}
+                setTabValue={setTabValue}
+                address={playerAddress}
+              />
+            </TabPanel>
+            <TabPanel value={tabValue} index={2}>
+              <GameBoard
+                currentGameNumber={currentGameNumber}
+                mapContract_read={mapContract_read}
+                gameContract_read={gameContract_read}
+                charContract_read={charContract_read}
+                playerSignerAddress={playerAddress}
+                actionsContract_write={actionsContract_write}
+                eventFlipper={eventFlipper}
+                resetEventFlipper={resetEventFlipper}
+                lastDieRoll={lastDieRoll}
+                setCurrentGameNumber={setCurrentGameNumber}
+              />
+            </TabPanel>
+            <TabPanel value={tabValue} index={3}>
+              <Box>Lobbies</Box>
+            </TabPanel>
+            <Typography>UI/UX is temporary.  Feedback is not required.  I know ;)</Typography>
+          </Card>
+        </div>
+      </ThemeProvider>
   );
 }
 

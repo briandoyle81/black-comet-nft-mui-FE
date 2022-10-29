@@ -23,7 +23,7 @@ export interface GameInfoInterface {
   currentGameProps: GameInterface,
   currentGameNumber: number,
   playerSignerAddress: string,
-  gameContract_write: any, // TODO: Any
+  actionsContract_write: any, // TODO: Any
   lastDieRoll: Number
 }
 
