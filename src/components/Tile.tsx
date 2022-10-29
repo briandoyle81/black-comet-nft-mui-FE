@@ -116,7 +116,7 @@ export default function Tile(props: TilePropsInterface) {
 
     if (props.tile.looted) {
       lootRenders.push(
-        <Grid item xs={3}>
+        <Grid item xs={3} key={(lootRenders.length-1)+"looted"}>
           <img src={Looted} alt="Looted" style={{ width: '100%', zIndex: 2000 }} />
         </Grid>
       )
@@ -124,14 +124,14 @@ export default function Tile(props: TilePropsInterface) {
       const roomData = props.roomTiles[props.tile.roomId];
       for (let i = 0; i < roomData.numItems; i++) {
         lootRenders.push(
-          <Grid item xs={3}>
+          <Grid item xs={3} key={(lootRenders.length-1)+"item"}>
             <img src={ItemIcon} alt="Looted" style={{ width: '100%', zIndex: 2000 }} />
           </Grid>
         )
       }
       for (let i = 0; i < roomData.numData; i++) {
         lootRenders.push(
-          <Grid item xs={3}>
+          <Grid item xs={3} key={(lootRenders.length-1)+"data"}>
             <img src={DataIcon} alt="Looted" style={{ width: '100%', zIndex: 2000 }} />
           </Grid>
         )
@@ -140,7 +140,7 @@ export default function Tile(props: TilePropsInterface) {
 
     // Fill out array for spacing
     while (lootRenders.length < 3) {
-      lootRenders.push(<Grid item xs={3}></Grid>)
+      lootRenders.push(<Grid item xs={3} key={(lootRenders.length-1)+"empty"}></Grid>)
     }
 
     return (
@@ -261,7 +261,7 @@ export default function Tile(props: TilePropsInterface) {
   }
 
   return (
-    <Box>
+    <Box key={props.row+","+props.col+"-tile-box"}>
       { renderTile() }
     </Box>
   )
