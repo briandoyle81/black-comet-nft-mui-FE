@@ -44,6 +44,7 @@ let gameContract_read: ethers.Contract;
 let lobbiesContract_read: ethers.Contract;
 let charContract_read: ethers.Contract;
 let mapContract_read: ethers.Contract;
+let itemsContract_read: any;
 
 
 // const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP");
@@ -57,7 +58,6 @@ let gameContract_write: any; // TODO: any
 let lobbiesContract_write: any;
 let charContract_write: any;
 let actionsContract_write: any;
-let itemsContract_read: any;
 let playerAddress: string;
 
 // const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.address, roomTilesContractDeployData.abi, provider);
@@ -99,10 +99,10 @@ function App() {
       console.log("Loading wallet");
 
       provider = await alchemy.config.getProvider();
-      gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
-      lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
-      charContract_read = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
-      mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
+      gameContract_read = await new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
+      lobbiesContract_read = await new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
+      charContract_read = await new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
+      mapContract_read = await new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
 
       const walletProvider = new ethers.providers.Web3Provider(window.ethereum, "any");
       try {
@@ -251,6 +251,7 @@ function App() {
           <Box>Lobbies</Box>
         </TabPanel>
       </Box>
+      <p>UI/UX is temporary.  Feedback is not required.  I know ;)</p>
     </div>
   );
 }
