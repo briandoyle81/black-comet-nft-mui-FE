@@ -336,6 +336,14 @@ export default function GameBoard(props: GameBoardProps) {
     )
   }
 
+  function getNumItems() {
+    const currentPlayer = players[currentGame.currentPlayerTurnIndex];
+    const currentRoomId = gameTiles[currentPlayer.position.row][currentPlayer.position.col].roomId;
+    // console.log("there are this many items:", roomTiles[currentRoomId].numItems)
+    // console.log(typeof(roomTiles[currentRoomId].numItems))
+    return roomTiles[currentRoomId].numItems;
+  }
+
   function renderGameArea() {
     // TODO: WHY DOESN"T THE "loading" STATE DO THIS????
     // if (doors.length === 0) {
@@ -388,6 +396,7 @@ export default function GameBoard(props: GameBoardProps) {
               playerSignerAddress={props.playerSignerAddress}
               actionsContract_write={props.actionsContract_write}
               lastDieRoll={props.lastDieRoll}
+              numItems={getNumItems()}
             />
           </Card>
         </Grid>

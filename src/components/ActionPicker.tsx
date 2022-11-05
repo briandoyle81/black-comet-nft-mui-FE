@@ -2,6 +2,7 @@ import { Button, Card, FormControl, Grid, InputLabel, MenuItem, Typography } fro
 import { useState } from "react";
 import { GameInfoInterface } from "./GamePanel";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { ethers } from "ethers";
 
 enum Action { HACK=0, BREACH, MOVE, PASS, LOOT } // TODO: Add rest
 enum Followthrough { NONE = 0, MOVE }
@@ -34,13 +35,18 @@ export default function ActionPicker(props: GameInfoInterface) {
   };
 
   const submitAction = async () => {
+    let cost = ethers.utils.parseUnits("0", 'gwei'); // TODO: Hardcoding
+    if (action === Action.LOOT) {
+      cost = ethers.utils.parseUnits((100 * props.numItems).toString(), 'gwei')
+    }
     const actionTx = await props.actionsContract_write.doAction(
       props.currentGameNumber,
       props.currentPlayer.remoteId,
       action,
       followthrough,
       firstDir,
-      secondDir
+      secondDir,
+      {value: cost}
     );
     // Below works for the acting client, but not a hook, so others
     // won't get the update

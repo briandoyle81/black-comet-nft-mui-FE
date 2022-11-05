@@ -24,7 +24,8 @@ export interface GameInfoInterface {
   currentGameNumber: number,
   playerSignerAddress: string,
   actionsContract_write: any, // TODO: Any
-  lastDieRoll: Number
+  lastDieRoll: number,
+  numItems: number
 }
 
 export interface GameInterface {
