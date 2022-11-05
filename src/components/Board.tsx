@@ -177,7 +177,8 @@ export default function GameBoard(props: GameBoardProps) {
 
     const loadGameBoard = async () => {
 
-      if (props.eventFlipper === true || gameLoaded === false) {
+      if (props.eventFlipper === true) {
+        console.log("updating doors, board, players from chain")
         await updateDoorsFromChain();
         await updateBoardFromChain();
         await updateRemotePlayers();

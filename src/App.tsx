@@ -114,14 +114,6 @@ function App() {
       // setLoading(true);
       console.log("Loading wallet");
 
-      provider = await alchemy.config.getProvider();
-      gameContract_read = await new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
-      lobbiesContract_read = await new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
-      charContract_read = await new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
-      mapContract_read = await new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
-      itemsContract_read = await new ethers.Contract(itemsContractDeployData.address, itemsContractDeployData.abi, provider);
-      actionsContract_read = await new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, provider);
-      utilsContract_read = await new ethers.Contract(utilsContractDeployData.address, utilsContractDeployData.abi, provider);
 
       const walletProvider = new ethers.providers.Web3Provider(window.ethereum, "any");
       try {
@@ -156,6 +148,16 @@ function App() {
       await walletProvider.send("eth_requestAccounts", []);
       playerSigner = walletProvider.getSigner();
       playerAddress = await playerSigner.getAddress();
+
+      // provider = await alchemy.config.getProvider();
+      gameContract_read = await new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
+      lobbiesContract_read = await new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, playerSigner);
+      charContract_read = await new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, playerSigner);
+      mapContract_read = await new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, playerSigner);
+      itemsContract_read = await new ethers.Contract(itemsContractDeployData.address, itemsContractDeployData.abi, playerSigner);
+      actionsContract_read = await new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, playerSigner);
+      utilsContract_read = await new ethers.Contract(utilsContractDeployData.address, utilsContractDeployData.abi, playerSigner);
+
 
       // gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, playerSigner);
       charContract_write = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, playerSigner);
