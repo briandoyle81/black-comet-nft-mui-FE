@@ -275,6 +275,7 @@ function App() {
               <Box>Lobbies</Box>
             </TabPanel>
             <Typography>UI/UX is temporary.  Feedback is not required.  I know ;)</Typography>
+            <Typography>Alpha Test.  Play at your own risk!  Use a dev wallet!</Typography>
           </Card>
         </div>
       </ThemeProvider>
