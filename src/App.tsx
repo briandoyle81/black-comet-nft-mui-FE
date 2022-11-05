@@ -38,21 +38,21 @@ const theme = createTheme({
 declare var window: any;
 
 // TODO: Keys are fine here but need to allowlist on Alchemy
-if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
-  var settings = {
-    apiKey: 'zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP',
-    network: Network.MATIC_MUMBAI,
-  };
-} else {
-  var settings = {
-    apiKey: 'ZpTrffHTCK4-j10a7fqHRAxXDIpQly2y',
-    network: Network.MATIC_MUMBAI,
-  };
-}
+// if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
+//   var settings = {
+//     apiKey: 'removed',
+//     network: Network.MATIC_MUMBAI,
+//   };
+// } else {
+//   var settings = {
+//     apiKey: 'removed',
+//     network: Network.MATIC_MUMBAI,
+//   };
+// }
 
-const alchemy = new Alchemy(settings);
+// const alchemy = new Alchemy(settings);
 
-let provider: any;
+// let provider: any;
 let gameContract_read: ethers.Contract;
 let lobbiesContract_read: ethers.Contract;
 let charContract_read: ethers.Contract;
