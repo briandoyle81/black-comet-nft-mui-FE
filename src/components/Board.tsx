@@ -75,6 +75,7 @@ export interface CharInterface {
 }
 
 export default function GameBoard(props: GameBoardProps) {
+  const { resetEventFlipper } = props;
   const n = 11; // TODO: Hardcoded board size, can't use await here
 
   const [loading, setLoading] = useState(true);
@@ -177,14 +178,14 @@ export default function GameBoard(props: GameBoardProps) {
 
     const loadGameBoard = async () => {
 
-      if (props.eventFlipper === true) {
+      if (props.eventFlipper === true || gameLoaded === false) {
         console.log("updating doors, board, players from chain")
         await updateDoorsFromChain();
         await updateBoardFromChain();
         await updateRemotePlayers();
 
         if (props.eventFlipper) {
-          props.resetEventFlipper();
+          resetEventFlipper();
         }
       }
 
@@ -195,14 +196,13 @@ export default function GameBoard(props: GameBoardProps) {
         setGameLoaded(true);
       }
 
-
       // Maybe need to have await tx.await() here?
       setLoading(false);
 
     }
     loadGameBoard();
 
-  }, [gameLoaded, props]);
+  }, [gameLoaded, props.charContract_read, props.currentGameNumber, props.eventFlipper, props.gameContract_read, props.mapContract_read, resetEventFlipper]);
 
   function onUpdateGameClick() {
     setGameLoaded(false);
