@@ -112,10 +112,6 @@ function App() {
 
     const loadWallet = async () => {
       // TODO: Cleanup
-      // setLoading(true);
-      console.log("Loading wallet");
-
-
       const walletProvider = new ethers.providers.Web3Provider(window.ethereum, "any");
       try {
         // send a request to the wallet to switch the network and select the Ethereum mainnet
@@ -189,8 +185,7 @@ function App() {
       console.log("Loading wallet")
       loadWallet();
     }
-
-  }, [currentGameNumber, walletLoaded, provider]);
+  });
 
 
   interface TabPanelProps {

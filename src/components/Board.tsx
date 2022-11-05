@@ -1,24 +1,16 @@
-import { Button, Card, CardContent, CardMedia, TextField } from '@mui/material';
-import React, { ReactNode, useEffect, useState } from 'react';
+import { Button, Card, CardContent, TextField } from '@mui/material';
+import { ReactNode, useEffect, useState } from 'react';
 import GamePanel, { GameInterface } from './GamePanel';
-import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 
-import { ethers, utils } from 'ethers';
-
-import { roomDisplayDataList } from './RoomTiles';
-
-import { DoorInterface, DoorStatus } from './Doors';
+import { DoorInterface } from './Doors';
 
 import Door from "./Doors";
 
-import Vent from "../assets/img/overlays/vent.png";
-import Player, { PlayerInterface } from './Player';
-import { Position } from './Utils';
-import GameInfo from './GameInfo';
-import Tile, { EmptyRoomTile, EmptyTile, GameTileInterface, RoomTile } from './Tile';
+import { PlayerInterface } from './Player';
+
+import Tile, { EmptyTile, GameTileInterface, RoomTile } from './Tile';
 
 let timesBoardPulled = 0;
 
@@ -78,7 +70,7 @@ export default function GameBoard(props: GameBoardProps) {
   const { resetEventFlipper } = props;
   const n = 11; // TODO: Hardcoded board size, can't use await here
 
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(false);
   const [currentGame, setCurrentGame] = useState(EmptyGame);
   const [roomTiles, setRoomTiles] = useState<RoomTile[]>([]);
   const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
@@ -88,125 +80,128 @@ export default function GameBoard(props: GameBoardProps) {
   const [gameLoaded, setGameLoaded] = useState(false);
   const [formGameNumber, setFormGameNumber] = useState(props.currentGameNumber);
 
+  const updateBoardFromChain = async () => {
+    timesBoardPulled++;
+    console.log("timesBoardPulled", timesBoardPulled);
+    const remoteBoard = await props.mapContract_read.extGetBoard(props.currentGameNumber); // TODO: Confirm that game and map numbers will always match
+    const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile));
+
+    remoteBoard.forEach((rowData: GameTileInterface[], row: number) => {
+      rowData.forEach((gameTile: GameTileInterface, col) => {
+        localBoard[row][col] = gameTile;
+      })
+    })
+
+    const remoteRoomTiles = await props.mapContract_read.extGetRoomList(props.currentGameNumber);// TODO: Confirm that game and map numbers will always match
+    const localRoomTiles: RoomTile[] = [];
+
+    remoteRoomTiles.forEach((roomTile: RoomTile) => {
+      localRoomTiles.push(roomTile);
+    });
+
+    // console.log(localRoomTiles);
+    setGameTiles(localBoard);
+    setRoomTiles(localRoomTiles);
+  }
+
+  const updateCharsFromChain = async () => {
+    const updatedChars: CharInterface[] = [];
+    // TODO: Get the cached char id list instead of loading it
+    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
+
+    for (let i = 0; i < playerIndexes.length; i++) {
+      const remotePlayer = await props.gameContract_read.players(playerIndexes[i]);
+      const remoteChar = await props.charContract_read.characters(remotePlayer.characterId);
+      updatedChars.push(remoteChar);
+    }
+
+    setChars(updatedChars);
+  }
+
+  const updateDoorsFromChain = async () => {
+    const remoteDoors = await props.mapContract_read.extGetDoors(props.currentGameNumber); // TODO: Get game first and get board number from it
+    // console.log(remoteDoors);
+
+    const newDoors: DoorInterface[] = [];
+
+    remoteDoors.forEach((door: DoorInterface, index: number) => {
+      const newDoor: DoorInterface = { vsBreach: door.vsBreach, vsHack: door.vsHack, status: door.status, rotate: false };
+      // newDoors[index] = newDoor;
+      newDoors.push(newDoor);
+    });
+
+    setDoors(newDoors);
+  }
+
+  const updateRemotePlayers = async () => {
+    const newPlayers: PlayerInterface[] = [];
+
+    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
+
+    for (let i = 0; i < playerIndexes.length; i++) {
+      const remotePlayer = await props.gameContract_read.players(playerIndexes[i]);
+      const { position } = remotePlayer;
+      const newPlayer: PlayerInterface = {
+        remoteId: playerIndexes[i],
+
+        owner: remotePlayer.owner,
+        charContractAddress: remotePlayer.charContractAddress,
+        characterId: remotePlayer.characterId,
+
+        position: position,
+
+        healthDmgTaken: remotePlayer.healthDmgTaken,
+        armorDmgTaken: remotePlayer.armorDmgTaken,
+        actionsTaken: remotePlayer.actionsTaken,
+
+        dataTokens: remotePlayer.dataTokens,
+        currentEffects: remotePlayer.currentEffects,
+        inventoryIDs: remotePlayer.inventoryIDs,
+
+        canHarmOthers: remotePlayer.canHarmOthers,
+        dead: remotePlayer.dead
+      }
+      newPlayers.push(newPlayer);
+    }
+    setPlayers(newPlayers);
+  }
+
+  const loadGameBoard = async () => {
+
+    if (props.eventFlipper === true) {
+      console.log("updating doors, board, players from chain")
+      await updateDoorsFromChain();
+      await updateBoardFromChain();
+      await updateRemotePlayers();
+
+      await resetEventFlipper();
+    }
+
+    if (gameLoaded === false) {
+      const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
+      setCurrentGame(remoteGame);
+      await updateDoorsFromChain();
+      await updateBoardFromChain();
+      await updateRemotePlayers();
+
+      await updateCharsFromChain();
+      setGameLoaded(true);
+    }
+
+    // Maybe need to have await tx.await() here?
+    // setLoading(false);
+  }
+
   useEffect(() => {
     console.log("Start of useEffect in Board");
-    async function updateCharsFromChain() {
-      const updatedChars: CharInterface[] = [];
-      // TODO: Get the cached char id list instead of loading it
-      const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
 
-      for (let i = 0; i < playerIndexes.length; i++) {
-        const remotePlayer = await props.gameContract_read.players(playerIndexes[i]);
-        const remoteChar = await props.charContract_read.characters(remotePlayer.characterId);
-        updatedChars.push(remoteChar);
-      }
-
-      setChars(updatedChars);
-    }
-
-    async function updateBoardFromChain() {
-      timesBoardPulled++;
-      console.log("timesBoardPulled", timesBoardPulled);
-      const remoteBoard = await props.mapContract_read.extGetBoard(props.currentGameNumber); // TODO: Confirm that game and map numbers will always match
-      const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile));
-
-      remoteBoard.forEach((rowData: GameTileInterface[], row: number) => {
-        rowData.forEach((gameTile: GameTileInterface, col) => {
-          localBoard[row][col] = gameTile;
-        })
-      })
-
-      const remoteRoomTiles = await props.mapContract_read.extGetRoomList(props.currentGameNumber);// TODO: Confirm that game and map numbers will always match
-      const localRoomTiles: RoomTile[] = [];
-
-      remoteRoomTiles.forEach((roomTile: RoomTile) => {
-        localRoomTiles.push(roomTile);
-      });
-
-      // console.log(localRoomTiles);
-      setGameTiles(localBoard);
-      setRoomTiles(localRoomTiles);
-    }
-
-    async function updateDoorsFromChain() {
-      const remoteDoors = await props.mapContract_read.extGetDoors(props.currentGameNumber); // TODO: Get game first and get board number from it
-      // console.log(remoteDoors);
-
-      const newDoors: DoorInterface[] = [];
-
-      remoteDoors.forEach((door: DoorInterface, index: number) => {
-        const newDoor: DoorInterface = { vsBreach: door.vsBreach, vsHack: door.vsHack, status: door.status, rotate: false };
-        // newDoors[index] = newDoor;
-        newDoors.push(newDoor);
-      });
-
-      setDoors(newDoors);
-    }
-
-    async function updateRemotePlayers() {
-      const newPlayers: PlayerInterface[] = [];
-
-      const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
-
-      for (let i = 0; i < playerIndexes.length; i++) {
-        const remotePlayer = await props.gameContract_read.players(playerIndexes[i]);
-        const { position } = remotePlayer;
-        const newPlayer: PlayerInterface = {
-          remoteId: playerIndexes[i],
-
-          owner: remotePlayer.owner,
-          charContractAddress: remotePlayer.charContractAddress,
-          characterId: remotePlayer.characterId,
-
-          position: position,
-
-          healthDmgTaken: remotePlayer.healthDmgTaken,
-          armorDmgTaken: remotePlayer.armorDmgTaken,
-          actionsTaken: remotePlayer.actionsTaken,
-
-          dataTokens: remotePlayer.dataTokens,
-          currentEffects: remotePlayer.currentEffects,
-          inventoryIDs: remotePlayer.inventoryIDs,
-
-          canHarmOthers: remotePlayer.canHarmOthers,
-          dead: remotePlayer.dead
-        }
-        newPlayers.push(newPlayer);
-      }
-      setPlayers(newPlayers);
-    }
-
-    const loadGameBoard = async () => {
-
-      if (props.eventFlipper === true || gameLoaded === false) {
-        console.log("updating doors, board, players from chain")
-        await updateDoorsFromChain();
-        await updateBoardFromChain();
-        await updateRemotePlayers();
-
-        if (props.eventFlipper) {
-          resetEventFlipper();
-        }
-      }
-
-      if (gameLoaded === false) {
-        const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
-        setCurrentGame(remoteGame);
-        await updateCharsFromChain();
-        setGameLoaded(true);
-      }
-
-      // Maybe need to have await tx.await() here?
-      setLoading(false);
-
-    }
     loadGameBoard();
 
-  }, [gameLoaded, props.charContract_read, props.currentGameNumber, props.eventFlipper, props.gameContract_read, props.mapContract_read, resetEventFlipper]);
+  }, [gameLoaded, props.currentGameNumber, props.eventFlipper]);
 
   function onUpdateGameClick() {
     setGameLoaded(false);
-    setLoading(true);
+    // setLoading(true);
     props.setCurrentGameNumber(formGameNumber);
   }
 
@@ -288,18 +283,18 @@ export default function GameBoard(props: GameBoardProps) {
 
   function renderMapWithDoors() {
     // TODO: WHY DOESN"T THE "loading" STATE DO THIS????
-    if (doors.length === 0) {
-      return "Waiting for doors";
-    }
-    if (players.length === 0) {
-      return "Waiting for players";
-    }
-    if (gameTiles.length === 0) {
-      return "Waiting for gameTiles"
-    }
-    if (currentGame.mapContract === "") {
-      return "Waiting for game"
-    }
+    // if (doors.length === 0) {
+    //   return "Waiting for doors";
+    // }
+    // if (players.length === 0) {
+    //   return "Waiting for players";
+    // }
+    // if (gameTiles.length === 0) {
+    //   return "Waiting for gameTiles"
+    // }
+    // if (currentGame.mapContract === "") {
+    //   return "Waiting for game"
+    // }
     const rows: ReactNode[] = [];
     gameTiles.forEach((rowData: GameTileInterface[], row) => {
       if (row === 0) {
@@ -330,7 +325,7 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   function renderMapArea() {
-    return (loading ? "Loading..." :
+    return (!gameLoaded ? "Loading..." :
       <Card>
         <CardContent>
           <Box sx={{ flexGrow: 1 }}>
@@ -343,25 +338,25 @@ export default function GameBoard(props: GameBoardProps) {
 
   function renderGameArea() {
     // TODO: WHY DOESN"T THE "loading" STATE DO THIS????
-    if (doors.length === 0) {
-      return "Waiting for doors";
-    }
-    if (players.length === 0) {
-      return "Waiting for players";
-    }
-    if (gameTiles.length === 0) {
-      return "Waiting for gameTiles"
-    }
-    if (currentGame.mapContract === "") {
-      return "Waiting for game"
-    }
-    if (props.playerSignerAddress === undefined) {
-      return "Waiting for game"
-    }
+    // if (doors.length === 0) {
+    //   return "Waiting for doors";
+    // }
+    // if (players.length === 0) {
+    //   return "Waiting for players";
+    // }
+    // if (gameTiles.length === 0) {
+    //   return "Waiting for gameTiles"
+    // }
+    // if (currentGame.mapContract === "") {
+    //   return "Waiting for game"
+    // }
+    // if (props.playerSignerAddress === undefined) {
+    //   return "Waiting for game"
+    // }
     // if (chars.length === 0) {
     //   return "Waiting for chars";
     // }
-    return (loading ? "Loading Game Area..." :
+    return (!gameLoaded ? "Loading Game Area..." :
       <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
         <Grid item xs={9}>
           {renderMapArea()}
@@ -400,7 +395,7 @@ export default function GameBoard(props: GameBoardProps) {
     )
   }
 
-  return (loading ? <Box>"Loading Board..."</Box> :
+  return (!gameLoaded ? <Box>"Loading Board..."</Box> :
     <Box>
       {renderGameArea()}
     </Box>
