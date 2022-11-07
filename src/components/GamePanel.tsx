@@ -59,7 +59,9 @@ export default function GamePanel(props: GameInfoInterface) {
     const itemList = props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex];
     for (let i = 0; i < itemList.length; i++) {
       itemCards.push(
-        <ItemCard {...itemList[i]}  id={"item-card-for-" + itemList[i].genHash}/>
+        <Grid item xs={12} key={"item-card-for-" + itemList[i].genHash}>
+          <ItemCard {...itemList[i]}/>
+        </Grid>
       )
     }
     return (

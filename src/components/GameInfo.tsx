@@ -3,7 +3,6 @@ import { GameInterface, GameInfoInterface } from "./GamePanel";
 import Player, { PlayerInterface } from "./Player";
 
 export default function GameInfo(props: GameInfoInterface) {
-  console.log(props.allHeldItems)
   return (
     <Card>
       <Grid container spacing={0}>

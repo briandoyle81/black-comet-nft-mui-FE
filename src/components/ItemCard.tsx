@@ -42,43 +42,41 @@ const ItemTypeToString = new Map([
 export default function ItemCard(props: ItemDataInterface) {
 
     return (
-        <Grid item xs={12} id={"item-card-for-" + props.genHash}>
-            <Card>
-                <CardContent>
-                    <Grid container spacing={1}>
-                        <Grid item xs={12}>
-                            <Typography variant="body1">
-                                {props.genHash}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Typography variant="body1">
-                                Id: {props.id.toString()}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Typography variant="body1">
-                                Weight: {props.weight.toString()}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Typography variant="body1">
-                                Category: {ItemCategoryToString.get(props.itemCategory)}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Typography variant="body1">
-                                Type: {ItemTypeToString.get(props.itemType)}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Typography variant="body1">
-                                Power: {props.power.toString()}
-                            </Typography>
-                        </Grid>
+        <Card>
+            <CardContent>
+                <Grid container spacing={1}>
+                    <Grid item xs={12}>
+                        <Typography variant="body1">
+                            {props.genHash}
+                        </Typography>
                     </Grid>
-                </CardContent>
-            </Card>
-        </Grid>
+                    <Grid item xs={4}>
+                        <Typography variant="body1">
+                            Id: {props.id.toString()}
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Typography variant="body1">
+                            Weight: {props.weight.toString()}
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Typography variant="body1">
+                            Category: {ItemCategoryToString.get(props.itemCategory)}
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Typography variant="body1">
+                            Type: {ItemTypeToString.get(props.itemType)}
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Typography variant="body1">
+                            Power: {props.power.toString()}
+                        </Typography>
+                    </Grid>
+                </Grid>
+            </CardContent>
+        </Card>
     )
 }

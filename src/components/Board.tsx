@@ -88,11 +88,9 @@ export default function GameBoard(props: GameBoardProps) {
 
     let playerItems: any[][] = [];
     for (let i = 0; i < playerIndexes.length; i++) {
-      // console.log("Getting items for player", playerIndexes[i])
       const currentPlayerId = playerIndexes[i];
       // TODO: Debug this.  Works fine in unit test trying to get items from null set, crashes here
       const remoteItems = await props.itemContract_read.getItemsByPlayer(currentPlayerId);
-      // console.log("remote items", remoteItems)
 
       playerItems.push(remoteItems);
     }
