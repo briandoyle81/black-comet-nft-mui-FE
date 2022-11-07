@@ -263,6 +263,7 @@ function App() {
                 mapContract_read={mapContract_read}
                 gameContract_read={gameContract_read}
                 charContract_read={charContract_read}
+                itemContract_read={itemsContract_read}
                 playerSignerAddress={playerAddress}
                 actionsContract_write={actionsContract_write}
                 eventFlipper={eventFlipper}

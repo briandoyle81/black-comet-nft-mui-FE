@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { ReactNode } from 'react';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -8,6 +8,8 @@ import { PlayerInterface } from './Player';
 import ActionPicker from './ActionPicker';
 import { CharInterface } from './Board';
 import { Typography } from '@mui/material';
+import { isPropertySignature } from 'typescript';
+import ItemCard from './ItemCard';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -25,11 +27,12 @@ export interface GameInfoInterface {
   playerSignerAddress: string,
   actionsContract_write: any, // TODO: Any
   lastDieRoll: number,
-  numItems: number
+  numItems: number, // number of items in the current room
+  allHeldItems: any, // TODO: any
 }
 
 export interface GameInterface {
-  // TODO: Should games just always be 3 or 4 players???
+
   active: boolean;
 
   playerIndexes: number[];
@@ -51,6 +54,22 @@ export interface GameInterface {
 }
 
 export default function GamePanel(props: GameInfoInterface) {
+  function renderItemCards() {
+    const itemCards: ReactNode[] = [];
+    const itemList = props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex];
+    for (let i = 0; i < itemList.length; i++) {
+      itemCards.push(
+        <ItemCard {...itemList[i]} />
+      )
+    }
+    return (
+      <Grid container>
+        {itemCards}
+      </Grid>
+    )
+  }
+
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1}>
@@ -61,7 +80,7 @@ export default function GamePanel(props: GameInfoInterface) {
           <ActionPicker {...props}/>
         </Grid>
         <Grid item xs={12}>
-          <Item>xs=4</Item>
+          {renderItemCards()}
         </Grid>
         <Grid item xs={12}>
           <Typography variant="body1">

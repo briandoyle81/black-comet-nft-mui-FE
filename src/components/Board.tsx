@@ -36,6 +36,7 @@ export interface GameBoardProps {
   mapContract_read: any;  // TODO anys
   gameContract_read: any;
   charContract_read: any;
+  itemContract_read: any;
   playerSignerAddress: string;
   actionsContract_write: any; // TODO: Any
   eventFlipper: boolean;
@@ -79,6 +80,24 @@ export default function GameBoard(props: GameBoardProps) {
   const [chars, setChars] = useState<CharInterface[]>([]);
   const [gameLoaded, setGameLoaded] = useState(false);
   const [formGameNumber, setFormGameNumber] = useState(props.currentGameNumber);
+  const [currentPlayerItems, setCurrentPlayerItems] = useState<any[]>(); // TODO: Any
+
+  const updateCurrentPlayerItemsFromChain = async () => {
+    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
+    // console.log("Player indexes", playerIndexes);
+
+    let playerItems: any[][] = [];
+    for (let i = 0; i < playerIndexes.length; i++) {
+      // console.log("Getting items for player", playerIndexes[i])
+      const currentPlayerId = playerIndexes[i];
+      // TODO: Debug this.  Works fine in unit test trying to get items from null set, crashes here
+      const remoteItems = await props.itemContract_read.getItemsByPlayer(currentPlayerId);
+      // console.log("remote items", remoteItems)
+
+      playerItems.push(remoteItems);
+    }
+    setCurrentPlayerItems(playerItems);
+  }
 
   const updateBoardFromChain = async () => {
     timesBoardPulled++;
@@ -170,9 +189,11 @@ export default function GameBoard(props: GameBoardProps) {
 
     if (props.eventFlipper === true) {
       console.log("updating doors, board, players from chain")
+
       await updateDoorsFromChain();
       await updateBoardFromChain();
       await updateRemotePlayers();
+      await updateCurrentPlayerItemsFromChain();
 
       await resetEventFlipper();
     }
@@ -183,6 +204,7 @@ export default function GameBoard(props: GameBoardProps) {
       await updateDoorsFromChain();
       await updateBoardFromChain();
       await updateRemotePlayers();
+      await updateCurrentPlayerItemsFromChain();
 
       await updateCharsFromChain();
       setGameLoaded(true);
@@ -397,6 +419,7 @@ export default function GameBoard(props: GameBoardProps) {
               actionsContract_write={props.actionsContract_write}
               lastDieRoll={props.lastDieRoll}
               numItems={getNumItems()}
+              allHeldItems={currentPlayerItems}
             />
           </Card>
         </Grid>

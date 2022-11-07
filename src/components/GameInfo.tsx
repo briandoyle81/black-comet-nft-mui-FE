@@ -3,7 +3,7 @@ import { GameInterface, GameInfoInterface } from "./GamePanel";
 import Player, { PlayerInterface } from "./Player";
 
 export default function GameInfo(props: GameInfoInterface) {
-
+  console.log(props.allHeldItems)
   return (
     <Card>
       <Grid container spacing={0}>
@@ -31,7 +31,7 @@ export default function GameInfo(props: GameInfoInterface) {
                 Dmg. Taken: {props.currentPlayer.healthDmgTaken.toString()}/{props.currentChar.traits.health}
               </Typography>
               <Typography variant="body1">
-                Carrying: TODO/{props.currentChar.traits.carry}
+                Carrying: { props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex].length}/{props.currentChar.traits.carry}
               </Typography>
               <Typography variant="body1">
                 Defense: {props.currentChar.traits.defense}
