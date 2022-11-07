@@ -61,13 +61,6 @@ let itemsContract_read: ethers.Contract;
 let actionsContract_read: ethers.Contract;
 let utilsContract_read: ethers.Contract;
 
-
-// const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP");
-
-// const provider = new ethers.providers.AlchemyWebSocketProvider('maticmum', 'zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP');
-// const provider = new ethers.providers.JsonRpcProvider("https://polygon-mumbai.infura.io/v3/357c214d39224c62ba25d2886bdf0a27");
-// const provider = new ethers.providers.InfuraWebSocketProvider('maticmum', '357c214d39224c62ba25d2886bdf0a27')
-// const debugSigner = new ethers.Wallet(process.env.REACT_APP_METAMASK_WALLET_1 as string, provider);
 let playerSigner: any; //TODO: any
 // let gameContract_write: ethers.Contract;
 let lobbiesContract_write: ethers.Contract;
@@ -75,21 +68,6 @@ let charContract_write: ethers.Contract;
 let actionsContract_write: ethers.Contract;
 let itemsContract_write: ethers.Contract;
 let playerAddress: string;
-
-// const roomTilesContract_read = new ethers.Contract(roomTilesContractDeployData.address, roomTilesContractDeployData.abi, provider);
-// const gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
-// const lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
-// const charContract_read = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
-// const mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
-// myContract_write = new ethers.Contract(address, abi, signer)    // Write only
-
-// const gameEventFilter = {
-//   address: gameContractDeployData.address,
-//   topics: [
-//     utils.id("DiceRollEvent(uint,uint)"),
-//     utils.id("ActionCompleteEvent(BCTypes.Player,BCTypes.Action)")
-//   ]
-// }
 
 function App() {
   const [appLoading, setAppLoading] = useState(true);
