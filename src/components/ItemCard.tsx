@@ -26,7 +26,21 @@ interface ItemDataInterface {
     inGame: boolean
 }
 
+const ItemCategoryToString = new Map([
+    [ItemCategory.COMPANY, "Company"],
+    [ItemCategory.ARTIFACT, "Artifact"],
+    [ItemCategory.SCAVENGER, "Scavenger"]
+]);
+
+const ItemTypeToString = new Map([
+    [ItemType.ARMOR, "Armor"],
+    [ItemType.GUN, "Gun"],
+    [ItemType.MELEE, "Melee"],
+    [ItemType.TODO_ITEM, "TODO TYPE"]
+]);
+
 export default function ItemCard(props: ItemDataInterface) {
+
     return (
         <Grid item xs={12} id={"item-card-for-" + props.genHash}>
             <Card>
@@ -49,12 +63,12 @@ export default function ItemCard(props: ItemDataInterface) {
                         </Grid>
                         <Grid item xs={4}>
                             <Typography variant="body1">
-                                Category: {props.itemCategory.toString()}
+                                Category: {ItemCategoryToString.get(props.itemCategory)}
                             </Typography>
                         </Grid>
                         <Grid item xs={4}>
                             <Typography variant="body1">
-                                Type: {props.itemType.toString()}
+                                Type: {ItemTypeToString.get(props.itemType)}
                             </Typography>
                         </Grid>
                         <Grid item xs={4}>
