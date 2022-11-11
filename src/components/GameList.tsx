@@ -33,6 +33,7 @@ export default function GameList(props: GameListDataInterface) {
           currentPlayerTurnIndex,
           numPlayers,
           turnsTaken,
+          eventTracker,
           mapContract,
           mapId
         } = newGame;
@@ -43,6 +44,7 @@ export default function GameList(props: GameListDataInterface) {
           currentPlayerTurnIndex: currentPlayerTurnIndex,
           numPlayers: numPlayers,
           turnsTaken: turnsTaken,
+          eventTracker: eventTracker,
           mapContract: mapContract,
           mapId: mapId,
           gameNumber: gameIds[i]

@@ -1,24 +1,91 @@
-import { Card, Grid, Typography } from "@mui/material";
+import { Card, CardContent, CardHeader, Grid, Typography } from "@mui/material";
 import { GameInterface, GameInfoInterface } from "./GamePanel";
 import Player, { PlayerInterface } from "./Player";
 
 export default function GameInfo(props: GameInfoInterface) {
   return (
     <Card>
-      <Grid container spacing={0}>
+      <Grid container spacing={1}>
         <Grid item xs={12}>
-          <Typography variant="h5">
-            Game Info
-          </Typography>
-          <Typography variant="body1">
-            Game Number: {props.currentGameNumber}
-          </Typography>
-          <Typography variant="body1">
-            Current Player: {props.currentGameProps.currentPlayerTurnIndex.toString()}
-          </Typography>
-          <Typography variant="body1">
-              Id Number: {props.currentChar.id.toString()}
-            </Typography>
+          <Card>
+            <CardContent>
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <Card>
+                    <CardHeader
+                      title="Game Info"
+                    />
+                    <CardContent>
+                      <Grid container spacing={1}>
+                        <Grid item xs={9}>
+                          <Typography variant="body1" align="left">
+                            Game #:
+                          </Typography>
+                          <Typography variant="body1" align="left">
+                            Current Player:
+                          </Typography>
+                          <Typography variant="body1" align="left">
+                            Id Number:
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Typography variant="body1">
+                            {props.currentGameNumber}
+                          </Typography>
+                          <Typography variant="body1">
+                            {props.currentGameProps.currentPlayerTurnIndex.toString()}
+                          </Typography>
+                          <Typography variant="body1">
+                            {props.currentChar.id.toString()}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+                <Grid item xs={6}>
+                  <Card>
+                    <CardHeader
+                      title="Event Tracker"
+                    />
+                    <CardContent>
+                      <Grid container spacing={1}>
+                        <Grid item xs={6}>
+                          <Typography variant="body1" align="left">
+                            Bug:
+                          </Typography>
+                          <Typography variant="body1" align="left">
+                            Mystery:
+                          </Typography>
+                          <Typography variant="body1" align="left">
+                            Scavenger:
+                          </Typography>
+                          <Typography variant="body1" align="left">
+                            Ship:
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            {props.currentGameProps.eventTracker.bugEvents.toString()}
+                          </Typography>
+                          <Typography variant="body1">
+                            {props.currentGameProps.eventTracker.mysteryEvents.toString()}
+                          </Typography>
+                          <Typography variant="body1">
+                            {props.currentGameProps.eventTracker.scavEvents.toString()}
+                          </Typography>
+                          <Typography variant="body1">
+                            {props.currentGameProps.eventTracker.shipEvents.toString()}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
         </Grid>
         <Grid item xs={12}>
           <Grid container spacing={0}>
@@ -30,7 +97,7 @@ export default function GameInfo(props: GameInfoInterface) {
                 Dmg. Taken: {props.currentPlayer.healthDmgTaken.toString()}/{props.currentChar.traits.health}
               </Typography>
               <Typography variant="body1">
-                Carrying: { props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex].length}/{props.currentChar.traits.carry}
+                Carrying: {props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex].length}/{props.currentChar.traits.carry}
               </Typography>
               <Typography variant="body1">
                 Defense: {props.currentChar.traits.defense}

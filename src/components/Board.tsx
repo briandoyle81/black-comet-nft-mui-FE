@@ -1,6 +1,6 @@
 import { Button, Card, CardContent, TextField } from '@mui/material';
 import { ReactNode, useEffect, useState } from 'react';
-import GamePanel, { GameInterface } from './GamePanel';
+import GamePanel, { EventTrackerInterface, GameInterface } from './GamePanel';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 
@@ -16,6 +16,13 @@ let timesBoardPulled = 0;
 
 const DISPLAY_COLUMNS = 13;
 
+const EmptyEventTracker: EventTrackerInterface = {
+  bugEvents: 0,
+  mysteryEvents: 0,
+  scavEvents: 0,
+  shipEvents: 0
+}
+
 export const EmptyGame: GameInterface = {
   active: false,
 
@@ -24,6 +31,8 @@ export const EmptyGame: GameInterface = {
   numPlayers: 0,
 
   turnsTaken: 0,
+
+  eventTracker: EmptyEventTracker,
 
   mapContract: "",
   mapId: 0,
@@ -72,7 +81,7 @@ export default function GameBoard(props: GameBoardProps) {
   const n = 11; // TODO: Hardcoded board size, can't use await here
 
   // const [loading, setLoading] = useState(false);
-  const [currentGame, setCurrentGame] = useState(EmptyGame);
+  const [currentGame, setCurrentGame] = useState<GameInterface>(EmptyGame);
   const [roomTiles, setRoomTiles] = useState<RoomTile[]>([]);
   const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
   const [doors, setDoors] = useState<DoorInterface[]>([]);
@@ -193,10 +202,13 @@ export default function GameBoard(props: GameBoardProps) {
       await updateRemotePlayers();
       await updateCurrentPlayerItemsFromChain();
 
-      await resetEventFlipper();
+      await updateCharsFromChain();
+
+      resetEventFlipper();
     }
 
     if (gameLoaded === false) {
+      console.log("Loading game number:", props.currentGameNumber)
       const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
       setCurrentGame(remoteGame);
       await updateDoorsFromChain();

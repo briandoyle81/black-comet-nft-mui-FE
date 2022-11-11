@@ -31,6 +31,13 @@ export interface GameInfoInterface {
   allHeldItems: any, // TODO: any
 }
 
+export interface EventTrackerInterface {
+  bugEvents: number;
+  mysteryEvents: number;
+  scavEvents: number;
+  shipEvents: number;
+}
+
 export interface GameInterface {
 
   active: boolean;
@@ -42,7 +49,7 @@ export interface GameInterface {
 
   turnsTaken: number;
 
-  // EventTracker eventTracker;
+  eventTracker: EventTrackerInterface;
 
   mapContract: string; // TODO: Handle if game contract changes!!!!
   mapId: number;
