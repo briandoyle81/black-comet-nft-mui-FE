@@ -17,10 +17,10 @@ let timesBoardPulled = 0;
 const DISPLAY_COLUMNS = 13;
 
 const EmptyEventTracker: EventTrackerInterface = {
-  bugEvents: 0,
-  mysteryEvents: 0,
-  scavEvents: 0,
-  shipEvents: 0
+  bugEvents: -1,
+  mysteryEvents: -1,
+  scavEvents: -1,
+  shipEvents: -1
 }
 
 export const EmptyGame: GameInterface = {
