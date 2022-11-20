@@ -62,6 +62,24 @@ export default function Characters(props: CharactersDataInterface) {
     }
   }
 
+  async function handleSoloClick(id: number) {
+    const tx = await props.charContract_write.enlistSolo(id, { value: ethers.utils.parseEther(".0005") });
+    await tx.wait();
+    setCharsLoaded(false);
+  }
+
+  function renderSoloButton(char: CharInterface) {
+    if (char.inGame) {
+      return (
+        <Button variant="contained" disabled>Away on Mission</Button>
+      )
+    } else {
+      return (
+        <Button variant="contained" onClick={() => { handleSoloClick(char.id) }}>Start Solo Mission</Button>
+      )
+    }
+  }
+
   function renderCharData() {
     const charList: ReactNode[] = []
     chars.forEach((char: CharInterface, index) => {
@@ -114,7 +132,14 @@ export default function Characters(props: CharactersDataInterface) {
               </Grid>
             </Grid>
             <Grid item xs={12}>
-              {renderEnlistButton(char)}
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  {renderEnlistButton(char)}
+                </Grid>
+                <Grid item xs={6}>
+                  {renderSoloButton(char)}
+                </Grid>
+              </Grid>
             </Grid>
           </Card>
         </Grid>
