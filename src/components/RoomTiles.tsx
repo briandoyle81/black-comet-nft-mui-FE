@@ -1,5 +1,3 @@
-import { constants } from "crypto";
-
 import Space from "../assets/img/room-bg/space.png";
 import Unexplored from "../assets/img/room-bg/tile_back.png";
 
@@ -40,7 +38,7 @@ interface roomDisplayData {
 }
 
 let roomDisplayDataList: roomDisplayData[] = []
-
+// TODO: Critical -> Don't rely on order assumption here, add room id number
 roomDisplayDataList.push({
   name: "Empty Space",
   desc: "There is nothing here.",
