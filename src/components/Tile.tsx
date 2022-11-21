@@ -25,6 +25,8 @@ import ShipIcon from '../assets/img/overlays/ship.png';
 import DataIcon from '../assets/img/overlays/data.png';
 import ItemIcon from '../assets/img/overlays/item.png';
 
+import Hazard from '../assets/img/overlays/hazard.png';
+
 export enum EventType { NONE=0, BUG, MYSTERY, SCAVENGER, SHIP_SECURITY }
 
 const TileOverlay = styled(Box)(({ theme }) => ({
@@ -59,7 +61,7 @@ export interface RoomTile {
   numItems: number;
   numData: number;
 
-  hasHazard: boolean;
+  // hasHazard: boolean;
   sigDetected: boolean;
 }
 
@@ -70,7 +72,7 @@ export const EmptyRoomTile: RoomTile = {
   numItems: 0,
   numData: 0,
 
-  hasHazard: false,
+  // hasHazard: false,
   sigDetected: false
 }
 
@@ -82,7 +84,8 @@ export interface GameTileInterface {
 
   explored: boolean,
   looted: boolean,
-  hasVent: boolean
+  hasVent: boolean,
+  hasHazard: false
 }
 
 export const EmptyTile: GameTileInterface = {
@@ -93,7 +96,8 @@ export const EmptyTile: GameTileInterface = {
 
   explored: false,
   looted: false,
-  hasVent: false
+  hasVent: false,
+  hasHazard: false
 }
 
 export interface TilePropsInterface {
@@ -235,6 +239,14 @@ export default function Tile(props: TilePropsInterface) {
       iconRenders.push(
         <Grid item xs={3} key={(iconRenders.length - 1) + "bottom_icon"}>
           <img src={Vent} alt="Vent" style={{ width: '100%', zIndex: 2000 }} />
+        </Grid>
+      )
+    }
+
+    if (props.tile.hasHazard) {
+      iconRenders.push(
+        <Grid item xs={3} key={(iconRenders.length - 1) + "bottom_icon"}>
+          <img src={Hazard} alt="Hazard" style={{ width: '100%', zIndex: 2000 }} />
         </Grid>
       )
     }
