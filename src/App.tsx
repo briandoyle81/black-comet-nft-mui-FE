@@ -62,7 +62,7 @@ let actionsContract_read: ethers.Contract;
 let utilsContract_read: ethers.Contract;
 
 let playerSigner: any; //TODO: any
-// let gameContract_write: ethers.Contract;
+let gameContract_write: ethers.Contract;
 let lobbiesContract_write: ethers.Contract;
 let charContract_write: ethers.Contract;
 let actionsContract_write: ethers.Contract;
@@ -135,7 +135,7 @@ function App() {
       utilsContract_read = await new ethers.Contract(utilsContractDeployData.address, utilsContractDeployData.abi, provider);
 
 
-      // gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
+      gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
       charContract_write = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
       lobbiesContract_write = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
       actionsContract_write = new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, provider);
@@ -240,6 +240,7 @@ function App() {
                 currentGameNumber={currentGameNumber}
                 mapContract_read={mapContract_read}
                 gameContract_read={gameContract_read}
+                gameContract_write={gameContract_write}
                 charContract_read={charContract_read}
                 itemContract_read={itemsContract_read}
                 playerSignerAddress={playerAddress}
@@ -253,8 +254,10 @@ function App() {
             <TabPanel value={tabValue} index={3}>
               <Box>Lobbies</Box>
             </TabPanel>
+            <Typography>Dev Notes</Typography>
             <Typography>UI/UX is temporary.  Feedback is not required.  I know ;)</Typography>
-            <Typography>Alpha Test.  Play at your own risk!  Use a dev wallet!</Typography>
+            <Typography>Alpha Test.  Play at your own risk!  In-game NFTs will be reset regularly.  Use a dev wallet!</Typography>
+            <Typography>A transaction that is expected to fail means bad input.  If transactions are failing after submission, try again with double the gas limit.</Typography>
           </Card>
         </div>
       </ThemeProvider>

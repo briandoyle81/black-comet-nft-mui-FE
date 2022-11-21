@@ -35,7 +35,11 @@ export default function GameList(props: GameListDataInterface) {
           turnsTaken,
           eventTracker,
           mapContract,
-          mapId
+          mapId,
+          eventPlayerId,
+          eventNumber,
+          eventIsTile,
+          eventPosition
         } = newGame;
 
         const localGame = {
@@ -47,6 +51,10 @@ export default function GameList(props: GameListDataInterface) {
           eventTracker: eventTracker,
           mapContract: mapContract,
           mapId: mapId,
+          eventPlayerId: eventPlayerId,
+          eventNumber: eventNumber,
+          eventIsTile: eventIsTile,
+          eventPosition: eventPosition,
           gameNumber: gameIds[i]
         }
         newGames.push(localGame);

@@ -10,6 +10,8 @@ import { CharInterface } from './Board';
 import { Typography } from '@mui/material';
 import { isPropertySignature } from 'typescript';
 import ItemCard from './ItemCard';
+import EventModal from './EventModal';
+import { Position } from './Utils';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -26,6 +28,7 @@ export interface GameInfoInterface {
   currentGameNumber: number,
   playerSignerAddress: string,
   actionsContract_write: any, // TODO: Any
+  gameContract_write: any,
   lastDieRoll: number,
   numItems: number, // number of items in the current room
   allHeldItems: any, // TODO: any
@@ -54,10 +57,12 @@ export interface GameInterface {
   mapContract: string; // TODO: Handle if game contract changes!!!!
   mapId: number;
 
-  gameNumber: number;
+  eventPlayerId: number;
+  eventNumber: number;
+  eventIsTile: boolean;
+  eventPosition: Position;
 
-  // uint8 currentPlayerTurn;
-  // uint8 startPlayerIndex;
+  gameNumber: number;
 }
 
 export default function GamePanel(props: GameInfoInterface) {
@@ -84,6 +89,9 @@ export default function GamePanel(props: GameInfoInterface) {
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <GameInfo {...props}/>
+        </Grid>
+        <Grid item xs={12}>
+          <EventModal {...props}/>
         </Grid>
         <Grid item xs={12}>
           <ActionPicker {...props}/>

@@ -37,6 +37,11 @@ export const EmptyGame: GameInterface = {
   mapContract: "",
   mapId: 0,
 
+  eventPlayerId: 0,
+  eventNumber: 0,
+  eventIsTile: false,
+  eventPosition: {row: 0, col: 0},
+
   gameNumber: -1
 }
 
@@ -44,6 +49,7 @@ export interface GameBoardProps {
   currentGameNumber: number;
   mapContract_read: any;  // TODO anys
   gameContract_read: any;
+  gameContract_write: any;
   charContract_read: any;
   itemContract_read: any;
   playerSignerAddress: string;
@@ -196,6 +202,9 @@ export default function GameBoard(props: GameBoardProps) {
   const loadGameBoard = async () => {
 
     if (props.eventFlipper === true) {
+      console.log("Loading game number:", props.currentGameNumber)
+      const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
+      setCurrentGame(remoteGame);
       console.log("updating doors, board, players from chain")
 
       await updateDoorsFromChain();
@@ -428,6 +437,7 @@ export default function GameBoard(props: GameBoardProps) {
               currentGameNumber={props.currentGameNumber}
               playerSignerAddress={props.playerSignerAddress}
               actionsContract_write={props.actionsContract_write}
+              gameContract_write={props.gameContract_write}
               lastDieRoll={props.lastDieRoll}
               numItems={getNumItems()}
               allHeldItems={currentPlayerItems}
