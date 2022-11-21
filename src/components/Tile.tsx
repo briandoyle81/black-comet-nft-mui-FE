@@ -35,6 +35,14 @@ const TileOverlay = styled(Box)(({ theme }) => ({
   background: 'transparent',
 }));
 
+const BottomOverlay = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  left: '0',
+  bottom: '0',
+  zIndex: 2000,
+  background: 'transparent',
+}));
+
 const RoomName = styled(Typography)(({ theme }) => ({
   position: 'absolute',
   bottom: 0,
@@ -96,15 +104,6 @@ export interface TilePropsInterface {
   currentGame: GameInterface;
   roomTiles: RoomTile[];
 }
-
-// TODO: Why does it need negative, and why does it change size/scale
-// TODO: Move to component?  Maybe move tiles to component
-const VentOverlay = styled(Card)(({ theme }) => ({
-  position: 'absolute',
-  left: '-55%',
-  bottom: '-55%',
-  scale: '15%'
-}));
 
 export default function Tile(props: TilePropsInterface) {
 
@@ -210,34 +209,41 @@ export default function Tile(props: TilePropsInterface) {
     }
 
     return (
-      <TileOverlay>
-        <Grid container>
-          <Grid item xs={12}>
-            {renderTopRowIcons()}
-          </Grid>
-          <Grid item xs={12}>
-            <Grid container>
-              {playerRenders}
+      <Box>
+        <TileOverlay>
+          <Grid container>
+            <Grid item xs={12}>
+              {renderTopRowIcons()}
+            </Grid>
+            <Grid item xs={12}>
+              <Grid container>
+                {playerRenders}
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </TileOverlay>
+        </TileOverlay>
+        <BottomOverlay>
+          {renderBottomRowIcons()}
+        </BottomOverlay>
+      </Box>
     );
   }
 
-  function renderVent(vent: boolean) {
-    if (vent) {
-      return (
-        <VentOverlay>
-          <CardMedia
-            image={Vent}
-            component="img"
-          />
-        </VentOverlay>
+  function renderBottomRowIcons() {
+    const iconRenders: ReactNode[] = [];
+    if (props.tile.hasVent) {
+      iconRenders.push(
+        <Grid item xs={3} key={(iconRenders.length - 1) + "bottom_icon"}>
+          <img src={Vent} alt="Vent" style={{ width: '100%', zIndex: 2000 }} />
+        </Grid>
       )
-    } else {
-      return (<Box></Box>)
     }
+
+    return (
+      <Grid container>
+        {iconRenders}
+      </Grid>
+    )
   }
 
   function renderTile() {
@@ -253,7 +259,6 @@ export default function Tile(props: TilePropsInterface) {
             component="img"
           />
           <RoomName sx={{ fontSize: '0.5rem', fontWeight: 'bold', textAlign: 'right' }}>{roomDisplayDataList[props.tile.roomId].name}</RoomName>
-          {renderVent(props.tile.hasVent)}
           {renderOverlays({ row: props.row, col: props.col })}
         </Card>
       )
