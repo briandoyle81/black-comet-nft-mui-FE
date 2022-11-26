@@ -54,10 +54,10 @@ export interface GameBoardProps {
   itemContract_read: any;
   playerSignerAddress: string;
   actionsContract_write: any; // TODO: Any
-  eventFlipper: boolean;
-  resetEventFlipper: Function;
-  lastDieRoll: number
+  actionsContract_read: any;
+  utilsContract_read: any;
   setCurrentGameNumber: Function;
+  walletLoaded: boolean;
 }
 
 export interface TraitsInterface {
@@ -83,7 +83,6 @@ export interface CharInterface {
 }
 
 export default function GameBoard(props: GameBoardProps) {
-  const { resetEventFlipper } = props;
   const n = 11; // TODO: Hardcoded board size, can't use await here
 
   // const [loading, setLoading] = useState(false);
@@ -96,6 +95,10 @@ export default function GameBoard(props: GameBoardProps) {
   const [gameLoaded, setGameLoaded] = useState(false);
   const [formGameNumber, setFormGameNumber] = useState(props.currentGameNumber);
   const [currentPlayerItems, setCurrentPlayerItems] = useState<any[]>(); // TODO: Any
+
+  const [lastDieRoll, setLastDieRoll] = useState(0);
+  const [eventFlipper, setEventFlipper] = useState(true);
+  const [eventsLoaded, setEventsLoaded] = useState(false);
 
   const updateCurrentPlayerItemsFromChain = async () => {
     const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
@@ -201,7 +204,7 @@ export default function GameBoard(props: GameBoardProps) {
 
   const loadGameBoard = async () => {
 
-    if (props.eventFlipper === true) {
+    if (eventFlipper === true) {
       console.log("Loading game number:", props.currentGameNumber)
       const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
       setCurrentGame(remoteGame);
@@ -214,7 +217,7 @@ export default function GameBoard(props: GameBoardProps) {
 
       await updateCharsFromChain();
 
-      resetEventFlipper();
+      setEventFlipper(false);
     }
 
     if (gameLoaded === false) {
@@ -238,8 +241,26 @@ export default function GameBoard(props: GameBoardProps) {
     console.log("Start of useEffect in Board");
 
     loadGameBoard();
+    if (props.walletLoaded && !eventsLoaded) {
+      // TODO: Find appropriate home
+      // TODO: This is probably triggered by ANY game
+      // TODO: This is here because if it's in App, for some reason, events cause the tab content to unmount and remount, completely reloading Board
+      props.actionsContract_read.on("ActionCompleteEvent", (player: any, action: any, event: any) => {
+        console.log("Event Player", player);
+        console.log("Event Action", action);
 
-  }, [gameLoaded, props.currentGameNumber, props.eventFlipper]);
+        setEventFlipper(true);
+      })
+
+      props.utilsContract_read.on("DiceRollEvent", (roll: any, forValue: any, against: any, event: any) => {
+        console.log("Roll Event roll", roll);
+
+        // TODO: This probably needs to say and filter based on which game number
+        setLastDieRoll(roll);
+      })
+    }
+
+  }, [gameLoaded, props.currentGameNumber, eventFlipper, props.walletLoaded]);
 
   function onUpdateGameClick() {
     setGameLoaded(false);
@@ -438,7 +459,7 @@ export default function GameBoard(props: GameBoardProps) {
               playerSignerAddress={props.playerSignerAddress}
               actionsContract_write={props.actionsContract_write}
               gameContract_write={props.gameContract_write}
-              lastDieRoll={props.lastDieRoll}
+              lastDieRoll={lastDieRoll}
               numItems={getNumItems()}
               allHeldItems={currentPlayerItems}
             />

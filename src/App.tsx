@@ -69,101 +69,83 @@ let actionsContract_write: ethers.Contract;
 let itemsContract_write: ethers.Contract;
 let playerAddress: string;
 
+let provider: any; //TODO: any
+
 function App() {
   const [appLoading, setAppLoading] = useState(true);
   const [walletLoaded, setWalletLoaded] = useState(false);
-  const [provider, setProvider] = useState();
+  // const [provider, setProvider] = useState();
 
   const [currentGameNumber, setCurrentGameNumber] = useState(0);
 
-  const [eventFlipper, setEventFlipper] = useState(true);
-  const [lastDieRoll, setLastDieRoll] = useState(0);
-
   const [tabValue, setTabValue] = useState(0);
 
-  function resetEventFlipper() {
-    setEventFlipper(false);
+  const [eventFlipper, setEventFlipper] = useState(false);
+
+  const loadWallet = async () => {
+    // TODO: Cleanup
+    const walletProvider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    try {
+      // send a request to the wallet to switch the network and select the Ethereum mainnet
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [{
+          chainId: ethers.utils.hexValue(80001),
+          rpcUrls: ["https://rpc-mumbai.maticvigil.com"],
+          chainName: "Polygon Testnet Mumbai",
+          nativeCurrency: {
+            name: "tMATIC",
+            symbol: "tMATIC", // 2-6 characters long
+            decimals: 18,
+          },
+          blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
+        }]
+      })
+    } catch (error: any) {
+      if (error.code === 4001) {
+        console.log("the user doesn't want to change the network!")
+      }
+      else if (error.code === 4902) {
+        console.log("this network is not in the user's wallet")
+      }
+      else {
+        console.log(`Error ${error.code}: ${error.message}`)
+      }
+    }
+
+    // Prompt user for account connections
+    walletProvider.send("eth_requestAccounts", []);
+    playerSigner = walletProvider.getSigner();
+    playerAddress = await playerSigner.getAddress();
+    provider = playerSigner;
+
+    // provider = await alchemy.config.getProvider();
+    gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
+    lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
+    charContract_read = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
+    mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
+    itemsContract_read = new ethers.Contract(itemsContractDeployData.address, itemsContractDeployData.abi, provider);
+    actionsContract_read = new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, provider);
+    utilsContract_read = new ethers.Contract(utilsContractDeployData.address, utilsContractDeployData.abi, provider);
+
+
+    gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
+    charContract_write = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
+    lobbiesContract_write = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
+    actionsContract_write = new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, provider);
+
+    setWalletLoaded(true);
+    setAppLoading(false);
   }
 
   useEffect(() => {
     console.log("Start of useEffect");
 
-    const loadWallet = async () => {
-      // TODO: Cleanup
-      const walletProvider = new ethers.providers.Web3Provider(window.ethereum, "any");
-      try {
-        // send a request to the wallet to switch the network and select the Ethereum mainnet
-        await window.ethereum.request({
-          method: "wallet_addEthereumChain",
-          params: [{
-            chainId: ethers.utils.hexValue(80001),
-            rpcUrls: ["https://rpc-mumbai.maticvigil.com"],
-            chainName: "Polygon Testnet Mumbai",
-            nativeCurrency: {
-              name: "tMATIC",
-              symbol: "tMATIC", // 2-6 characters long
-              decimals: 18,
-            },
-            blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
-          }]
-        })
-      } catch (error: any) {
-        if (error.code === 4001) {
-          console.log("the user doesn't want to change the network!")
-        }
-        else if (error.code === 4902) {
-          console.log("this network is not in the user's wallet")
-        }
-        else {
-          console.log(`Error ${error.code}: ${error.message}`)
-        }
-      }
-
-      // Prompt user for account connections
-      await walletProvider.send("eth_requestAccounts", []);
-      playerSigner = walletProvider.getSigner();
-      playerAddress = await playerSigner.getAddress();
-      setProvider(playerSigner);
-
-      // provider = await alchemy.config.getProvider();
-      gameContract_read = await new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
-      lobbiesContract_read = await new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
-      charContract_read = await new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
-      mapContract_read = await new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
-      itemsContract_read = await new ethers.Contract(itemsContractDeployData.address, itemsContractDeployData.abi, provider);
-      actionsContract_read = await new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, provider);
-      utilsContract_read = await new ethers.Contract(utilsContractDeployData.address, utilsContractDeployData.abi, provider);
-
-
-      gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
-      charContract_write = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
-      lobbiesContract_write = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
-      actionsContract_write = new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, provider);
-
-      // TODO: Find appropriate home
-      actionsContract_read.on("ActionCompleteEvent", (player, action, event) => {
-        console.log("Event Player", player);
-        console.log("Event Action", action);
-
-        setEventFlipper(true);
-      })
-
-      utilsContract_read.on("DiceRollEvent", (roll, forValue, against, event) => {
-        console.log("Roll Event roll", roll);
-
-        // TODO: This probably needs to say and filter based on which game number
-        setLastDieRoll(roll);
-      })
-
-      setWalletLoaded(true);
-      setAppLoading(false);
-    }
-
     if (!walletLoaded) {
       console.log("Loading wallet")
       loadWallet();
     }
-  });
+  }, []);
 
 
   interface TabPanelProps {
@@ -245,10 +227,10 @@ function App() {
                 itemContract_read={itemsContract_read}
                 playerSignerAddress={playerAddress}
                 actionsContract_write={actionsContract_write}
-                eventFlipper={eventFlipper}
-                resetEventFlipper={resetEventFlipper}
-                lastDieRoll={lastDieRoll}
+                actionsContract_read={actionsContract_read}
+                utilsContract_read={utilsContract_read}
                 setCurrentGameNumber={setCurrentGameNumber}
+                walletLoaded={walletLoaded}
               />
             </TabPanel>
             <TabPanel value={tabValue} index={3}>
