@@ -16,6 +16,7 @@ import itemsContractDeployData from "./deployments/BCItems.json";
 import gameContractDeployData from "./deployments/BCGames.json";
 import actionsContractDeployData from "./deployments/Actions.json";
 import utilsContractDeployData from "./deployments/BCUtils.json";
+import playersContractDeployData from "./deployments/BCPlayers.json";
 
 // import utilsContractDeployData from "./deployments/BCGames.json";
 import mapsContractDeployData from "./deployments/Maps.json";
@@ -60,6 +61,7 @@ let mapContract_read: ethers.Contract;
 let itemsContract_read: ethers.Contract;
 let actionsContract_read: ethers.Contract;
 let utilsContract_read: ethers.Contract;
+let playersContract_read: ethers.Contract;
 
 let playerSigner: any; //TODO: any
 let gameContract_write: ethers.Contract;
@@ -67,6 +69,8 @@ let lobbiesContract_write: ethers.Contract;
 let charContract_write: ethers.Contract;
 let actionsContract_write: ethers.Contract;
 let itemsContract_write: ethers.Contract;
+let playersContract_write: ethers.Contract;
+
 let playerAddress: string;
 
 let provider: any; //TODO: any
@@ -75,12 +79,23 @@ function App() {
   const [appLoading, setAppLoading] = useState(true);
   const [walletLoaded, setWalletLoaded] = useState(false);
   // const [provider, setProvider] = useState();
+  const lastGameString = localStorage.getItem("lastGame");
+  let lastGame: number;
+  if (lastGameString == null) {
+    lastGame = 0;
+  } else {
+    lastGame = parseInt(lastGameString);
+  }
+  const [currentGameNumber, setCurrentGameNumber] = useState(lastGame);
+  const lastTabString = localStorage.getItem("lastTab");
+  let lastTab: number;
+  if(lastTabString == null) {
+    lastTab = 0;
+  } else {
+    lastTab = parseInt(lastTabString)
+  }
+  const [tabValue, setTabValue] = useState(lastTab);
 
-  const [currentGameNumber, setCurrentGameNumber] = useState(0);
-
-  const [tabValue, setTabValue] = useState(0);
-
-  const [eventFlipper, setEventFlipper] = useState(false);
 
   const loadWallet = async () => {
     // TODO: Cleanup
@@ -127,12 +142,13 @@ function App() {
     itemsContract_read = new ethers.Contract(itemsContractDeployData.address, itemsContractDeployData.abi, provider);
     actionsContract_read = new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, provider);
     utilsContract_read = new ethers.Contract(utilsContractDeployData.address, utilsContractDeployData.abi, provider);
-
+    playersContract_read = new ethers.Contract(playersContractDeployData.address, playersContractDeployData.abi, provider);
 
     gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
     charContract_write = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
     lobbiesContract_write = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
     actionsContract_write = new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, provider);
+    playersContract_write = new ethers.Contract(playersContractDeployData.address, playersContractDeployData.abi, provider);
 
     setWalletLoaded(true);
     setAppLoading(false);
@@ -182,6 +198,7 @@ function App() {
   }
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    localStorage.setItem("lastTab", newValue.toString());
     setTabValue(newValue);
   }
   return (
@@ -228,6 +245,8 @@ function App() {
                 playerSignerAddress={playerAddress}
                 actionsContract_write={actionsContract_write}
                 actionsContract_read={actionsContract_read}
+                playersContract_read={playersContract_read}
+                playersContract_write={playersContract_write}
                 utilsContract_read={utilsContract_read}
                 setCurrentGameNumber={setCurrentGameNumber}
                 walletLoaded={walletLoaded}

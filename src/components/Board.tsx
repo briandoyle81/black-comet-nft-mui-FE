@@ -55,6 +55,8 @@ export interface GameBoardProps {
   playerSignerAddress: string;
   actionsContract_write: any; // TODO: Any
   actionsContract_read: any;
+  playersContract_read: any;
+  playersContract_write: any;
   utilsContract_read: any;
   setCurrentGameNumber: Function;
   walletLoaded: boolean;
@@ -146,7 +148,7 @@ export default function GameBoard(props: GameBoardProps) {
     const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
 
     for (let i = 0; i < playerIndexes.length; i++) {
-      const remotePlayer = await props.gameContract_read.players(playerIndexes[i]);
+      const remotePlayer = await props.playersContract_read.players(playerIndexes[i]);
       const remoteChar = await props.charContract_read.characters(remotePlayer.characterId);
       updatedChars.push(remoteChar);
     }
@@ -175,7 +177,7 @@ export default function GameBoard(props: GameBoardProps) {
     const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
 
     for (let i = 0; i < playerIndexes.length; i++) {
-      const remotePlayer = await props.gameContract_read.players(playerIndexes[i]);
+      const remotePlayer = await props.playersContract_read.players(playerIndexes[i]);
       const { position } = remotePlayer;
       const newPlayer: PlayerInterface = {
         remoteId: playerIndexes[i],
@@ -245,14 +247,14 @@ export default function GameBoard(props: GameBoardProps) {
       // TODO: Find appropriate home
       // TODO: This is probably triggered by ANY game
       // TODO: This is here because if it's in App, for some reason, events cause the tab content to unmount and remount, completely reloading Board
-      props.actionsContract_read.on("ActionCompleteEvent", (player: any, action: any, event: any) => {
-        console.log("Event Player", player);
+      props.actionsContract_read.on("ActionCompleteEvent", (game: any, player: any, action: any, event: any) => {
+        console.log("Event Player", game);
         console.log("Event Action", action);
 
         setEventFlipper(true);
       })
 
-      props.utilsContract_read.on("DiceRollEvent", (roll: any, forValue: any, against: any, event: any) => {
+      props.utilsContract_read.on("DiceRollEvent", (game: any, roll: any, event: any) => {
         console.log("Roll Event roll", roll);
 
         // TODO: This probably needs to say and filter based on which game number
@@ -265,6 +267,7 @@ export default function GameBoard(props: GameBoardProps) {
   function onUpdateGameClick() {
     setGameLoaded(false);
     // setLoading(true);
+    localStorage.setItem("lastGame", formGameNumber.toString())
     props.setCurrentGameNumber(formGameNumber);
   }
 
