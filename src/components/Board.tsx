@@ -248,17 +248,23 @@ export default function GameBoard(props: GameBoardProps) {
       // TODO: This is probably triggered by ANY game
       // TODO: This is here because if it's in App, for some reason, events cause the tab content to unmount and remount, completely reloading Board
       props.actionsContract_read.on("ActionCompleteEvent", (game: any, player: any, action: any, event: any) => {
-        console.log("Event Player", game);
+        console.log("Event Game", game);
         console.log("Event Action", action);
 
-        setEventFlipper(true);
+        const { mapId } = game;
+        // TODO: Hack using mapID instead of gameId
+        if (mapId == props.currentGameNumber) {
+          setEventFlipper(true);
+        }
       })
 
       props.utilsContract_read.on("DiceRollEvent", (game: any, roll: any, event: any) => {
         console.log("Roll Event roll", roll);
-
-        // TODO: This probably needs to say and filter based on which game number
-        setLastDieRoll(roll);
+        const { mapId } = game;
+        // TODO: Hack using mapID instead of gameId
+        if (mapId == props.currentGameNumber) {
+          setLastDieRoll(roll);
+        }
       })
     }
 
