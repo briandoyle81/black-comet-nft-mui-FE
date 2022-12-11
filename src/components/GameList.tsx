@@ -1,4 +1,4 @@
-import { Button, Card, Typography } from "@mui/material";
+import { Button, Card, CardContent, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system"
 import { ethers } from "ethers";
 import { ReactNode, useEffect, useState } from "react";
@@ -72,7 +72,8 @@ export default function GameList(props: GameListDataInterface) {
 
 
   function handleGameButtonClick(id: number) {
-    props.setCurrentGameNumber(id);
+    localStorage.setItem("lastGame", id.toString())
+    // props.setCurrentGameNumber(id);
     props.setTabValue(2);
   }
 
@@ -80,27 +81,31 @@ export default function GameList(props: GameListDataInterface) {
     const gameList: ReactNode[] = []
     games.forEach((game: GameInterface, index: number) => {
       gameList.push(
-        <Card key={index + " Game card"}>
-          <Typography variant="body1">
-            Game Number: {game.gameNumber.toString()}
-          </Typography>
-          <Typography variant="body1">
-            Active: {game.active.toString()}
-          </Typography>
-          <Typography variant="body1">
-            Players: {game.playerIndexes.toString()}
-          </Typography>
-          <Typography variant="body1">
-            Current Player Turn Index: {game.currentPlayerTurnIndex.toString()}
-          </Typography>
-          <Typography variant="body1">
-            Turns Taken: {game.turnsTaken.toString()}
-          </Typography>
-          <Typography variant="body1">
-            Map ID: {game.mapId.toString()}
-          </Typography>
-          <Button variant="contained" onClick={() => { handleGameButtonClick(game.gameNumber) }}>Load Game</Button>
-        </Card>
+        <Grid item key={index + " Game card"}>
+          <Card>
+            <CardContent>
+              <Typography variant="body1">
+                Game Number: {game.gameNumber.toString()}
+              </Typography>
+              <Typography variant="body1">
+                Active: {game.active.toString()}
+              </Typography>
+              <Typography variant="body1">
+                Players: {game.playerIndexes.toString()}
+              </Typography>
+              <Typography variant="body1">
+                Current Player Turn Index: {game.currentPlayerTurnIndex.toString()}
+              </Typography>
+              <Typography variant="body1">
+                Turns Taken: {game.turnsTaken.toString()}
+              </Typography>
+              <Typography variant="body1">
+                Map ID: {game.mapId.toString()}
+              </Typography>
+            </CardContent>
+            <Button variant="contained" onClick={() => { handleGameButtonClick(game.gameNumber) }}>Load Game</Button>
+            </Card>
+          </Grid>
       )
     })
     return gameList;
@@ -112,7 +117,9 @@ export default function GameList(props: GameListDataInterface) {
         Number of Games In: {games.length}
       </Typography>
       <Box>
-        {renderGameData()}
+        <Grid container>
+          {renderGameData()}
+        </Grid>
       </Box>
     </Box>
   )

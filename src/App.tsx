@@ -257,7 +257,7 @@ function App() {
             </TabPanel>
             <Typography>Dev Notes</Typography>
             <Typography>UI/UX is temporary.  Feedback is not required.  I know ;)</Typography>
-            <Typography>Alpha Test.  Play at your own risk!  In-game NFTs will be reset regularly.  Use a dev wallet!</Typography>
+            <Typography>Pre-Alpha Test.  Bugs abound! Play at your own risk!  In-game NFTs will be reset regularly.  Use a dev wallet!</Typography>
             <Typography>A transaction that is expected to fail means bad input.  If transactions are failing after submission, try again with double the gas limit.</Typography>
           </Card>
         </div>
