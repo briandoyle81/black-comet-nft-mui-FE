@@ -271,6 +271,13 @@ export default function GameBoard(props: GameBoardProps) {
           setLastDieRoll(roll);
         }
       })
+
+      props.playersContract_read.on("EventResolvedEvent", (gameId: any, playerId: any, currentEvent: any, currentEffect: any, event: any) => {
+        // DO NOT USE ===, will always be false!!
+        if (gameId == props.currentGameNumber) {
+          setEventFlipper(true);
+        }
+      })
     }
 
   }, [gameLoaded, props.currentGameNumber, eventFlipper, props.walletLoaded]);
