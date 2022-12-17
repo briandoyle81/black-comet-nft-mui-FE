@@ -19,6 +19,7 @@ import Galley from "../assets/img/room-bg/Galley[face].png";
 import HullBreach from "../assets/img/room-bg/Hull Breach[face].png";
 import LHallway from "../assets/img/room-bg/L Hallway[face].png";
 import MainReactor from "../assets/img/room-bg/Main Reactor[face].png";
+import MainReactorBack from "../assets/img/room-bg/Main Reactor[back].png";
 import Medbay from "../assets/img/room-bg/Medbay[face].png";
 import Observation from "../assets/img/room-bg/Observation[face].png";
 import OfficersBunk from "../assets/img/room-bg/Officer_s Bunk[face].png";
@@ -190,25 +191,10 @@ roomDisplayDataList.push({
   desc: "You think something just touched your leg!",
   art: TrashCompactor
 });
-// roomDisplayDataList.push({
-//   name: "Trash Compactor",
-//   desc: "You think something just touched your leg!",
-//   art: TrashCompactor
-// });
-// roomDisplayDataList.push({
-//   name: "Trash Compactor",
-//   desc: "You think something just touched your leg!",
-//   art: TrashCompactor
-// });
-// roomDisplayDataList.push({
-//   name: "Trash Compactor",
-//   desc: "You think something just touched your leg!",
-//   art: TrashCompactor
-// });
-// roomDisplayDataList.push({
-//   name: "Trash Compactor",
-//   desc: "You think something just touched your leg!",
-//   art: TrashCompactor
-// });
+roomDisplayDataList[100] = { // LOL thanks javascript!
+  name: "Main Reactor",
+  desc: "Scans detect the Black Comet's main reactor at this location.",
+  art: MainReactorBack
+}
 
 export { roomDisplayDataList }

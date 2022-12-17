@@ -124,7 +124,9 @@ export default function Tile(props: TilePropsInterface) {
         </Grid>
       )
     } else {
-      const roomData = props.roomTiles[props.tile.roomId];
+      // TODO: Hack for having made 100 be ID for main reactor
+      const roomId = props.tile.roomId === 100 ? 1 : props.tile.roomId;
+      const roomData = props.roomTiles[roomId];
       for (let i = 0; i < roomData.numItems; i++) {
         lootRenders.push(
           <Grid item xs={3} key={(lootRenders.length-1)+"item"}>
@@ -157,7 +159,9 @@ export default function Tile(props: TilePropsInterface) {
   }
 
   function renderEventType() {
-    const roomData = props.roomTiles[props.tile.roomId];
+    // TODO: Hack for having made 100 be ID for main reactor
+    const roomId = props.tile.roomId === 100 ? 1 : props.tile.roomId;
+    const roomData = props.roomTiles[roomId];
 
     if (roomData.eventType === EventType.NONE) {
       return (
