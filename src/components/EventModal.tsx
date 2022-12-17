@@ -2,6 +2,7 @@ import { Box, Button, Modal, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { TileEventDisplayData } from "./EventData";
 import { GameInfoInterface, GameInterface } from "./GamePanel";
+import Tile, { EmptyTile } from "./Tile";
 
 
 const style = {
@@ -45,6 +46,14 @@ export default function EventModal(props: GameInfoInterface) {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             {TileEventDisplayData[props.currentGameProps.eventNumber].name}
           </Typography>
+          <Tile
+            tile={props.currentTile}
+            players={props.players}
+            row={props.currentGameProps.eventPosition.row}
+            col={props.currentGameProps.eventPosition.col}
+            currentGame={props.currentGameProps}
+            roomTiles={props.roomTiles}
+          />
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             {TileEventDisplayData[props.currentGameProps.eventNumber].desc}
           </Typography>

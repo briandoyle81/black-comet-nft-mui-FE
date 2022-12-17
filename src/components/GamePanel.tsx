@@ -12,6 +12,7 @@ import { isPropertySignature } from 'typescript';
 import ItemCard from './ItemCard';
 import EventModal from './EventModal';
 import { Position } from './Utils';
+import { GameTileInterface, RoomTile, TilePropsInterface } from './Tile';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -32,6 +33,9 @@ export interface GameInfoInterface {
   lastDieRoll: number,
   numItems: number, // number of items in the current room
   allHeldItems: any, // TODO: any
+  roomTiles: RoomTile[],
+  players: PlayerInterface[],
+  currentTile: GameTileInterface,
 }
 
 export interface EventTrackerInterface {

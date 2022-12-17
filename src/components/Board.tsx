@@ -441,6 +441,7 @@ export default function GameBoard(props: GameBoardProps) {
     // if (chars.length === 0) {
     //   return "Waiting for chars";
     // }
+
     return (!gameLoaded ? "Loading Game Area..." :
       <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
         <Grid item xs={9}>
@@ -476,6 +477,9 @@ export default function GameBoard(props: GameBoardProps) {
               lastDieRoll={lastDieRoll}
               numItems={getNumItems()}
               allHeldItems={currentPlayerItems}
+              roomTiles={roomTiles}
+              players={players}
+              currentTile={gameTiles[players[currentGame.currentPlayerTurnIndex].position.row][players[currentGame.currentPlayerTurnIndex].position.col]}
             />
           </Card>
         </Grid>
