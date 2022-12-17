@@ -207,7 +207,7 @@ export default function GameBoard(props: GameBoardProps) {
   const loadGameBoard = async () => {
 
     if (eventFlipper === true) {
-      console.log("Loading game number:", props.currentGameNumber)
+      console.log("Loading game number from event:", props.currentGameNumber)
       const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
       setCurrentGame(remoteGame);
       console.log("updating doors, board, players from chain")
@@ -223,7 +223,7 @@ export default function GameBoard(props: GameBoardProps) {
     }
 
     if (gameLoaded === false) {
-      console.log("Loading game number:", props.currentGameNumber)
+      console.log("Loading game number from start:", props.currentGameNumber)
       const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
       setCurrentGame(remoteGame);
       await updateDoorsFromChain();
@@ -247,22 +247,27 @@ export default function GameBoard(props: GameBoardProps) {
       // TODO: Find appropriate home
       // TODO: This is probably triggered by ANY game
       // TODO: This is here because if it's in App, for some reason, events cause the tab content to unmount and remount, completely reloading Board
-      props.actionsContract_read.on("ActionCompleteEvent", (game: any, player: any, action: any, event: any) => {
+      props.actionsContract_read.on("ActionCompleteEvent", (gameId: any, game: any, playerId: any, player: any, action: any, event: any) => {
+        console.log("Event Game ID", gameId)
         console.log("Event Game", game);
         console.log("Event Action", action);
 
         const { mapId } = game;
+        console.log("MapID", mapId)
         // TODO: Hack using mapID instead of gameId
+        console.log("Test is", mapId == props.currentGameNumber)
+        // DO NOT USE ===, will always be false!!
         if (mapId == props.currentGameNumber) {
+          console.log("SET EVENT FLIPPER")
           setEventFlipper(true);
         }
       })
 
-      props.utilsContract_read.on("DiceRollEvent", (game: any, roll: any, event: any) => {
+      props.utilsContract_read.on("DiceRollEvent", (gameId: any, roll: any, event: any) => {
         console.log("Roll Event roll", roll);
-        const { mapId } = game;
         // TODO: Hack using mapID instead of gameId
-        if (mapId == props.currentGameNumber) {
+        // DO NOT USE ===, will always be false!!
+        if (gameId == props.currentGameNumber) {
           setLastDieRoll(roll);
         }
       })
