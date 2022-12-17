@@ -33,6 +33,23 @@ export default function EventModal(props: GameInfoInterface) {
     props.gameContract_write.resolveEvent(props.currentGameNumber, 0);
   }
 
+  // TODO: DRY also used in ActionPicker
+  function isPlayerTurn(walletAddress: string, charOwner: string) {
+    return walletAddress === charOwner;
+  };
+
+  function renderResolveButton(playerTurn: boolean) {
+    if (playerTurn) {
+      return (
+        <Button onClick={handleEvent} >Resolve</Button>
+      )
+    } else {
+      return (
+        <Button onClick={handleEvent} disabled>Not Your Turn</Button>
+      )
+    }
+  }
+
   return (
     <div>
       <Button onClick={handleOpen}>Event</Button>
@@ -60,7 +77,7 @@ export default function EventModal(props: GameInfoInterface) {
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             (Temporary) Please refresh the browser after the transaction completes.
           </Typography>
-          <Button onClick={handleEvent}>Resolve</Button>
+          {renderResolveButton(isPlayerTurn(props.playerSignerAddress, props.currentPlayer.owner))}
         </Box>
       </Modal>
     </div>

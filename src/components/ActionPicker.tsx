@@ -48,7 +48,7 @@ export default function ActionPicker(props: GameInfoInterface) {
       secondDir,
       {
         value: cost,
-        gasLimit: 2000000 // TODO: Find a more elegant solution here
+        gasLimit: 4000000 // TODO: Find a more elegant solution here
       }
     );
     // Below works for the acting client, but not a hook, so others
