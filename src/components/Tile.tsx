@@ -120,7 +120,7 @@ export default function Tile(props: TilePropsInterface) {
     if (props.tile.looted) {
       lootRenders.push(
         <Grid item xs={3} key={(lootRenders.length-1)+"looted"}>
-          <img src={Looted} alt="Looted" style={{ width: '100%', zIndex: 2000 }} />
+          <img src={Looted} alt="Looted" style={{ width: '100%', zIndex: 1299 }} />
         </Grid>
       )
     } else {
@@ -128,14 +128,14 @@ export default function Tile(props: TilePropsInterface) {
       for (let i = 0; i < roomData.numItems; i++) {
         lootRenders.push(
           <Grid item xs={3} key={(lootRenders.length-1)+"item"}>
-            <img src={ItemIcon} alt="Looted" style={{ width: '100%', zIndex: 2000 }} />
+            <img src={ItemIcon} alt="Looted" style={{ width: '100%', zIndex: 1299 }} />
           </Grid>
         )
       }
       for (let i = 0; i < roomData.numData; i++) {
         lootRenders.push(
           <Grid item xs={3} key={(lootRenders.length-1)+"data"}>
-            <img src={DataIcon} alt="Looted" style={{ width: '100%', zIndex: 2000 }} />
+            <img src={DataIcon} alt="Looted" style={{ width: '100%', zIndex: 1299 }} />
           </Grid>
         )
       }
@@ -168,25 +168,25 @@ export default function Tile(props: TilePropsInterface) {
     } else if (roomData.eventType === EventType.BUG) {
       return (
         <Grid item xs={3}>
-          <img src={BugIcon} alt="Bug Event" style={{ width: '100%', zIndex: 2000 }} />
+          <img src={BugIcon} alt="Bug Event" style={{ width: '100%', zIndex: 1299 }} />
         </Grid>
       )
     } else if (roomData.eventType === EventType.MYSTERY) {
       return (
         <Grid item xs={3}>
-          <img src={MysteryIcon} alt="Mystery Event" style={{ width: '100%', zIndex: 2000 }} />
+          <img src={MysteryIcon} alt="Mystery Event" style={{ width: '100%', zIndex: 1299 }} />
         </Grid>
       )
     } else if (roomData.eventType === EventType.SCAVENGER) {
       return (
         <Grid item xs={3}>
-          <img src={ScavIcon} alt="Scavenger Event" style={{ width: '100%', zIndex: 2000 }} />
+          <img src={ScavIcon} alt="Scavenger Event" style={{ width: '100%', zIndex: 1299 }} />
         </Grid>
       )
     } else if (roomData.eventType === EventType.SHIP_SECURITY) {
       return (
         <Grid item xs={3}>
-          <img src={ShipIcon} alt="Ship Security Event" style={{ width: '100%', zIndex: 2000 }} />
+          <img src={ShipIcon} alt="Ship Security Event" style={{ width: '100%', zIndex: 1299 }} />
         </Grid>
       )
     } else {
@@ -238,7 +238,7 @@ export default function Tile(props: TilePropsInterface) {
     if (props.tile.hasVent) {
       iconRenders.push(
         <Grid item xs={3} key={(iconRenders.length - 1) + "bottom_icon"}>
-          <img src={Vent} alt="Vent" style={{ width: '100%', zIndex: 2000 }} />
+          <img src={Vent} alt="Vent" style={{ width: '100%', zIndex: 1299 }} />
         </Grid>
       )
     }
@@ -246,7 +246,7 @@ export default function Tile(props: TilePropsInterface) {
     if (props.tile.hasHazard) {
       iconRenders.push(
         <Grid item xs={3} key={(iconRenders.length - 1) + "bottom_icon"}>
-          <img src={Hazard} alt="Hazard" style={{ width: '100%', zIndex: 2000 }} />
+          <img src={Hazard} alt="Hazard" style={{ width: '100%', zIndex: 1299 }} />
         </Grid>
       )
     }
