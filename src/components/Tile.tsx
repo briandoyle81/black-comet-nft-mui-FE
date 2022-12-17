@@ -33,7 +33,7 @@ const TileOverlay = styled(Box)(({ theme }) => ({
   position: 'absolute',
   left: '0',
   top: '0',
-  zIndex: 2000,
+  zIndex: 1299,
   background: 'transparent',
 }));
 
@@ -41,7 +41,7 @@ const BottomOverlay = styled(Box)(({ theme }) => ({
   position: 'absolute',
   left: '0',
   bottom: '0',
-  zIndex: 2000,
+  zIndex: 1299,
   background: 'transparent',
 }));
 
