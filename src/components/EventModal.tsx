@@ -75,7 +75,7 @@ export default function EventModal(props: GameInfoInterface) {
             {TileEventDisplayData[props.currentGameProps.eventNumber].desc}
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            (Temporary) Please refresh the browser after the transaction completes.
+            (Temporary) Please close the modal after the event resolve transaction completes.  You may need to refresh the browser.
           </Typography>
           {renderResolveButton(isPlayerTurn(props.playerSignerAddress, props.currentPlayer.owner))}
         </Box>

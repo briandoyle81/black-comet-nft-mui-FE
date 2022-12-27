@@ -56,4 +56,10 @@ TileEventDisplayData.push({
     id: 200007
 })
 
+TileEventDisplayData.push({
+    name: "Trash Compactor",
+    desc: "As you enter, the doors slam shut and the trash compactor comes to life!  In three turns, everything in the room will be destroyed!",
+    id: 200008
+})
+
 export { TileEventDisplayData }
