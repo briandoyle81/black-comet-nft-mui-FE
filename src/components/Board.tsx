@@ -456,6 +456,23 @@ export default function GameBoard(props: GameBoardProps) {
         </Grid>
         <Grid item xs={3}>
           <Card>
+            <GamePanel
+              currentPlayer={players[currentGame.currentPlayerTurnIndex]}
+              currentChar={chars[currentGame.currentPlayerTurnIndex]}
+              currentGameProps={currentGame}
+              currentGameNumber={props.currentGameNumber}
+              playerSignerAddress={props.playerSignerAddress}
+              actionsContract_write={props.actionsContract_write}
+              gameContract_write={props.gameContract_write}
+              lastDieRoll={lastDieRoll}
+              numItems={getNumItems()}
+              allHeldItems={currentPlayerItems}
+              roomTiles={roomTiles}
+              players={players}
+              currentTile={gameTiles[players[currentGame.currentPlayerTurnIndex].position.row][players[currentGame.currentPlayerTurnIndex].position.col]}
+            />
+          </Card>
+          <Card>
             <Box
               component="form"
               sx={{
@@ -473,21 +490,6 @@ export default function GameBoard(props: GameBoardProps) {
               />
               <Button variant="contained" onClick={onUpdateGameClick}>Submit</Button>
             </Box>
-            <GamePanel
-              currentPlayer={players[currentGame.currentPlayerTurnIndex]}
-              currentChar={chars[currentGame.currentPlayerTurnIndex]}
-              currentGameProps={currentGame}
-              currentGameNumber={props.currentGameNumber}
-              playerSignerAddress={props.playerSignerAddress}
-              actionsContract_write={props.actionsContract_write}
-              gameContract_write={props.gameContract_write}
-              lastDieRoll={lastDieRoll}
-              numItems={getNumItems()}
-              allHeldItems={currentPlayerItems}
-              roomTiles={roomTiles}
-              players={players}
-              currentTile={gameTiles[players[currentGame.currentPlayerTurnIndex].position.row][players[currentGame.currentPlayerTurnIndex].position.col]}
-            />
           </Card>
         </Grid>
       </Grid>

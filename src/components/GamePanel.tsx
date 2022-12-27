@@ -92,6 +92,14 @@ export default function GamePanel(props: GameInfoInterface) {
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
+          <Typography variant="body1">
+            Last Roll:
+          </Typography>
+          <Typography variant="h3">
+            {props.lastDieRoll.toString()}
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
           <GameInfo {...props}/>
         </Grid>
         <Grid item xs={12}>
@@ -102,14 +110,6 @@ export default function GamePanel(props: GameInfoInterface) {
         </Grid>
         <Grid item xs={12}>
           {renderItemCards()}
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body1">
-            Last Roll:
-          </Typography>
-          <Typography variant="h3">
-            {props.lastDieRoll.toString()}
-          </Typography>
         </Grid>
       </Grid>
     </Box>
