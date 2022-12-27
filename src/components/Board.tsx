@@ -98,7 +98,7 @@ export default function GameBoard(props: GameBoardProps) {
   const [formGameNumber, setFormGameNumber] = useState(props.currentGameNumber);
   const [currentPlayerItems, setCurrentPlayerItems] = useState<any[]>(); // TODO: Any
 
-  const [lastDieRoll, setLastDieRoll] = useState(0);
+  const [lastDieRoll, setLastDieRoll] = useState("None");
   const [eventFlipper, setEventFlipper] = useState(true);
   const [eventsLoaded, setEventsLoaded] = useState(false);
 
@@ -268,7 +268,7 @@ export default function GameBoard(props: GameBoardProps) {
         // TODO: Hack using mapID instead of gameId
         // DO NOT USE ===, will always be false!!
         if (gameId == props.currentGameNumber) {
-          setLastDieRoll(roll);
+          setLastDieRoll(roll.toString());
         }
       })
 
@@ -465,6 +465,7 @@ export default function GameBoard(props: GameBoardProps) {
               actionsContract_write={props.actionsContract_write}
               gameContract_write={props.gameContract_write}
               lastDieRoll={lastDieRoll}
+              setLastDieRoll={setLastDieRoll}
               numItems={getNumItems()}
               allHeldItems={currentPlayerItems}
               roomTiles={roomTiles}

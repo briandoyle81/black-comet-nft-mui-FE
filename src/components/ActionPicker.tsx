@@ -51,6 +51,15 @@ export default function ActionPicker(props: GameInfoInterface) {
         gasLimit: 4000000 // TODO: Find a more elegant solution here
       }
     );
+
+    if (action === Action.BREACH || Action.HACK) {
+      // TODO: Shoot
+      // TODO: Roll for egg, etc.
+      props.setLastDieRoll("Rolling...");
+    } else {
+      props.setLastDieRoll("None");
+    }
+
     // Below works for the acting client, but not a hook, so others
     // won't get the update
     // await actionTx.wait();

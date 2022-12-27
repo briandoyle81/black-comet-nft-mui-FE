@@ -30,7 +30,8 @@ export interface GameInfoInterface {
   playerSignerAddress: string,
   actionsContract_write: any, // TODO: Any
   gameContract_write: any,
-  lastDieRoll: number,
+  lastDieRoll: string,
+  setLastDieRoll: Function,
   numItems: number, // number of items in the current room
   allHeldItems: any, // TODO: any
   roomTiles: RoomTile[],
@@ -93,7 +94,7 @@ export default function GamePanel(props: GameInfoInterface) {
       <Grid container spacing={1}>
         <Grid item xs={12}>
           <Typography variant="body1">
-            Last Roll:
+            Roll:
           </Typography>
           <Typography variant="h3">
             {props.lastDieRoll.toString()}
