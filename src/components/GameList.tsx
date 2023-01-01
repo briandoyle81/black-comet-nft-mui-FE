@@ -38,7 +38,7 @@ export default function GameList(props: GameListDataInterface) {
           mapId,
           eventPlayerId,
           eventNumber,
-          eventIsTile,
+          eventType,
           eventPosition
         } = newGame;
 
@@ -53,7 +53,7 @@ export default function GameList(props: GameListDataInterface) {
           mapId: mapId,
           eventPlayerId: eventPlayerId,
           eventNumber: eventNumber,
-          eventIsTile: eventIsTile,
+          eventType: eventType,
           eventPosition: eventPosition,
           gameNumber: gameIds[i]
         }

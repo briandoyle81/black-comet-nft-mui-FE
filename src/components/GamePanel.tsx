@@ -22,6 +22,8 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
+export enum BCEventType {NONE=0, BUG, MYSTERY, SCAVENGER, SHIP_SECURITY, ROOM}
+
 export interface GameInfoInterface {
   currentPlayer: PlayerInterface,
   currentChar: CharInterface,
@@ -64,7 +66,7 @@ export interface GameInterface {
 
   eventPlayerId: number;
   eventNumber: number;
-  eventIsTile: boolean;
+  eventType: BCEventType;
   eventPosition: Position;
 
   gameNumber: number;

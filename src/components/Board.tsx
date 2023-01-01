@@ -1,6 +1,6 @@
 import { Button, Card, CardContent, TextField } from '@mui/material';
 import { ReactNode, useEffect, useState } from 'react';
-import GamePanel, { EventTrackerInterface, GameInterface } from './GamePanel';
+import GamePanel, { BCEventType, EventTrackerInterface, GameInterface } from './GamePanel';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 
@@ -39,7 +39,7 @@ export const EmptyGame: GameInterface = {
 
   eventPlayerId: 0,
   eventNumber: 0,
-  eventIsTile: false,
+  eventType: BCEventType.NONE,
   eventPosition: {row: 0, col: 0},
 
   gameNumber: -1

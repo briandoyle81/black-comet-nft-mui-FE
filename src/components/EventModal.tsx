@@ -1,7 +1,7 @@
 import { Box, Button, Modal, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { TileEventDisplayData } from "./EventData";
-import { GameInfoInterface, GameInterface } from "./GamePanel";
+import { EventDataDisplay, BugEventDisplayData, TileEventDisplayData } from "./EventData";
+import { BCEventType, GameInfoInterface, GameInterface } from "./GamePanel";
 import Tile, { EmptyTile } from "./Tile";
 
 
@@ -50,6 +50,18 @@ export default function EventModal(props: GameInfoInterface) {
     }
   }
 
+  function getEventData(id: number) {
+    switch (props.currentGameProps.eventType) {
+      case BCEventType.ROOM:
+        return TileEventDisplayData[id];
+      case BCEventType.BUG:
+        return BugEventDisplayData[id];
+    }
+    // TODO: throw error
+    console.log("Didn't find correct event");
+    return TileEventDisplayData[0];
+  }
+
   return (
     <div>
       <Button onClick={handleOpen}>Event</Button>
@@ -61,7 +73,7 @@ export default function EventModal(props: GameInfoInterface) {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            {TileEventDisplayData[props.currentGameProps.eventNumber].name}
+            {getEventData(props.currentGameProps.eventNumber).name}
           </Typography>
           <Tile
             tile={props.currentTile}
@@ -72,7 +84,7 @@ export default function EventModal(props: GameInfoInterface) {
             roomTiles={props.roomTiles}
           />
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {TileEventDisplayData[props.currentGameProps.eventNumber].desc}
+            {getEventData(props.currentGameProps.eventNumber).desc}
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             (Temporary) Please close the modal after the event resolve transaction completes.  You may need to refresh the browser.
