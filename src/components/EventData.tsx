@@ -267,4 +267,100 @@ MysteryEventDisplayData.push({
     id: 400015
 })
 
+ScavEventDisplayData.push({
+    name: "No Event",
+    desc: "Nothing Happens",
+    id: 500000
+})
+
+ScavEventDisplayData.push({
+    name: "Crazed Prophet",
+    desc: "A woman with wild hair and a dirty robe starts gibbering about your destiny. She pushes something into your hands then runs away down the corridor.\n\nDraw an item from the item deck.",
+    id: 500001
+})
+
+ScavEventDisplayData.push({
+    name: "Blackjack",
+    desc: "A blow from behind knocks you over. Through the haze, you see a grizzled Scavenger pawing through your belongings. By the time you recover, the Scavenger has run off.\n\nTake 1 damage and discard one item at random.",
+    id: 500002
+})
+
+ScavEventDisplayData.push({
+    name: "Toll",
+    desc: "A large and well-armed Scavenger has taken control of this room. He demands you pay a toll to pass.\n\nDiscard one item for free passage\n\n-OR-\n\nThe Scavenger becomes hostile and attacks. Take 1 physical damage. Place a Scavenger in this room.",
+    id: 500003
+})
+
+ScavEventDisplayData.push({
+    name: "Bear Trap",
+    desc: "You see a beautiful alien artifact! Unable to contain your excitement, you run over and grab it. With a snap, a metal device clamps down on your leg. You are trapped! Even worse, the artifact is just a hollow shell.\n\nYou may not move.  As an action, roll a die:\n\n1:    Place a Scavenger in the room.\n\n2-3: Lose this action.\n\n4-6: You successfully free yourself.",
+    id: 500004
+})
+
+ScavEventDisplayData.push({
+    name: "Cooking Badly",
+    desc: "You come across two Scavengers that are in the middle of cooking some sort of foul chemical compound. They see you and scramble out of the room, knocking over their stove in the process.\n\nPlace a hazard token in this room.",
+    id: 500005
+})
+
+ScavEventDisplayData.push({
+    name: "Garbage Collection",
+    desc: "It looks like a Scavenger has been collecting scrap in this room. Luckily, they're not around. It's yours to take.\n\nDraw 2 items from the item deck.",
+    id: 500006
+})
+
+ScavEventDisplayData.push({
+    name: "You scratch my back...",
+    desc: "A voice whispers from the shadows, 'You scratcher my back, I scratcher yours. Gimmes summin shiny and I'll get you summun else's shiny.'\n\nYou may discard one item to take an item at random from another player. If you choose not to do this, the Scavenger vanishes.",
+    id: 500007
+})
+
+ScavEventDisplayData.push({
+    name: "Bully",
+    desc: "A large Scavenger is in this room. He looks at you and says, 'Well, well. Another weakling. You better gimme your lunch money, punk!'\n\nGive up and discard an item.\n\n-OR-\n\nThrow a punch. Take 1 physical damage from the scuffle and the bully runs off.",
+    id: 500008
+})
+
+ScavEventDisplayData.push({
+    name: "Arm Rassling",
+    desc: "A beefy Scavenger invites you to take a seat across from her. 'You got what it takes?'\n\nArm wrestle! Wager an item card and roll a die. On a 4-6, keep your wager and draw another item card. Otherwise, discard your wager.\n\n-OR-\n\nRefuse. The Scavenger becomes enraged by your cowardice. Place a Scavenger in this room.",
+    id: 500009
+})
+
+ScavEventDisplayData.push({
+    name: "Hitman",
+    desc: "A tall, bald Scavenger steps out of the shadows, and holds up a strange device. He states flatly, 'We can speak freely. Your ship can't hear us now. I can thin out the competition. Payment in hard assets only.'\n\nDiscard an artifact. Pick another player. That player dies instantly.\n\n-OR-\n\nDecline offer.  The hitman vanishes back into the shadows.",
+    id: 500010
+})
+
+ScavEventDisplayData.push({
+    name: "Mad Mel",
+    desc: "This room contains a completely psychotic Scavenger with a funny voice. He attacks immediately.\n\nTake 1 physical damage. Place a Scavenger in the room.",
+    id: 500011
+})
+
+ScavEventDisplayData.push({
+    name: "Scavangus Interruptus",
+    desc: "You enter the room and interrupt two Scavengers that seem to me in the middle of some sort of unpleasant courtship ritual. They are quite upset by your interference.\n\nPlace 2 Scavengers in this room.",
+    id: 500012
+})
+
+ScavEventDisplayData.push({
+    name: "I'm sleeping here!",
+    desc: "You wake a Scavenger from a nap in a pile of trash. She's not happy about it.\n\nPlace 1 Scavenger in this room.",
+    id: 500013
+})
+
+ScavEventDisplayData.push({
+    name: "I'm not following you!",
+    desc: "You hear a bump, a large clatter, and an impressive stream of profanity. Sounds like an idiot is trying to follow you.\n\nPlace 1 Scavenger in the room you just left.",
+    id: 500014
+})
+
+ScavEventDisplayData.push({
+    name: "You Are Not Alone",
+    desc: "You've found yourself in a rather populated part of the ship. It seems like there are Scavengers all over the place.\n\nPlace one Scavenger in each adjacent room.",
+    id: 500015
+})
+
 export { TileEventDisplayData, BugEventDisplayData, MysteryEventDisplayData, ScavEventDisplayData, ShipEventDisplayData }
