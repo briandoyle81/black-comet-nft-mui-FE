@@ -205,7 +205,9 @@ function App() {
   return (
     appLoading ?
       <ThemeProvider theme={theme}>
-        <div>"Loading Wallet..."</div>
+        <Typography variant="body1" align="left" color="white">
+          Please connect or unlock your wallet.  Or wait for it to load.
+        </Typography>
       </ThemeProvider>
       :
       <ThemeProvider theme={theme}>

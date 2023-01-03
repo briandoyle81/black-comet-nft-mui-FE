@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardHeader, Grid, Typography } from "@mui/material";
+import { Button, Card, CardContent, CardHeader, Grid, List, ListItem, Typography } from "@mui/material";
 import { Box } from "@mui/system"
 
 
@@ -22,6 +22,53 @@ export default function Info() {
         <Typography variant="body1" align="left" color="red">
           Don't enter the Main Reactor room, it will break the game.
         </Typography>
+        <List>
+          <ListItem>
+            <Typography variant="body1" align="left" color="yellow">
+              There is currently a bug with game selection.
+            </Typography>
+          </ListItem>
+          <ListItem>
+            <Typography variant="body1" align="left" color="yellow">
+              To start: Buy NFT Character
+            </Typography>
+          </ListItem>
+          <ListItem>
+            <Typography variant="body1" align="left" color="yellow">
+              Click "Start Solo Mission"
+            </Typography>
+          </ListItem>
+          <ListItem>
+            <Typography variant="body1" align="left" color="yellow">
+              Go to the Games List tab
+            </Typography>
+          </ListItem>
+          <ListItem>
+            <Typography variant="body1" align="left" color="yellow">
+              Click Load Game
+            </Typography>
+          </ListItem>
+          <ListItem>
+            <Typography variant="body1" align="left" color="yellow">
+              Refresh the browser window
+            </Typography>
+          </ListItem>
+          <ListItem>
+            <Typography variant="body1" align="left" color="yellow">
+              Switch to the Games Tab
+            </Typography>
+          </ListItem>
+          <ListItem>
+            <Typography variant="body1" align="left" color="yellow">
+              You should see the "Actions" section with drop down menus on the right side.
+            </Typography>
+          </ListItem>
+          <ListItem>
+            <Typography variant="body1" align="left" color="yellow">
+              Alternately, find your game number from the Games List, and use the control on the bottom right of the Game tab to select that game.
+            </Typography>
+          </ListItem>
+        </List>
         <Typography variant="body1" align="left">
           Explore the Black Comet and loot rooms to collect valuable data and NFT items.
         </Typography>
