@@ -19,6 +19,9 @@ export default function Info() {
         <Typography variant="body1" align="left" color="red">
           USE A DEV WALLET.  WE ARE NOT RESPONSIBLE FOR ANY LOSSES!!!  EXPECT BUGS AND REGULAR RESETS!
         </Typography>
+        <Typography variant="body1" align="left" color="red">
+          Don't enter the Main Reactor room, it will break the game.
+        </Typography>
         <Typography variant="body1" align="left">
           Explore the Black Comet and loot rooms to collect valuable data and NFT items.
         </Typography>
@@ -32,6 +35,9 @@ export default function Info() {
           Doors can be open, breached, or closed.  The left number is the strength vs. hack.  The right number is strength vs. breach.  Hacking opens the door temporarily, it will close at the end of the round.  Breaching opens it permanently, but allows fire to spread.
         </Typography>
         <Typography variant="body1" align="left">
+          Use the "Move" followup to enter a room after breaching or hacking, or to move through two open/breached doors through two discovered rooms.
+        </Typography>
+        <Typography variant="body1" align="left">
           Use "Loot" if there are icons in the upper left corner of your current room.
         </Typography>
         <Typography variant="h4" align="left">
@@ -41,7 +47,10 @@ export default function Info() {
           Moving, looting, some events.  Dying if you go into space, or stand in fire (icon in lower left next to vents)
         </Typography>
         <Typography variant="body1" align="left">
-          The Medbay should heal you if you "Use Room", and the Engineering Catwalk should teleport you to the room marked as "Main Reactor"
+          Rooms with Bug events will trigger, but many events are not implemented fully.
+        </Typography>
+        <Typography variant="body1" align="left">
+          The Medbay should heal you if you "Use Room"
         </Typography>
         <Typography variant="h4" align="left">
           What Doesn't Work
