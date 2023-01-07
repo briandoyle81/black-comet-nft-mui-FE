@@ -257,7 +257,7 @@ function App() {
               />
             </TabPanel>
             <TabPanel value={tabValue} index={3}>
-              <Box>Lobbies</Box>
+              <Box>Lobbies (Not implemented)</Box>
             </TabPanel>
             <TabPanel value={tabValue} index={4}>
               <Info />

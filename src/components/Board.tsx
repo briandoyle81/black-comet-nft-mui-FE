@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, TextField } from '@mui/material';
+import { Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from '@mui/material';
 import { ReactNode, useEffect, useState } from 'react';
 import GamePanel, { BCEventType, EventTrackerInterface, GameInterface } from './GamePanel';
 import Box from '@mui/material/Box';
@@ -88,6 +88,7 @@ export default function GameBoard(props: GameBoardProps) {
   const n = 11; // TODO: Hardcoded board size, can't use await here
 
   // const [loading, setLoading] = useState(false);
+  const [numGames, setNumGames] = useState(0);
   const [currentGame, setCurrentGame] = useState<GameInterface>(EmptyGame);
   const [roomTiles, setRoomTiles] = useState<RoomTile[]>([]);
   const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
@@ -207,6 +208,7 @@ export default function GameBoard(props: GameBoardProps) {
   const loadGameBoard = async () => {
 
     if (eventFlipper === true) {
+      setNumGames(await props.gameContract_read.extGetNumGames());
       console.log("Loading game number from event:", props.currentGameNumber)
       const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
       setCurrentGame(remoteGame);
@@ -223,6 +225,7 @@ export default function GameBoard(props: GameBoardProps) {
     }
 
     if (gameLoaded === false) {
+      setNumGames(await props.gameContract_read.extGetNumGames());
       console.log("Loading game number from start:", props.currentGameNumber)
       const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
       setCurrentGame(remoteGame);
@@ -409,6 +412,18 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   function renderMapArea() {
+    // if (numGames === 0) {
+    //   return (
+    //     <Box>No games yet!</Box>
+    //   )
+    // }
+
+    if (props.currentGameNumber > numGames) {
+      return (
+        <Box>Selected game does not exist!</Box>
+      )
+    }
+
     return (!gameLoaded ? "Loading..." :
       <Card>
         <CardContent>
@@ -428,27 +443,24 @@ export default function GameBoard(props: GameBoardProps) {
     return roomTiles[currentRoomId].numItems;
   }
 
-  function renderGameArea() {
-    // TODO: WHY DOESN"T THE "loading" STATE DO THIS????
-    // if (doors.length === 0) {
-    //   return "Waiting for doors";
-    // }
-    // if (players.length === 0) {
-    //   return "Waiting for players";
-    // }
-    // if (gameTiles.length === 0) {
-    //   return "Waiting for gameTiles"
-    // }
-    // if (currentGame.mapContract === "") {
-    //   return "Waiting for game"
-    // }
-    // if (props.playerSignerAddress === undefined) {
-    //   return "Waiting for game"
-    // }
-    // if (chars.length === 0) {
-    //   return "Waiting for chars";
-    // }
+  function handleGameSelectorChange(event: SelectChangeEvent) {
+    const gameNum = event.target.value;
+    setGameLoaded(false);
+    localStorage.setItem("lastGame", formGameNumber.toString())
+    props.setCurrentGameNumber(gameNum);
+  }
 
+  function buildGamesDropDown() {
+    const menuItems: ReactNode[] = [];
+    for (let i = 0; i < numGames; i++) {
+      menuItems.push(
+        <MenuItem value={i}>{i}</MenuItem>
+      );
+    }
+    return menuItems;
+  }
+
+  function renderGameArea() {
     return (!gameLoaded ? "Loading Game Area..." :
       <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
         <Grid item xs={9}>
@@ -492,6 +504,19 @@ export default function GameBoard(props: GameBoardProps) {
               <Button variant="contained" onClick={onUpdateGameClick}>Submit</Button>
             </Box>
           </Card>
+          <Box>
+            <FormControl fullWidth>
+              <InputLabel id="game-selector-label">Change Game</InputLabel>
+              <Select
+                labelId="game-selector-dd-label"
+                id="game-selector-dd"
+                value={props.currentGameNumber.toString()}
+                onChange={handleGameSelectorChange}
+              >
+                {buildGamesDropDown()}
+              </Select>
+            </FormControl>
+          </Box>
         </Grid>
       </Grid>
     )

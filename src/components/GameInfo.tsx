@@ -79,7 +79,6 @@ export default function GameInfo(props: GameInfoInterface) {
                           </Typography>
                         </Grid>
                       </Grid>
-
                     </CardContent>
                   </Card>
                 </Grid>
