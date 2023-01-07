@@ -25,11 +25,6 @@ export default function Info() {
         <List>
           <ListItem>
             <Typography variant="body1" align="left" color="yellow">
-              There is currently a bug with game selection.
-            </Typography>
-          </ListItem>
-          <ListItem>
-            <Typography variant="body1" align="left" color="yellow">
               To start: Buy NFT Character
             </Typography>
           </ListItem>
@@ -50,17 +45,7 @@ export default function Info() {
           </ListItem>
           <ListItem>
             <Typography variant="body1" align="left" color="yellow">
-              Refresh the browser window
-            </Typography>
-          </ListItem>
-          <ListItem>
-            <Typography variant="body1" align="left" color="yellow">
-              Switch to the Games Tab
-            </Typography>
-          </ListItem>
-          <ListItem>
-            <Typography variant="body1" align="left" color="yellow">
-              You should see the "Actions" section with drop down menus on the right side.
+              You should see the game board, and the "Actions" section with drop down menus on the right side.
             </Typography>
           </ListItem>
           <ListItem>
