@@ -10,7 +10,7 @@ import Door from "./Doors";
 
 import { PlayerInterface } from './Player';
 
-import Tile, { EmptyTile, GameTileInterface, RoomTile } from './Tile';
+import Tile, { EmptyRoomTile, EmptyTile, GameTileInterface, RoomTile } from './Tile';
 
 let timesBoardPulled = 0;
 
@@ -137,6 +137,9 @@ export default function GameBoard(props: GameBoardProps) {
     remoteRoomTiles.forEach((roomTile: RoomTile) => {
       localRoomTiles.push(roomTile);
     });
+
+    // TODO: Hack for broken reactor.  Remove next time you see this!
+    localRoomTiles[100] = EmptyRoomTile;
 
     // console.log(localRoomTiles);
     setGameTiles(localBoard);
@@ -440,6 +443,7 @@ export default function GameBoard(props: GameBoardProps) {
     const currentRoomId = gameTiles[currentPlayer.position.row][currentPlayer.position.col].roomId;
     // console.log("there are this many items:", roomTiles[currentRoomId].numItems)
     // console.log(typeof(roomTiles[currentRoomId].numItems))
+
     return roomTiles[currentRoomId].numItems;
   }
 
