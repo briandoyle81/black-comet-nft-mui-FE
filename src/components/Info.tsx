@@ -20,18 +20,22 @@ export default function Info() {
           USE A DEV WALLET.  WE ARE NOT RESPONSIBLE FOR ANY LOSSES!!!  EXPECT BUGS AND REGULAR RESETS!
         </Typography>
         <Typography variant="body1" align="left" color="red">
-          Don't enter the Main Reactor room, it will break the game.
+          The Main Reactor room is bugged and will have an event every time you enter.  This will eventually break the board.
         </Typography>
-        <Grid container>
-          <Grid item xs={4}>
-            <CardMedia
-              component="iframe"
-              width="560"
-              height="315"
-              src="https://www.youtube.com/embed/onhnfBiq1KE"
-            />
-          </Grid>
-        </Grid>
+        <Card>
+          <CardContent>
+            <Grid container>
+              <Grid item xs={4}>
+                <CardMedia
+                  component="iframe"
+                  width="560"
+                  height="315"
+                  src="https://www.youtube.com/embed/onhnfBiq1KE"
+                />
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
         <List>
           <ListItem>
             <Typography variant="body1" align="left" color="yellow">
