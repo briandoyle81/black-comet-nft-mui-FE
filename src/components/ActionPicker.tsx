@@ -48,7 +48,7 @@ export default function ActionPicker(props: GameInfoInterface) {
       secondDir,
       {
         value: cost,
-        gasLimit: 4000000 // TODO: Find a more elegant solution here
+        // gasLimit: 4000000 // TODO: Find a more elegant solution here
       }
     );
 

@@ -454,7 +454,7 @@ export default function GameBoard(props: GameBoardProps) {
     const menuItems: ReactNode[] = [];
     for (let i = 0; i < numGames; i++) {
       menuItems.push(
-        <MenuItem value={i}>{i}</MenuItem>
+        <MenuItem key={"games-dd-" + i} value={i}>{i}</MenuItem>
       );
     }
     return menuItems;
