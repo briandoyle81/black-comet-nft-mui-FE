@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardHeader, Grid, List, ListItem, Typography } from "@mui/material";
+import { Button, Card, CardContent, CardHeader, CardMedia, Grid, List, ListItem, Typography } from "@mui/material";
 import { Box } from "@mui/system"
 
 
@@ -22,6 +22,16 @@ export default function Info() {
         <Typography variant="body1" align="left" color="red">
           Don't enter the Main Reactor room, it will break the game.
         </Typography>
+        <Grid container>
+          <Grid item xs={4}>
+            <CardMedia
+              component="iframe"
+              width="560"
+              height="315"
+              src="https://www.youtube.com/embed/onhnfBiq1KE"
+            />
+          </Grid>
+        </Grid>
         <List>
           <ListItem>
             <Typography variant="body1" align="left" color="yellow">

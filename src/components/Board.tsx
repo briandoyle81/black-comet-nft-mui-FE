@@ -450,7 +450,7 @@ export default function GameBoard(props: GameBoardProps) {
   function handleGameSelectorChange(event: SelectChangeEvent) {
     const gameNum = event.target.value;
     setGameLoaded(false);
-    localStorage.setItem("lastGame", formGameNumber.toString())
+    localStorage.setItem("lastGame", gameNum.toString())
     props.setCurrentGameNumber(gameNum);
   }
 
