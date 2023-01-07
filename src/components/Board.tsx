@@ -485,25 +485,6 @@ export default function GameBoard(props: GameBoardProps) {
               currentTile={gameTiles[players[currentGame.currentPlayerTurnIndex].position.row][players[currentGame.currentPlayerTurnIndex].position.col]}
             />
           </Card>
-          <Card>
-            <Box
-              component="form"
-              sx={{
-                '& > :not(style)': { m: 1, width: '25ch' },
-              }}
-              noValidate
-              autoComplete="off"
-            >
-              <TextField
-                id="game-number"
-                label="Game Number"
-                variant="outlined"
-                value={formGameNumber}
-                onChange={(event) => {setFormGameNumber(Number(event.target.value))}}
-              />
-              <Button variant="contained" onClick={onUpdateGameClick}>Submit</Button>
-            </Box>
-          </Card>
           <Box>
             <FormControl fullWidth>
               <InputLabel id="game-selector-label">Change Game</InputLabel>
