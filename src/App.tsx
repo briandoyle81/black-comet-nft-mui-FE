@@ -110,8 +110,8 @@ function App() {
           rpcUrls: ["https://rpc-mumbai.maticvigil.com"],
           chainName: "Polygon Testnet Mumbai",
           nativeCurrency: {
-            name: "tMATIC",
-            symbol: "tMATIC", // 2-6 characters long
+            name: "MATIC",
+            symbol: "MATIC", // 2-6 characters long
             decimals: 18,
           },
           blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
