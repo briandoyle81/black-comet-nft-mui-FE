@@ -172,12 +172,6 @@ MysteryEventDisplayData.push({
 })
 
 MysteryEventDisplayData.push({
-    name: "No Event",
-    desc: "Nothing happens.",
-    id: 400000
-})
-
-MysteryEventDisplayData.push({
     name: "Mesmer",
     desc: "You see a shimmer in the corner of your eye. As you turn, it transforms into a beautiful pattern of scintillating colors. Enchanted, you stare at the wonder. It seems to be trying to tell you something. You become lost. The truth seem so close, but something prevents you from seeing it. Finally, you tear yourself away, knowing that all the answers you have ever sought remain just out of reach.\n\nLose the rest of your turn.",
     id: 400001
@@ -361,6 +355,102 @@ ScavEventDisplayData.push({
     name: "You Are Not Alone",
     desc: "You've found yourself in a rather populated part of the ship. It seems like there are Scavengers all over the place.\n\nPlace one Scavenger in each adjacent room.",
     id: 500015
+})
+
+ShipEventDisplayData.push({
+    name: "No Event",
+    desc: "Nothing happens.",
+    id: 600000
+})
+
+ShipEventDisplayData.push({
+    name: "Snitch",
+    desc: "You find a security console that is displaying images of you and your fellow crew members. Symbols indicate that the security system suspects that one is carrying contraband. It wants you to tell it who.\n\nSelect a player.  Place a Sentry Robot in the room with that player.",
+    id: 600001
+})
+
+ShipEventDisplayData.push({
+    name: "Alarm",
+    desc: "As you enter this room, a klaxon sounds and spinning red lights emerge from the walls. Followed by a fully armed and activated turret!\n\nPlace a Sentry Turret in this room.",
+    id: 600002
+})
+
+ShipEventDisplayData.push({
+    name: "Lockdown",
+    desc: "An alien voice speaks in your helmet speaker. In a soothing tone, it says, 'Warning. Emergency event detected. For your safety, please stay in this room until the all clear is given.' Security doors slam shut, trapping you inside!\n\nUntil the beginning of your next turn, no players or denizens may enter or leave this room, including you.",
+    id: 600003
+})
+
+ShipEventDisplayData.push({
+    name: "Vent the Ship",
+    desc: "An alien voice speaks in your helmet speaker. Urgently, it says, 'Alarm! Fire detected! Report to duty stations and prepare for emergency vent.'\n\nTake 1 hazard damage. Place a Hazard Tile in this room.",
+    id: 600004
+})
+
+ShipEventDisplayData.push({
+    name: "Maintenance Hatch",
+    desc: "You discover a maintenance hatch that is closed, but unlocked. This will provide safe passage to another part of the ship.\n\nPlace a Maintenance Hatch Token on this tile. Place the the other token in any discovered part of the ship. As an action, any player may move between these two tiles. You may do so now, for free, if you choose.",
+    id: 600005
+})
+
+ShipEventDisplayData.push({
+    name: "Replicator",
+    desc: "You discover a barely functioning replicator device. It has a very limited inventory, but it looks like there is just enough power for one last use.\n\nTake any one item card from the discard pile. If there aren't any, receive a data token instead.",
+    id: 600006
+})
+
+ShipEventDisplayData.push({
+    name: "First Aid Station",
+    desc: "You've found an operational first aid station. With some trepidation, you stick your arm into the device. It clamps down on you and the pain starts. But after a second, you feel wonderful. Better than you've felt in years. The station goes dark.\n\nHeal all damage, plus 1. This additional hitpoint is temporary and cannot be restored if lost.",
+    id: 600007
+})
+
+ShipEventDisplayData.push({
+    name: "ATM",
+    desc: "A well worn set of buttons gives you some idea of what the password might be.\n\nRoll two dice:\n2-3:     A Sentry Turret appears in this room\n4-8:     They system locks out. Nothing happens\n9-10:   The system grants you 1 data token before shutting down\n11-12: The system grants you 3 data tokens before shutting down",
+    id: 600008
+})
+
+ShipEventDisplayData.push({
+    name: "Blooper Reel",
+    desc: "As you enter the room, the door partially closes and cracks you on the head.\n\nTake 1 physical damage.",
+    id: 600009
+})
+
+ShipEventDisplayData.push({
+    name: "Locker",
+    desc: "You find an undisturbed equipment locker. Even better, it's unlocked!\n\nDraw an item from the item deck.",
+    id: 600010
+})
+
+ShipEventDisplayData.push({
+    name: "Contraband",
+    desc: "An alien voice speaks in your helmet speaker. Authoritatively, it states, 'Contraband detected. This is your first offense. Surrender the contraband and no further action will be taken.'\n\nDiscard an item at random.\n\n-OR-\n\nRefuse to comply. Place a Sentry Robot in this room.",
+    id: 600011
+})
+
+ShipEventDisplayData.push({
+    name: "Fire",
+    desc: "A gas conduit in this room ruptures and explodes. You are caught in the blast.\n\nTake 1 hazard damage. Place a Hazard token in this room.",
+    id: 600012
+})
+
+ShipEventDisplayData.push({
+    name: "Janitorial Misconduct",
+    desc: "Someone should have put a sign that says 'Wet Floor!' You slip in a puddle, fall down, and drop some of your stuff.\n\nPick an item card at random and drop it in the room you just left.",
+    id: 600013
+})
+
+ShipEventDisplayData.push({
+    name: "Target Acquired",
+    desc: "As you enter this room, you see a Sentry Turret. It turns to you and fires!\n\nTake 1 damage.  Place a Sentry Turret in this room.",
+    id: 600014
+})
+
+ShipEventDisplayData.push({
+    name: "Security!",
+    desc: "You enter the room hoping to find an artifact. Instead, you find an armed and activated Sentry Robot!\n\nPlace a Sentry Robot in this room.",
+    id: 600015
 })
 
 export { TileEventDisplayData, BugEventDisplayData, MysteryEventDisplayData, ScavEventDisplayData, ShipEventDisplayData }
