@@ -100,8 +100,9 @@ export default function GameBoard(props: GameBoardProps) {
   const [currentPlayerItems, setCurrentPlayerItems] = useState<any[]>(); // TODO: Any
 
   const [lastDieRoll, setLastDieRoll] = useState("None");
-  const [eventFlipper, setEventFlipper] = useState(true);
+  const [eventFlipper, setEventFlipper] = useState(true); // TODO: Confusing name, think this should be actionFlipper
   const [eventsLoaded, setEventsLoaded] = useState(false);
+  const [eventResolved, setEventResolved] = useState(false);
 
   const updateCurrentPlayerItemsFromChain = async () => {
     const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
@@ -251,7 +252,7 @@ export default function GameBoard(props: GameBoardProps) {
     loadGameBoard();
     if (props.walletLoaded && !eventsLoaded) {
       // TODO: Find appropriate home
-      // TODO: This is probably triggered by ANY game
+      // WARNING:  This is creating a stale closure, but it's not impacted because the listener is destroyed and recreated when the game changes
       // TODO: This is here because if it's in App, for some reason, events cause the tab content to unmount and remount, completely reloading Board
       props.actionsContract_read.on("ActionCompleteEvent", (gameId: any, game: any, playerId: any, player: any, action: any, event: any) => {
         console.log("Event Game ID", gameId)
@@ -264,10 +265,9 @@ export default function GameBoard(props: GameBoardProps) {
         console.log("Test is", mapId == props.currentGameNumber)
         // DO NOT USE ===, will always be false!!
         if (mapId == props.currentGameNumber) {
-          console.log("SET EVENT FLIPPER")
           setEventFlipper(true);
         }
-      })
+      });
 
       props.utilsContract_read.on("DiceRollEvent", (gameId: any, roll: any, event: any) => {
         console.log("Roll Event roll", roll);
@@ -276,14 +276,19 @@ export default function GameBoard(props: GameBoardProps) {
         if (gameId == props.currentGameNumber) {
           setLastDieRoll(roll.toString());
         }
-      })
+      });
 
       props.playersContract_read.on("EventResolvedEvent", (gameId: any, playerId: any, currentEvent: any, currentEffect: any, event: any) => {
         // DO NOT USE ===, will always be false!!
+        console.log("Triggered Event Resolved Event");
         if (gameId == props.currentGameNumber) {
+          setEventResolved(true);
           setEventFlipper(true);
+          console.log("currentEvent", currentEvent);
+          console.log("currentEffect", currentEffect);
         }
-      })
+      });
+      setEventsLoaded(true);
     }
 
   }, [gameLoaded, props.currentGameNumber, eventFlipper, props.walletLoaded]);
@@ -372,19 +377,6 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   function renderMapWithDoors() {
-    // TODO: WHY DOESN"T THE "loading" STATE DO THIS????
-    // if (doors.length === 0) {
-    //   return "Waiting for doors";
-    // }
-    // if (players.length === 0) {
-    //   return "Waiting for players";
-    // }
-    // if (gameTiles.length === 0) {
-    //   return "Waiting for gameTiles"
-    // }
-    // if (currentGame.mapContract === "") {
-    //   return "Waiting for game"
-    // }
     const rows: ReactNode[] = [];
     gameTiles.forEach((rowData: GameTileInterface[], row) => {
       if (row === 0) {
@@ -488,6 +480,8 @@ export default function GameBoard(props: GameBoardProps) {
               players={players}
               currentTile={gameTiles[players[currentGame.currentPlayerTurnIndex].position.row][players[currentGame.currentPlayerTurnIndex].position.col]}
               setEventFlipper={setEventFlipper}
+              eventResolved={eventResolved}
+              setEventResolved={setEventResolved}
             />
           </Card>
           <Box>

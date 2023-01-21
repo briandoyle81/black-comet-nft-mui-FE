@@ -40,6 +40,8 @@ export interface GameInfoInterface {
   players: PlayerInterface[],
   currentTile: GameTileInterface,
   setEventFlipper: Function,
+  eventResolved: boolean,
+  setEventResolved: Function
 }
 
 export interface EventTrackerInterface {

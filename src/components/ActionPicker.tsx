@@ -62,8 +62,10 @@ export default function ActionPicker(props: GameInfoInterface) {
 
     // Below works for the acting client, but not a hook, so others
     // won't get the update
-    await actionTx.wait();
-    props.setEventFlipper();
+    await actionTx.wait().then(() => {
+      // TODO: Set waiting state to prevent action submission
+      props.setEventFlipper();
+    });
   };
 
   function isPlayerTurn(walletAddress: string, charOwner: string) {
