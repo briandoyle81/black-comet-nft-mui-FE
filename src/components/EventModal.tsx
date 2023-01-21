@@ -1,6 +1,6 @@
 import { Box, Button, Modal, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { EventDataDisplay, BugEventDisplayData, TileEventDisplayData } from "./EventData";
+import { EventDataDisplay, BugEventDisplayData, TileEventDisplayData, MysteryEventDisplayData, ScavEventDisplayData, ShipEventDisplayData } from "./EventData";
 import { BCEventType, GameInfoInterface, GameInterface } from "./GamePanel";
 import Tile, { EmptyTile } from "./Tile";
 
@@ -56,10 +56,20 @@ export default function EventModal(props: GameInfoInterface) {
         return TileEventDisplayData[id];
       case BCEventType.BUG:
         return BugEventDisplayData[id];
+      case BCEventType.MYSTERY:
+        return MysteryEventDisplayData[id];
+      case BCEventType.SCAVENGER:
+        return ScavEventDisplayData[id];
+      case BCEventType.SHIP_SECURITY:
+        return ShipEventDisplayData[id];
     }
     // TODO: throw error
     console.log("Didn't find correct event");
-    return TileEventDisplayData[0];
+    return ({
+      name: "Event Missing",
+      desc: "Fallback to prevent crash.",
+      id: 0
+    })
   }
 
   return (

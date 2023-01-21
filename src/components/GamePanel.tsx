@@ -39,6 +39,7 @@ export interface GameInfoInterface {
   roomTiles: RoomTile[],
   players: PlayerInterface[],
   currentTile: GameTileInterface,
+  setEventFlipper: Function,
 }
 
 export interface EventTrackerInterface {

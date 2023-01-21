@@ -487,6 +487,7 @@ export default function GameBoard(props: GameBoardProps) {
               roomTiles={roomTiles}
               players={players}
               currentTile={gameTiles[players[currentGame.currentPlayerTurnIndex].position.row][players[currentGame.currentPlayerTurnIndex].position.col]}
+              setEventFlipper={setEventFlipper}
             />
           </Card>
           <Box>
