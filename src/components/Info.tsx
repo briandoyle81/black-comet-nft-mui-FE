@@ -19,9 +19,6 @@ export default function Info() {
         <Typography variant="body1" align="left" color="red">
           USE A DEV WALLET.  WE ARE NOT RESPONSIBLE FOR ANY LOSSES!!!  EXPECT BUGS AND REGULAR RESETS!
         </Typography>
-        <Typography variant="body1" align="left" color="red">
-          The Main Reactor room is bugged and will have an event every time you enter.  This will eventually break the board.
-        </Typography>
         <Card>
           <CardContent>
             <Grid container>
