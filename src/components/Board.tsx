@@ -278,14 +278,14 @@ export default function GameBoard(props: GameBoardProps) {
         }
       });
 
-      props.playersContract_read.on("EventResolvedEvent", (gameId: any, playerId: any, currentEvent: any, currentEffect: any, event: any) => {
+      props.playersContract_read.on("EventResolvedEvent", (gameId: any, playerId: any, currentEvent: any, appliedEffects: any, event: any) => {
         // DO NOT USE ===, will always be false!!
         console.log("Triggered Event Resolved Event");
         if (gameId == props.currentGameNumber) {
           setEventResolved(true);
           setEventFlipper(true);
           console.log("currentEvent", currentEvent);
-          console.log("currentEffect", currentEffect);
+          console.log("appliedEffects", appliedEffects);
         }
       });
       setEventsLoaded(true);
@@ -459,9 +459,6 @@ export default function GameBoard(props: GameBoardProps) {
   function renderGameArea() {
     return (!gameLoaded ? "Loading Game Area..." :
       <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
-        <Grid item xs={9}>
-          {renderMapArea()}
-        </Grid>
         <Grid item xs={3}>
           <Card>
             <GamePanel
@@ -497,6 +494,9 @@ export default function GameBoard(props: GameBoardProps) {
               </Select>
             </FormControl>
           </Box>
+        </Grid>
+        <Grid item xs={9}>
+          {renderMapArea()}
         </Grid>
       </Grid>
     )
