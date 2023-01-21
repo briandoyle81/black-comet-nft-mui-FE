@@ -64,11 +64,11 @@ export default function EventModal(props: GameInfoInterface) {
   function renderResolveButton(playerTurn: boolean) {
     if (playerTurn) {
       return (
-        <Button onClick={handleEvent} >Resolve</Button>
+        <Button variant="contained" onClick={handleEvent} >Resolve</Button>
       )
     } else {
       return (
-        <Button onClick={handleEvent} disabled>Not Your Turn</Button>
+        <Button variant="contained" onClick={handleEvent} disabled>Not Your Turn</Button>
       )
     }
   }
@@ -111,7 +111,7 @@ export default function EventModal(props: GameInfoInterface) {
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             Waiting for event resolution...
           </Typography>
-          <Button onClick={handleDebugReset} >Debug Reshow Resolve Button</Button>
+          <Button variant="contained" onClick={handleDebugReset} >Debug Reshow Resolve Button</Button>
         </Box>
       )
     } else if (modalState === eventModalState.LIVE) {
@@ -129,7 +129,7 @@ export default function EventModal(props: GameInfoInterface) {
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             TODO: PUT WHAT HAPPENED HERE!
           </Typography>
-          <Button onClick={handleConfirm} >Ok</Button>
+          <Button variant="contained" onClick={handleConfirm} >Ok</Button>
         </Box>
       )
     } else {

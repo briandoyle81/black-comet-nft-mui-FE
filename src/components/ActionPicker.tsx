@@ -6,13 +6,15 @@ import { ethers } from "ethers";
 
 enum Action { HACK=0, BREACH, MOVE, PASS, LOOT, USE_ROOM } // TODO: Add rest
 enum Followthrough { NONE = 0, MOVE }
-enum Direction { NORTH=0, SOUTH, EAST, WEST}
+enum Direction { NORTH = 0, SOUTH, EAST, WEST }
+enum PanelState { LIVE=0, WAITING }
 
 export default function ActionPicker(props: GameInfoInterface) {
   const [action, setAction] = useState(Action.PASS);
   const [firstDir, setFirstDir] = useState(Direction.NORTH);
   const [followthrough, setFollowthrough] = useState(Followthrough.NONE);
   const [secondDir, setSecondDir] = useState(Direction.NORTH);
+  const [panelState, setPanelState] = useState(PanelState.LIVE);
 
   const handleAction = (event: SelectChangeEvent) => {
     const act = event.target.value as string;
@@ -36,6 +38,7 @@ export default function ActionPicker(props: GameInfoInterface) {
 
   const submitAction = async () => {
     let cost = ethers.utils.parseUnits("0", 'gwei'); // TODO: Hardcoding
+    setPanelState(PanelState.WAITING);
     if (action === Action.LOOT) {
       cost = ethers.utils.parseUnits((100 * props.numItems).toString(), 'gwei')
     }
@@ -61,10 +64,11 @@ export default function ActionPicker(props: GameInfoInterface) {
     }
 
     // Below works for the acting client, but not a hook, so others
-    // won't get the update
+    // won't get the update (they do through the events though)
     await actionTx.wait().then(() => {
       // TODO: Set waiting state to prevent action submission
       props.setEventFlipper();
+      setPanelState(PanelState.LIVE);
     });
   };
 
@@ -146,7 +150,13 @@ export default function ActionPicker(props: GameInfoInterface) {
           </FormControl>
         </Grid>
         <Grid item xs={12}>
-          <Button variant="contained" onClick={submitAction}>Submit</Button>
+          <Button
+            variant="contained"
+            onClick={submitAction}
+            disabled={panelState == PanelState.LIVE ? false : true}
+          >
+            Submit
+          </Button>
         </Grid>
       </Grid>
       :
