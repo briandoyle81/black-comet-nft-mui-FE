@@ -153,6 +153,7 @@ export default function EventModal(props: GameInfoInterface) {
           <Tile
             tile={props.currentTile}
             players={props.players}
+            chars={props.chars}
             row={props.currentGameProps.eventPosition.row}
             col={props.currentGameProps.eventPosition.col}
             currentGame={props.currentGameProps}

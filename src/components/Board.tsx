@@ -312,6 +312,7 @@ export default function GameBoard(props: GameBoardProps) {
           <Tile
             tile={tile}
             players={players}
+            chars={chars}
             row={row}
             col={col}
             currentGame={currentGame}
@@ -475,6 +476,7 @@ export default function GameBoard(props: GameBoardProps) {
               allHeldItems={currentPlayerItems}
               roomTiles={roomTiles}
               players={players}
+              chars={chars}
               currentTile={gameTiles[players[currentGame.currentPlayerTurnIndex].position.row][players[currentGame.currentPlayerTurnIndex].position.col]}
               setEventFlipper={setEventFlipper}
               eventResolved={eventResolved}

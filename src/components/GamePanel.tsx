@@ -38,6 +38,7 @@ export interface GameInfoInterface {
   allHeldItems: any, // TODO: any
   roomTiles: RoomTile[],
   players: PlayerInterface[],
+  chars: CharInterface[],
   currentTile: GameTileInterface,
   setEventFlipper: Function,
   eventResolved: boolean,

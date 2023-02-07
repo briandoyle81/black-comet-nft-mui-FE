@@ -13,6 +13,7 @@ import { roomDisplayDataList } from './RoomTiles';
 
 import Vent from "../assets/img/overlays/vent.png";
 import Player, { PlayerInterface } from './Player';
+import { CharInterface } from './Board';
 import { Position } from './Utils';
 import GameInfo from './GameInfo';
 
@@ -103,6 +104,7 @@ export const EmptyTile: GameTileInterface = {
 export interface TilePropsInterface {
   tile: GameTileInterface;
   players: PlayerInterface[];
+  chars: CharInterface[];
   row: number;
   col: number;
   currentGame: GameInterface;
@@ -208,7 +210,14 @@ export default function Tile(props: TilePropsInterface) {
         if (position.row === player.position.row && position.col === player.position.col) {
           playerRenders.push(
             <Grid item xs={3} key={index + "player"}>
-              <Player {...{ player: player, portrait: false }} />
+              <Player
+                {...{
+                  player: player,
+                  portrait: false,
+                  genHash: props.chars[index].genHash, // TODO: I'm not 100% sure this is the right hash
+                }
+                }
+              />
             </Grid>
           )
             ;

@@ -23,7 +23,7 @@ import mapsContractDeployData from "./deployments/Maps.json";
 import lobbiesContractDeployData from "./deployments/Lobby.json";
 
 import GameBoard from './components/Board';
-import Characters from './components/Characters';
+import CharactersList from './components/CharactersList';
 import GameList from './components/GameList';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -223,7 +223,7 @@ function App() {
               </Tabs>
             </Box>
             <TabPanel value={tabValue} index={0}>
-              <Characters
+              <CharactersList
                 charContract_read={charContract_read}
                 charContract_write={charContract_write}
                 lobbiesContract_write={lobbiesContract_write}

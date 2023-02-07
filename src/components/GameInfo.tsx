@@ -113,7 +113,14 @@ export default function GameInfo(props: GameInfoInterface) {
         <Grid item xs={12}>
           <Grid container spacing={0}>
             <Grid item xs={6}>
-              <Player {...{ player: props.currentPlayer, portrait: true }} />
+              <Player
+                {...{
+                  player: props.currentPlayer,
+                  portrait: true,
+                  genHash: props.currentChar.genHash
+                }
+                }
+              />
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1">

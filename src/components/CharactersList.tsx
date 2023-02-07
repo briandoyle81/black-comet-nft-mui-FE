@@ -1,9 +1,9 @@
-import { Button, Card, Grid, Typography } from "@mui/material";
+import { Button, Card, CardMedia, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system"
 import { ethers } from "ethers";
 import { ReactNode, useEffect, useState } from "react";
 import { CharInterface } from "./Board";
-
+import Player, { ArchetypeProps, PlayerInterface } from "./Player";
 
 interface CharactersDataInterface {
   charContract_read: any, // todo any
@@ -12,7 +12,29 @@ interface CharactersDataInterface {
   address: string
 }
 
-export default function Characters(props: CharactersDataInterface) {
+// const emptyPlayer: PlayerInterface = {
+//     // TODO: This is sloppy
+//   remoteId: -1,
+//   owner: "",
+//   charContractAddress: "",
+//   characterId: -1,
+
+//   position: { row: -1, col: -1 },
+
+//   healthDmgTaken: -1,
+//   armorDmgTaken: -1,
+//   actionsTaken: -1,
+
+//   dataTokens: -1,
+//   currentEffects: [],
+//   inventoryIDs: [],
+
+//   canHarmOthers: false,
+//   dead: false
+// }
+
+// TODO: Rename to CharactersList
+export default function CharactersList(props: CharactersDataInterface) {
 
   const [charsLoaded, setCharsLoaded] = useState(false);
   const [chars, setChars] = useState<CharInterface[]>([]);
@@ -80,55 +102,71 @@ export default function Characters(props: CharactersDataInterface) {
     }
   }
 
+  function buildPlayerProps(genHash: string) {
+    return (
+      {
+        portrait: true,
+        genHash: genHash
+      }
+    )
+  }
+
   function renderCharData() {
     const charList: ReactNode[] = []
     chars.forEach((char: CharInterface, index) => {
       charList.push(
         <Grid item xs={3} key={index + " Player card"}>
           <Card>
-            <Typography variant="body1">
-              Hash:
+            <Typography variant="body1" align="left">
+              UiF DNA:
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" align="left">
               {char.genHash.slice(2, 34)}
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body1" align="left">
               {char.genHash.slice(34, 66)}
             </Typography>
-            <Typography variant="body1">
-              Clone: {char.cloneNumber}/{char.maxClones}
-            </Typography>
-            <Typography variant="body1">
-              Id Number: {char.id.toString()}
-            </Typography>
             <Grid container spacing={1}>
-              <Grid item xs={12}>
-                <Card>
-                  <Typography variant="body1">
-                    Traits
-                  </Typography>
-                  <Typography variant="body1">
-                    Health: {char.traits.health}
-                  </Typography>
-                  <Typography variant="body1">
-                    Carry: {char.traits.carry}
-                  </Typography>
-                  <Typography variant="body1">
-                    Defense: {char.traits.defense}
-                  </Typography>
-                  <Typography variant="body1">
-                    Hack: {char.traits.hack}
-                  </Typography>
-                  <Typography variant="body1">
-                    Breach: {char.traits.breach}
-                  </Typography>
-                  <Typography variant="body1">
-                    Shoot: {char.traits.shoot}
-                  </Typography>
-                  <Typography variant="body1">
-                    Melee: {char.traits.melee}
-                  </Typography>
-                </Card>
+              <Grid item xs={6}>
+                <Player {...buildPlayerProps(char.genHash)} />
+              </Grid>
+              <Grid item xs={6}>
+                <Grid container spacing={1}>
+                  <Grid item xs={12}>
+                    <Card>
+                      <Typography variant="body1">
+                        Clone: {char.cloneNumber}/{char.maxClones}
+                      </Typography>
+                      <Typography variant="body1">
+                        Id Number: {char.id.toString()}
+                      </Typography>
+                      <Typography variant="body1">
+                        Traits
+                      </Typography>
+                      <Typography variant="body1">
+                        Health: {char.traits.health}
+                      </Typography>
+                      <Typography variant="body1">
+                        Carry: {char.traits.carry}
+                      </Typography>
+                      <Typography variant="body1">
+                        Defense: {char.traits.defense}
+                      </Typography>
+                      <Typography variant="body1">
+                        Hack: {char.traits.hack}
+                      </Typography>
+                      <Typography variant="body1">
+                        Breach: {char.traits.breach}
+                      </Typography>
+                      <Typography variant="body1">
+                        Shoot: {char.traits.shoot}
+                      </Typography>
+                      <Typography variant="body1">
+                        Melee: {char.traits.melee}
+                      </Typography>
+                    </Card>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
             <Grid item xs={12}>
