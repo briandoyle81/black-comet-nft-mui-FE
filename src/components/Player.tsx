@@ -12,9 +12,9 @@ import Archetype6 from "../assets/img/arch_svg/archetype_6";
 import Archetype7 from "../assets/img/arch_svg/archetype_7";
 
 export interface ArchetypeProps {
-  pantsStyle: object,
-  shirtStyle: object,
-  bootsStyle: object,
+  clothingColor: object,
+  clothingLowlight: object,
+  clothingHightlight: object,
   dirtStyle: object,
 }
 
@@ -68,14 +68,27 @@ export interface PlayerProps {
   genHash: string
 }
 
+// TODO: Move to utils and refine
+
+function changeColor(color: string, amount: number) { // #FFF not supportet rather use #FFFFFF
+    const clamp = (val: number) => Math.min(Math.max(val, 0), 0xFF)
+    const fill = (str: string) => ('00' + str).slice(-2)
+
+    const num = parseInt(color.substr(1), 16)
+    const red = clamp((num >> 16) + amount)
+    const green = clamp(((num >> 8) & 0x00FF) + amount)
+    const blue = clamp((num & 0x0000FF) + amount)
+    return '#' + fill(red.toString(16)) + fill(green.toString(16)) + fill(blue.toString(16))
+}
+
 export default function Player(props: PlayerProps) {
 
   function buildArchetype(genHash: string) {
-    const colorString = "#" + props.genHash.slice(20, 26) // Block 5 - 2
+    const colorString = "#" + props.genHash.slice(20, 26) // Block 5 - 2 // TODO: Library
     const builtProps: ArchetypeProps = {
-      pantsStyle: { fill: colorString },
-      shirtStyle: {},
-      bootsStyle: {},
+      clothingColor: { fill: colorString },
+      clothingLowlight: { fill: changeColor(colorString, -100) },
+      clothingHightlight: { fill: changeColor(colorString, 50) },
       dirtStyle: {},
     }
 

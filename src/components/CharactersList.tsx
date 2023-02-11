@@ -12,27 +12,6 @@ interface CharactersDataInterface {
   address: string
 }
 
-// const emptyPlayer: PlayerInterface = {
-//     // TODO: This is sloppy
-//   remoteId: -1,
-//   owner: "",
-//   charContractAddress: "",
-//   characterId: -1,
-
-//   position: { row: -1, col: -1 },
-
-//   healthDmgTaken: -1,
-//   armorDmgTaken: -1,
-//   actionsTaken: -1,
-
-//   dataTokens: -1,
-//   currentEffects: [],
-//   inventoryIDs: [],
-
-//   canHarmOthers: false,
-//   dead: false
-// }
-
 // TODO: Rename to CharactersList
 export default function CharactersList(props: CharactersDataInterface) {
 
