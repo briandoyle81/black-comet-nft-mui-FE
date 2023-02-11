@@ -104,6 +104,8 @@ export default function GameBoard(props: GameBoardProps) {
   const [eventsLoaded, setEventsLoaded] = useState(false);
   const [eventResolved, setEventResolved] = useState(false);
 
+  const [zoomed, setZoomed] = useState(true);
+
   const updateCurrentPlayerItemsFromChain = async () => {
     const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
     // console.log("Player indexes", playerIndexes);
