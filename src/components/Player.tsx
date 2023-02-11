@@ -18,27 +18,34 @@ export interface ArchetypeProps {
   dirtStyle: object,
 }
 
-const PlayerOverlay = styled(Card)(({ theme }) => ({
-  // position: 'absolute',
-  // left: '-55%',
-  // bottom: '-55%',
-  scale: '30%',
-  background: 'transparent'
-}));
+// const PlayerOverlay = styled(Card)(({ theme }) => ({
+//   // position: 'absolute',
+//   // left: '-55%',
+//   // bottom: '-55%',
+//   scale: '30%',
+//   background: 'transparent'
+// }));
 
 const PlayerStyle = {
   zIndex: 1299, // TODO
   width: '100%'
 }
 
+const OnBoardPlayer = styled(Card)(({ theme }) => ({
+  zIndex: 1299, // TODO
+  width: '90%',
+  background: 'white',
+  border: 'black'
+}));
+
 const Portrait = styled(Card)(({ theme }) => ({
   // scale: '50%',
   background: 'white'
 }));
 
-const ImageStyle = {
-  height: 150
-}
+// const ImageStyle = {
+//   height: 150
+// }
 
 export interface PlayerInterface {
   remoteId: number;
@@ -139,14 +146,15 @@ export default function Player(props: PlayerProps) {
     if (!portrait) {
       return (
 
-        // <img src={getArt()} style={PlayerStyle} alt="TODO PLAYER"/>
-        getArt()
+        <OnBoardPlayer>
+          {getArt()}
+       </OnBoardPlayer>
+
       )
     } else {
       return (
         <Portrait>
           <CardMedia>
-            {/* <img src={getArt()} style={ImageStyle} alt="TODO" /> */}
             {getArt()}
           </CardMedia>
         </Portrait>
