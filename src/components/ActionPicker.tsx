@@ -15,6 +15,7 @@ export default function ActionPicker(props: GameInfoInterface) {
   const [followthrough, setFollowthrough] = useState(Followthrough.NONE);
   const [secondDir, setSecondDir] = useState(Direction.NORTH);
   const [panelState, setPanelState] = useState(PanelState.LIVE);
+  const [actionIds, setActionIds] = useState<number[]>([]);
 
   const handleAction = (event: SelectChangeEvent) => {
     const act = event.target.value as string;
@@ -49,6 +50,7 @@ export default function ActionPicker(props: GameInfoInterface) {
       followthrough,
       firstDir,
       secondDir,
+      actionIds,
       {
         value: cost,
         gasLimit: 4000000 // TODO: Find a more elegant solution here
