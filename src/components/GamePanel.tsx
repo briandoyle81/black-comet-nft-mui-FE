@@ -13,6 +13,7 @@ import ItemCard from './ItemCard';
 import EventModal from './EventModal';
 import { Position } from './Utils';
 import { GameTileInterface, RoomTile, TilePropsInterface } from './Tile';
+import Inventory from './Inventory';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -77,24 +78,6 @@ export interface GameInterface {
 }
 
 export default function GamePanel(props: GameInfoInterface) {
-  function renderItemCards() {
-    const itemCards: ReactNode[] = [];
-    const itemList = props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex];
-    for (let i = 0; i < itemList.length; i++) {
-      itemCards.push(
-        <Grid item xs={12} key={"item-card-for-" + itemList[i].genHash}>
-          <ItemCard {...itemList[i]}/>
-        </Grid>
-      )
-    }
-    return (
-      <Grid container>
-        {itemCards}
-      </Grid>
-    )
-  }
-
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1}>
@@ -116,7 +99,7 @@ export default function GamePanel(props: GameInfoInterface) {
           <ActionPicker {...props}/>
         </Grid>
         <Grid item xs={12}>
-          {renderItemCards()}
+          {Inventory(props)}
         </Grid>
         <Grid item xs={12}>
           <Card>

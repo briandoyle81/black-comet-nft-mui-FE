@@ -173,9 +173,6 @@ export default function ActionPicker(props: GameInfoInterface) {
       </Typography>
       {renderActionPicker(isPlayerTurn(props.playerSignerAddress, props.currentPlayer.owner))}
       <Typography variant="body1">
-        Reject failed transactions
-      </Typography>
-      <Typography variant="body1">
         Input not validated client-side (yet)
       </Typography>
     </Card>

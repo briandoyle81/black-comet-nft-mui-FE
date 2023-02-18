@@ -112,7 +112,7 @@ export default function GameInfo(props: GameInfoInterface) {
         </Grid>
         <Grid item xs={12}>
           <Grid container spacing={0}>
-            <Grid item xs={6}>
+            <Grid item xs={4}>
               <Player
                 {...{
                   player: props.currentPlayer,
@@ -122,7 +122,7 @@ export default function GameInfo(props: GameInfoInterface) {
                 }
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={8}>
               <Typography variant="body1">
                 Dmg. Taken: {props.currentPlayer.healthDmgTaken.toString()}/{props.currentChar.traits.health}
               </Typography>
