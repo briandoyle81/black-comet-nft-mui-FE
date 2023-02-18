@@ -39,7 +39,6 @@ const OnBoardPlayer = styled(Card)(({ theme }) => ({
 }));
 
 const Portrait = styled(Card)(({ theme }) => ({
-  // scale: '50%',
   background: 'white'
 }));
 

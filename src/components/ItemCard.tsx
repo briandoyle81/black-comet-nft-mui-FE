@@ -1,8 +1,21 @@
-import { Card, CardContent, Grid, Typography } from "@mui/material"
+import { Box, Card, CardContent, CardMedia, Grid, Typography } from "@mui/material"
+import { styled } from '@mui/material/styles';
+
+import CompanyItemBG from "../assets/img/misc/companyitem_bg.jpg";
+import ScavengerBG from "../assets/img/misc/scavenger_bg.jpg";
+import ArtifactBG from "../assets/img/misc/artifact_bg.png";
 
 
 enum ItemCategory { COMPANY = 0, ARTIFACT, SCAVENGER }
-enum ItemType { MELEE=0, GUN, ARMOR, TODO_ITEM }
+enum ItemType { MELEE = 0, GUN, ARMOR, TODO_ITEM }
+
+const ItemOverlay = styled(Box)(({ theme }) => ({
+  position: 'absolute',
+  left: '0',
+  top: '0',
+  zIndex: 1299,
+  background: 'transparent',
+}));
 
 interface ItemDataInterface {
     genHash: string,
@@ -41,42 +54,58 @@ const ItemTypeToString = new Map([
 
 export default function ItemCard(props: ItemDataInterface) {
 
-    return (
-        <Card>
-            <CardContent>
-                <Grid container spacing={1}>
-                    <Grid item xs={12}>
-                        <Typography variant="body1">
-                            {props.genHash}
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Typography variant="body1">
-                            Id: {props.id.toString()}
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Typography variant="body1">
-                            Weight: {props.weight.toString()}
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Typography variant="body1">
-                            Category: {ItemCategoryToString.get(props.itemCategory)}
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Typography variant="body1">
-                            Type: {ItemTypeToString.get(props.itemType)}
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Typography variant="body1">
-                            Power: {props.power.toString()}
-                        </Typography>
-                    </Grid>
-                </Grid>
-            </CardContent>
-        </Card>
-    )
+  function getItemBg() {
+    switch (props.itemCategory) {
+      case 0:
+        return CompanyItemBG;
+      case 1:
+        return ArtifactBG;
+      case 2:
+        return ScavengerBG;
+    }
+  }
+
+  return (
+    <Card sx={{ position: 'relative' }}>
+      <CardMedia
+        image={getItemBg()}
+        component="img"
+      />
+      <ItemOverlay>
+        <Grid container spacing={0}>
+          <Grid item xs={12}>
+            <Typography variant="body1" color="black">
+              {props.genHash.slice(4, 8)}
+            </Typography>
+          </Grid>
+          {/* <Grid item xs={12}>
+              <Typography variant="body1">
+                  { '#' + props.id.toString()}
+              </Typography>
+          </Grid> */}
+          <Grid item xs={12}>
+            <Typography variant="body1" color="black">
+              {props.weight.toString()}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Typography variant="body1" color="black">
+              {ItemTypeToString.get(props.itemType)}
+            </Typography>
+          </Grid>
+          {/* <Grid item xs={12}>
+              <Typography variant="body1">
+                  {props.power.toString()}
+              </Typography>
+          </Grid> */}
+          <Grid item xs={12}>
+            <Typography variant="body1" color="black">
+              {ItemCategoryToString.get(props.itemCategory)}
+            </Typography>
+          </Grid>
+        </Grid>
+      </ItemOverlay>
+    </Card>
+  )
 }
