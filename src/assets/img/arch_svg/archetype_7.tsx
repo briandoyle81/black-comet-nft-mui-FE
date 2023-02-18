@@ -420,103 +420,103 @@ export default function Archetype7(props: ArchetypeProps) {
       />
       <path
         d="M149.86,385.63s-5.5,3.59.67,6.84c0,0-17.42,20.5-14,44,0,0-29,40-31,134,0,0-13,18.33,13.66,35l9.67,19.66s-1.67,12.67,2.67,10.34c0,0,27,46.07,35.33,52.33,0,0-1.67,13,4.67,7.33,0,0,1.33,9,3.33,3.34,0,0,15.6-25.06,30.3-24.86,0,0,2.37-10.81-5.3-9.81,0,0,5.67-11-4.33-10.67l-3.67-11.66s-4-59.67-35-72c0,0,7.33-3-.33-7,0,0,35.14-46.13,48.4-99.07,0,0-.07,93.07,6.6,110.73,0,0-6,11,0,25.34,0,0-6.95,72.73-2.34,100.87,0,0-6,16.79,2.34,18.13,0,0-7.16,11.35.08,9.67,0,0,23.22-5.91,28.4,2,0,0,9-.69,1.24-9.7,0,0,6-1.35,3.14-10.68l6.47-23s24.33-54.33,10-85.67l1.67-21,22.08-159.66s-1.06-30.1-9.74-33.05l-1.66,1.79-3.92,4.09s-3.47,2.33-12.1,1.5l-3,1.33s-8.33,10.71-10.66,7.84c0,0-1.84-2.67,2.5-7l5.9-6.33s2.64-3.21.76-4.51l-5.66-.66s-6.79,8.92-11.38,9.77c0,0-2.33-.37-2.12-1.94,0,0-3.87,3.75-7.35,3.34,0,0-1.15-1.73,1.3-6.81l2.05-3.45,3.66-6.41,5.05-6.5-.38-.34-7.17,3s-4.5,7.42-9.5,7.5c0,0-4.45-1.49,1.81-8l2-1.85,5.1-6.95a4.27,4.27,0,0,1,1.31-.6l14.37-.75a5.68,5.68,0,0,1,1.74.45l1.81.85,10,.58s-9.06-8.2-12.62-9.66c0,0-1.23-2.67-3.6-1.49C243.12,356.23,173.19,393.47,149.86,385.63Z"
-        style={props.clothingColor}
+        style={props.clothingcolor}
       />
       <path
         d="M273.21,389.21l1.66,3.68s-6.68,8.21-15.18,4.89c0,0-4.5,1.05-9,6.74,0,0-5.33,4.07-7.16-.55,0,0,3.65,1.08,7.72-4.4l2.94-3.44,3-1.33s7.2,1.08,12.1-1.5Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M251.93,390.64s-1.11-4.67-4.86-.67c0,0-8.33,10-11.42,5.27,0,0,3.71,0,11.38-9.77l5.66.66S254.42,387.32,251.93,390.64Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M234.54,394.86a1.6,1.6,0,0,1-1-1.56s-5,4.25-7.35,3.34C226.18,396.64,229.14,399.64,234.54,394.86Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M235.65,376.8l-4.71,1.71s-6.87,8.42-9.75,5.12c0,0,4.75-.08,9.5-7.5l7.17-3V374Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M202.86,439.13a47.3,47.3,0,0,1-22.67-22.91s13,18.12,21.5,19.37l21.88-25.75Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M204.93,463.4l-2.07-24.27-5.09,47.26S203.67,470.47,204.93,463.4Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M211.53,599.47s11,2.37,18.66-8.25C230.19,591.22,222.49,604.84,211.53,599.47Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M260.86,601.13s-6.92-1.29-11.42,6.21C249.44,607.34,250.53,598.68,260.86,601.13Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M214.62,720.34s-5.93,6.13,1.32,3.88c0,0,10.56-3.8,15-.5,0,0-3.37-4-14.5-1.75C216.44,722,212.54,724.47,214.62,720.34Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M209.19,700.34s3.38,5.88,9.13,5.13C218.32,705.47,210.82,708.21,209.19,700.34Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M218.32,716.72s17.37-4.61,22.93,3.76C241.25,720.48,236.82,715.84,218.32,716.72Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M244.39,709.8s-2.14,4-14.6.79C229.79,710.59,240.09,711.63,244.39,709.8Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M168.82,688s-1.25,9.62,4.12,1.37c0,0,2.13-8.75,10-13.25,0,0-7.75,2-11.5,12.63C171.44,688.72,170.07,693.72,168.82,688Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M198.57,667s8.12-.75,1.75,4.5a33.14,33.14,0,0,0-17.38,11.75s5.5-10.63,15.38-12.88C198.32,670.34,202.82,669.09,198.57,667Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M195.53,653.13a18.9,18.9,0,0,1-11.59,11.71S193.74,657.93,195.53,653.13Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M166.86,687.8s-.17-9.33,9-11.71C175.82,676.09,165.28,675.51,166.86,687.8Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M128.86,625.13s1.83,2.84,9.33-2C138.19,623.09,129.4,630.3,128.86,625.13Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M131.53,635.47s2.66,1,6.66-5.25C138.19,630.22,134.48,639.6,131.53,635.47Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M156.86,569.47s-3.54,4.12-12.54,0C144.32,569.47,152.9,571.47,156.86,569.47Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M156.53,562.47s-1,7.5-11.46,5.62C145.07,568.09,152.87,567.55,156.53,562.47Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M105.53,570.47s2.54-2.54,7-.09C112.57,570.38,107.65,565.94,105.53,570.47Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M119.19,605.47s5.88-.37,8.75-9.5C127.94,596,125.82,608.22,119.19,605.47Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M136.53,436.47s7.54,6.75,22,0A33.74,33.74,0,0,1,136.53,436.47Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M150.53,392.47s16.33,2.33,35.83-6.84C186.36,385.63,163.36,400.47,150.53,392.47Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M199.25,775.13s-7.39,10.67-3.72,18c0,0-9,6.34,0,13.34,0,0,46.83,25.33,53.91-6.34,0,0,1.48-16.33-5.05-20.66,0,0-19.53-2.77-19.53-20.22,0,0,3.67-6.12,0-11.12l16.39-36.27,9.94-21.39H217l-9.77,44.33,2,31.67Z"

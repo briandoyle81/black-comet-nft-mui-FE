@@ -80,31 +80,31 @@ export default function Archetype1(props: ArchetypeProps) {
       />
       <path
         d="M152.9,317.68s-14.5,9.44-23,55.94l-19,113s0,21-4.5,32.5c0,0-40.5,57-28.5,86,0,0-2.5,14.5,23,8.5,0,0,32.4,1.68,36.95,8.59,0,0,28.05,14.41,15.05-27.09l8-49L212.6,395h4.25L254.9,534.12l7,12.5s5.5,67,22.5,59.5c0,0,15.5-12.5,31-8.5,0,0,41.16,3,26-23,0,0-11.5-41-25-54.5,0,0-16.22-181-44.11-194.49,0,0-8.39,6.49-16.89,10l-1.84-13.52-13.16,2.52,2.5,15.18s-13.22,3.35-33.67.73a132.88,132.88,0,0,1-17.33-3.41s-3.8-8.54,1.6-15A17.24,17.24,0,0,0,180,319.3s-5.57,9.32-2.57,12.82C177.4,332.12,156.9,326.25,152.9,317.68Z"
-        style={props.clothingColor}
+        style={props.clothingcolor}
       />
       <path
         d="M206.9,362.12v17s12.5,7,14-17V341.47s-13.5.8-14-1.28Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M97.9,556.12s-19,42,4,36.5C101.9,592.62,60.4,614.12,97.9,556.12Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M100.9,614.62s4.93-10.13,29-12.5Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M137.85,623.21s18.45-17.59,0-38.59C137.85,584.62,145.3,607.3,137.85,623.21Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M129.9,531.12s8,14.5,18,0c0,0,.4,24.5-10.05,25,0,0,15.05,7,12.55-30C150.4,526.12,140.4,541.62,129.9,531.12Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M281.4,541.38s16-5.76,15.5-19.76c0,0,6,3,4.5,25l-4.5-12.5S286.9,545.64,281.4,541.38Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M191.4,403.12s30.5-13.24,48-7.12C239.4,396,219.4,384.62,191.4,403.12Z"
@@ -114,19 +114,19 @@ export default function Archetype1(props: ArchetypeProps) {
       />
       <path
         d="M320.9,546.62s43,51.5-11,42.5C309.9,589.12,348.9,587.12,320.9,546.62Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M254.9,535.12s27.24,27,36.62,21.52C291.52,556.64,266.9,562.12,254.9,535.12Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M315.4,598.62s-21-23-36.5-6A35.07,35.07,0,0,1,315.4,598.62Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M316.4,521.12s-4,38.5-14.76,44C301.64,565.12,320.78,561.57,316.4,521.12Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M179.76,165.28s9.81,1,18.47,11.34C198.23,176.62,193,165.28,179.76,165.28Z"

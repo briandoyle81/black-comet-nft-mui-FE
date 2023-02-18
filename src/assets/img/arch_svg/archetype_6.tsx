@@ -334,159 +334,159 @@ export default function Archetype6(props: ArchetypeProps) {
       />
       <path
         d="M174.22,134.17l-.26,8.3-9.84,2.29S163.91,135.93,174.22,134.17Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M222.15,139.47l-.86,8.6,7.08,2.79S229.59,141.75,222.15,139.47Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M174.22,134.17s-9.19,1.36-10.1,10.59c0,0-16.25,5.32-23.41,11.7,0,0-26.42-2.71-34.67,10.87,0,0-12,12.08-11.75,29.83,0,0-22,13-10.75,52,0,0,3.25,15.5-5.5,39.25,0,0-2.75,2,0,10.75,0,0-6.5,2.75.5,7,0,0-4.5,5.25.25,7,0,0,33.5-11.25,48.75,0,0,0,9.25-1.75,1.25-6.25,0,0,10.25-4.5-.25-9,0,0,0-15.5-8-23.5l18.75-15.75s8.25,10.25,14.5,13.5c0,0,4,8,2.25,15.25l-1.75,18.25s-15.5,15-13,47.75c0,0-22.19,70.76-18.5,101.75l-.25,9.25s-11,17.75-9.25,28.25c0,0-31,38.75-27.5,67.25l1.75,43.25s-7.5,3.25-1,10.5c0,0-14.5,9-5.5,14.5,0,0-13.25,21.25,6,19.25,0,0,21-7.5,31.25,4.75,0,0,7.5,3.5,3.25-11.75,0,0,10-.5,6.75-12,0,0,8-12.75,3.25-23,0,0,25.75-35,24-55.75,0,0,2-28.5,5-34.5,0,0,9.5-10.5,8.25-25.5,0,0,18.25-11.5,18-46.75,0,0,11-15.5,11.75-28.25,0,0,5,25.75,15.25,35l7.5,17.75s-3.75,5.25,0,19.75c0,0-7,5.5,0,9,0,0-20.5,37.75-9,64.25l5.25,18.5s-11.5,9.25.25,17.5c0,0-18.25,8.5-6,16.75,0,0-13.5,20.5-3.25,36.5,0,0-16.75,42,25.5,5,0,0,17.75-19,24.25-8.25,0,0,2.25-22.25-9.25-15.25,0,0,8.25-9,3.75-24.5,0,0,15.36-5,5.68-28.5,0,0,12.32-56.75,8.07-66.25l8.5-21.5s-4.25-24.75-4-31.75c0,0,8.75-23.75,1.25-47.25,0,0,14-39.5-14-84.75a99.12,99.12,0,0,0-6-23.75V285.66l-1.25-2.5,1.5-10.75s0,9.75,3.5,12.75c0,0-7,1.75.25,6.5,0,0-5.25,11.5,1,12.5l4,1.5s26.5-23.5,42.75-17c0,0,10.75-5.75,0-11,0,0,6-11.25-5.25-9.5l-2.25.25s-5.5-16.5-14.5-19.75c0,0,3.25-23.5-9-40.75,0,0,12.75-32-26.25-48.5l-16.42-8.55s.14-10.09-8.22-11.39c0,0,9,3.69,4.52,13.53l-1.8,9.84L220,176.16l-34.87-11.83-5.32-7.5-11-13.17S165.4,138.35,174.22,134.17Z"
-        style={props.clothingColor}
+        style={props.clothingcolor}
       />
       <path
         d="M168.71,137.66a5.58,5.58,0,0,0,.75,7.51l14,18.83-6.75,12.5-11.5-29.92S163.23,139.91,168.71,137.66Z"
-        style={props.clothingHightlight}
+        style={props.clothinghightlight}
       />
       <path
         d="M225.54,162.75,230.46,175,230,151.5s.49-7.53-5.17-11.18c0,0,6.72,7.16,2,12.13Z"
-        style={props.clothingHightlight}
+        style={props.clothinghightlight}
       />
       <polygon
         points="183.46 165.5 177.54 176.5 183.46 173.25 188.12 174.41 183.46 165.5"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polyline
         points="225.35 164.08 230.12 174.59 225.45 169.64 221.87 175"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M150.29,191.41s-14,17.25-28,20.5C122.29,211.91,138.54,211.66,150.29,191.41Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M99.22,177.16s-1.93,27.75,8.07,34.75c0,0-7.37-4.06-12.44-21.9C94.85,190,95.9,179.91,99.22,177.16Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M111,217.66a18.87,18.87,0,0,0,6-1.5l-3,3.75s-.5,10-6.75,16c0,0,5.75-9.75,4.88-15a9.66,9.66,0,0,1-4.88-7Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M88.29,231.91s4,8,8.5,10l-1.94,2S86,238.16,88.29,231.91Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M230.12,196.41s2.92,10.25-5.7,17.5C224.42,213.91,237,211.41,230.12,196.41Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M213,217.41s-22.25,6.25-35.5,5.5c0,0,26.67,1.82,41.58-2.72l-7.75.15Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M142.29,211.91s10.75,12.25,10.25,32,14,25.75,14,25.75-4.33,10-18.66-1.87l-8.59-9.13-3-6.25S149,240.91,142.29,211.91Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M260.54,222.16s3.75,23.25-7.25,35.25l-.92,16.19s7.17-6.69,11.92-21.19C264.29,252.41,283,224.91,260.54,222.16Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M84.79,303.41s24.5-6.75,37.5,0C122.29,303.41,106.79,293.91,84.79,303.41Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M80.29,299.19a66.73,66.73,0,0,1,44.25-2.28s-4.87-6.5-32.18-4.25C92.36,292.66,80.54,293,80.29,299.19Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M257.54,284.66s26.5-16.28,37.25-15Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M264.54,288.41s-10.85,7.75,7.07,2.5C271.61,290.91,261.54,293.41,264.54,288.41Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M273.29,287.16s16.46-8.71,25.5-7.75Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M264.29,273.6s10,6.06,18.25-13.19C282.54,260.41,275.7,282.5,264.29,273.6Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M247,217.41h10.5s5-4.5,6.75-9.5c0,0-1.25,11.61-5.25,12.43,0,0-16.25-.68-21.25-5.18Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M251,170.62s13.07,11.79,15.41,27.79C266.45,198.41,259.54,181.08,251,170.62Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="158.04 288.41 156.54 305.16 158.04 305.16 160.29 288.41 158.04 288.41"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="232.34 290.82 230.84 307.57 232.34 307.57 234.59 290.82 232.34 290.82"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="239.55 289.5 238.05 306.25 239.55 306.25 241.8 289.5 239.55 289.5"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="244.91 287.32 243.41 304.07 244.91 304.07 247.16 287.32 244.91 287.32"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="250.13 286.66 248.63 303.41 250.13 303.41 252.38 286.66 250.13 286.66"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="193.56 292.93 192.06 309.68 193.56 309.68 195.81 292.93 193.56 292.93"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="186.59 292.19 185.09 308.94 186.59 308.94 188.84 292.19 186.59 292.19"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="180.24 292.19 178.74 308.94 180.24 308.94 182.49 292.19 180.24 292.19"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="173.89 290.82 172.39 307.57 173.89 307.57 176.14 290.82 173.89 290.82"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="168.04 289.5 166.54 306.25 168.04 306.25 170.29 289.5 168.04 289.5"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="163.03 289.5 161.53 306.25 163.03 306.25 165.28 289.5 163.03 289.5"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="206.16 293.04 204.66 309.79 206.16 309.79 208.41 293.04 206.16 293.04"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="213.55 292.93 212.05 309.68 213.55 309.68 215.8 292.93 213.55 292.93"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="220.62 292.93 219.12 309.68 220.62 309.68 222.87 292.93 220.62 292.93"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="199.83 292.93 198.33 309.68 199.83 309.68 202.08 292.93 199.83 292.93"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <polygon
         points="227.5 292.19 226 308.94 227.5 308.94 229.75 292.19 227.5 292.19"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M156.54,279.34s-1.53-5.07,5,0c0,0,.67,7.32,21,9.07,0,0,51,4.25,64.67-3.75,0,0,8.62.06,0,22.91,0,0-59.65,11.4-85.64,0,0,0-8.23,1.84-10.1,9.84,0,0-.63-7,2.87-11.75Z"
@@ -497,83 +497,83 @@ export default function Archetype6(props: ArchetypeProps) {
       />
       <path
         d="M156,497.66s18.37-14.7,24.25-29C180.29,468.66,175.54,488.41,156,497.66Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M125,442.66s.75,18.25,2.25,26l-2.25,20v-18S122.54,453.41,125,442.66Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M156,517.66s-9.75,8.75-17,32.25c0,0,10-23.25,15.75-27Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M99.29,606.66s-19.75,7.75,0,9.5c0,0,22.5-.75,24.25,4,0,0-3.07-6.48-21.25-8.5C102.29,611.66,90.79,614.16,99.29,606.66Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M101.54,622.66s29.27,10.52,16.5,2c0,0,21.5,14.5-4.5,4.5l-18.75-7.75Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M86.54,632.68s-9.25,11.48,2.75,7.23C89.29,639.91,82,640.7,86.54,632.68Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M99.79,635.16s9.95,1.55,15.75,9.25c0,0,8.12,9.86,4.25-2.25,0,0-.25,7.89-5.75-1.3C114,640.86,111.79,637.16,99.79,635.16Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M213.29,648.2s-9.75,27.71,11.75,6.21C225,654.41,211,666.23,213.29,648.2Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M225,643.16s8.5-11,18.5-9.25C243.54,633.91,244.31,619.11,225,643.16Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M219.54,614.66s-11,28.75,5.5,16C225,630.66,198,659.16,219.54,614.66Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M231,617.66s19.5,5.75,14.25-9C245.29,608.66,257,625.91,231,617.66Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M221,601.41s-13.5,9,5,5.25c0,0,11.8-4.25,21.9-1a42.91,42.91,0,0,0-24.15-1.16S213.54,608.66,221,601.41Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M229.54,576.16s-5.75-10.5,12.25-26.25C241.79,549.91,226.79,568.91,229.54,576.16Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M235.23,507.66a22.4,22.4,0,0,1,3.56,23.25S239.67,516.91,235.23,507.66Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M198.54,414.66s8.25-23,6.13-42.25c0,0,16.14,8.75,33.38-14.5,0,0-7.49,17.5-24.13,22.75,0,0,.37,38.5,10.12,31l17.76-13.5a71,71,0,0,0-13.92,37.75s-3.66,24-1.88,25.75l-12.21-12A85.49,85.49,0,0,1,198.54,414.66Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M192.06,370.16s-2,47.25-21.77,62C170.29,432.16,195.07,423.16,192.06,370.16Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M246.54,492.91s9.75,15.25,8.5,26.38A27.82,27.82,0,0,0,246.54,492.91Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M236.79,243.91s1.86,11.5-2.2,22C234.59,265.91,236.79,245.91,236.79,243.91Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M204.67,269.59s18.05,2.62,23.21-1.53C227.88,268.06,221.79,275.27,204.67,269.59Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M234.59,271.77a19.09,19.09,0,0,1-1.87,15.39A12.61,12.61,0,0,0,234.59,271.77Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M80.29,312.69s31.15-12.53,47.25.47c0,0-.36,11-1.93,25.5,0,0-.57,21.75,1.93,25.25,0,0,4,10,2.5,12.5l11.25,7.25,4,9.75,3.75,4.5s1.25,13.75-3.5,14l.25,7.5.25,8.25-3.25,3-2.5-2.25-5.5,3.75-7.5-6.25s-8.5,0-11.25-7.75l-8.75-6.75L105,409.79l-.25-28.88-15-30.75S80.29,326.19,80.29,312.69Z"

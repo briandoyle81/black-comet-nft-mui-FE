@@ -11,11 +11,13 @@ import Archetype5 from "../assets/img/arch_svg/archetype_5";
 import Archetype6 from "../assets/img/arch_svg/archetype_6";
 import Archetype7 from "../assets/img/arch_svg/archetype_7";
 
+// Names must be lowercase to keep React from getting upset about custom
+// attributes in the DOM
 export interface ArchetypeProps {
-  clothingColor: object,
-  clothingLowlight: object,
-  clothingHightlight: object,
-  dirtStyle: object,
+  clothingcolor: object,
+  clothinglowlight: object,
+  clothinghightlight: object,
+  dirtstyle: object,
 }
 
 // const PlayerOverlay = styled(Card)(({ theme }) => ({
@@ -92,10 +94,10 @@ export default function Player(props: PlayerProps) {
   function buildArchetype(genHash: string) {
     const colorString = "#" + props.genHash.slice(20, 26) // Block 5 - 2 // TODO: Library
     const builtProps: ArchetypeProps = {
-      clothingColor: { fill: colorString },
-      clothingLowlight: { fill: changeColor(colorString, -100) },
-      clothingHightlight: { fill: changeColor(colorString, 50) },
-      dirtStyle: {},
+      clothingcolor: { fill: colorString },
+      clothinglowlight: { fill: changeColor(colorString, -100) },
+      clothinghightlight: { fill: changeColor(colorString, 50) },
+      dirtstyle: {},
     }
 
     return builtProps;

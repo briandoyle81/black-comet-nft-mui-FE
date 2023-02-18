@@ -386,23 +386,23 @@ export default function Archetype5(props: ArchetypeProps) {
       />
       <path
         d="M195.3,364.79l.5-2.5s-4.25,0-4.5,1.25-3.75,8.5-3.25,14c0,0,2,9-3,16.5,0,0-40.5,71-50,120.5l-14.5,37s-46,43-39,122l1.5,28-11,35,16,23s29.5-1,32-18.5l-17.38-16.5s3.88-16.5-7.12-26c0,0,11.25-51,38.38-80.5,0,0,16.62-14.25,25.62-57.13l4-11.87s73.5-100.36,80-128.68h5.5s-4,23.68,3.5,63.18c0,0-2,16.5,0,50.5,0,0-5.25,16.5-2.62,23,0,0-44.38,60.5-8.38,99,0,0,13,38,5,50,0,0-17,26,3,24.5,0,0,20-2.5,21.5,8,0,0,31,25,63.5,5.5l-35-22-30.5-25.5s-2-83.5,13-132c0,0,11.5-5,5-22,0,0,43.5-65.65,31-166.83a172.63,172.63,0,0,0-7.56-27.42l-4.69-1.67,2.25-6.58s.51-2.26-6.08-1.72l2.08,2.72S274.72,397.54,195.3,364.79Z"
-        style={props.clothingColor}
+        style={props.clothingcolor}
       />
       <path
         d="M195.3,364.79l1.25-2.92s-6.67.17-5.67,2.92L188,376.29s8.38,13.25,47.38,12.91l.84-14.36S203.39,369.7,195.3,364.79Z"
-        style={props.clothingHightlight}
+        style={props.clothinghightlight}
       />
       <path
         d="M245.55,374.9s-3,10.48-.66,14.31c0,0,14.63-.34,23.06-3,0,0-2.22-11.22-5.64-12.94C262.31,373.26,247.39,376.6,245.55,374.9Z"
-        style={props.clothingHightlight}
+        style={props.clothinghightlight}
       />
       <path
         d="M288.85,358.66a12.59,12.59,0,0,1,8.37,9.88s12.26-7.59,15-15.55l-1.7-4.7-4.69-1.67,2.25-6.58s0-2.76-6.08-1.72l2.08,2.72S298,351.44,288.85,358.66Z"
-        style={props.clothingHightlight}
+        style={props.clothinghightlight}
       />
       <path
         d="M282.92,364.68s6.55,3.05,7.55,10.22c0,0-10.17,7.66-21.17,11.5,0,0-1.38-10.83-5.19-13.92A131,131,0,0,0,282.92,364.68Z"
-        style={props.clothingHightlight}
+        style={props.clothinghightlight}
       />
       <ellipse
         cx={274.26}
@@ -413,19 +413,19 @@ export default function Archetype5(props: ArchetypeProps) {
       />
       <path
         d="M140.53,493.21s-7.2,42.39,0,46.28Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M129.72,552s-1.33,13.33,18,8.66C147.72,560.7,129.72,575.93,129.72,552Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M249.05,420.36s26.83,55,2.75,96l.75-32.81S243.72,428.68,249.05,420.36Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M268,510s.41,16.13,12.47,26.93Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M89.07,643.83H112.8l-9,57.46L103.05,713l7.5,12,6.75,12.25-1.2,12.29s4.36,9.46-6.85,13.21c0,0-33,12.5-41.45-1-.25-1.5-3.25-8.5,0-11.75v-6.25s2.25-10.25,4.25-16.25l12-12.75L82.8,679.54l-1.5-33Z"
@@ -657,19 +657,19 @@ export default function Archetype5(props: ArchetypeProps) {
       />
       <path
         d="M249.93,422.27s10.14.56,24.41-18.61Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M201.12,492.91S183.1,524,166.6,523.5C166.6,523.5,189.45,508.24,201.12,492.91Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M188,389.21s21.25,1.2,29.42,12.25C217.43,401.46,194.42,391.42,188,389.21Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
       <path
         d="M249.93,557s8.2,13.46,14.18,14.46C264.11,571.5,250.1,568.21,249.93,557Z"
-        style={props.clothingLowlight}
+        style={props.clothinglowlight}
       />
     </svg>
   )
