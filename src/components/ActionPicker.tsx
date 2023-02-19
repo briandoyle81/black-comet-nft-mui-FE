@@ -4,8 +4,8 @@ import { GameInfoInterface } from "./GamePanel";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { ethers } from "ethers";
 
-enum Action { HACK=0, BREACH, MOVE, PASS, LOOT, USE_ROOM, USE_ITEM, DROP_ITEMS, PICK_ITEMS } // TODO: Add rest
-enum Followthrough { NONE = 0, MOVE }
+export enum Action { HACK=0, BREACH, MOVE, PASS, LOOT, USE_ROOM, USE_ITEM, DROP_ITEMS, PICK_ITEMS } // TODO: Add rest
+export enum Followthrough { NONE = 0, MOVE }
 enum Direction { NORTH = 0, SOUTH, EAST, WEST }
 enum PanelState { LIVE=0, WAITING }
 
