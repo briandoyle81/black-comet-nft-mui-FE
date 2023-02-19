@@ -1,10 +1,10 @@
-import { Button, Card, FormControl, Grid, InputLabel, MenuItem, Typography } from "@mui/material";
+import { Button, Card, CardContent, FormControl, Grid, InputLabel, MenuItem, Typography } from "@mui/material";
 import { useState } from "react";
 import { GameInfoInterface } from "./GamePanel";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { ethers } from "ethers";
 
-enum Action { HACK=0, BREACH, MOVE, PASS, LOOT, USE_ROOM } // TODO: Add rest
+enum Action { HACK=0, BREACH, MOVE, PASS, LOOT, USE_ROOM, USE_ITEM, DROP_ITEMS, PICK_ITEMS } // TODO: Add rest
 enum Followthrough { NONE = 0, MOVE }
 enum Direction { NORTH = 0, SOUTH, EAST, WEST }
 enum PanelState { LIVE=0, WAITING }
@@ -81,6 +81,21 @@ export default function ActionPicker(props: GameInfoInterface) {
   };
 
   function renderActionPicker(playerTurn: boolean) {
+    if (props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex].length > props.currentChar.traits.carry) {
+      return (
+        <Card>
+          <CardContent>
+            <Typography align="left">
+              You are carrying too many items.
+            </Typography>
+            <Typography align="left">
+              You must drop some to act.
+            </Typography>
+          </CardContent>
+        </Card>
+      )
+    }
+
     return (playerTurn ?
       <Grid container spacing={1}>
         <Grid item xs={6}>
@@ -159,6 +174,9 @@ export default function ActionPicker(props: GameInfoInterface) {
           >
             Submit
           </Button>
+          <Typography variant="body1">
+            Input not validated client-side (yet)
+          </Typography>
         </Grid>
       </Grid>
       :
@@ -171,12 +189,10 @@ export default function ActionPicker(props: GameInfoInterface) {
   return (
     <Card>
       <Typography variant="body1">
-        Actions
+        Action Selector
       </Typography>
       {renderActionPicker(isPlayerTurn(props.playerSignerAddress, props.currentPlayer.owner))}
-      <Typography variant="body1">
-        Input not validated client-side (yet)
-      </Typography>
+
     </Card>
   )
 }

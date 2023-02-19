@@ -49,7 +49,7 @@ const ItemTypeToString = new Map([
     [ItemType.ARMOR, "Armor"],
     [ItemType.GUN, "Gun"],
     [ItemType.MELEE, "Melee"],
-    [ItemType.TODO_ITEM, "TODO TYPE"]
+    [ItemType.TODO_ITEM, "TODO"]
 ]);
 
 export default function ItemCard(props: ItemDataInterface) {
@@ -92,6 +92,11 @@ export default function ItemCard(props: ItemDataInterface) {
           <Grid item xs={12}>
             <Typography variant="body1" color="black">
               {ItemTypeToString.get(props.itemType)}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1" color="black">
+              {props.id.toString()}
             </Typography>
           </Grid>
           {/* <Grid item xs={12}>
