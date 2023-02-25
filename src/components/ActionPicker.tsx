@@ -15,7 +15,7 @@ export default function ActionPicker(props: GameInfoInterface) {
   const [followthrough, setFollowthrough] = useState(Followthrough.NONE);
   const [secondDir, setSecondDir] = useState(Direction.NORTH);
   const [panelState, setPanelState] = useState(PanelState.LIVE);
-  const [actionIds, setActionIds] = useState<number[]>([]);
+  // const [actionIds, setActionIds] = useState<number[]>([]);
 
   const handleAction = (event: SelectChangeEvent) => {
     const act = event.target.value as string;
@@ -39,10 +39,21 @@ export default function ActionPicker(props: GameInfoInterface) {
 
   const submitAction = async () => {
     let cost = ethers.utils.parseUnits("0", 'gwei'); // TODO: Hardcoding
+    let actionIds: number[] = [];
     setPanelState(PanelState.WAITING);
     if (action === Action.LOOT) {
       cost = ethers.utils.parseUnits((100 * props.numItems).toString(), 'gwei')
     }
+    if (action === Action.PICK_ITEMS) {
+      for (let worldItem of props.gameWorldItems) {
+        console.log("In actions, world item", worldItem);
+        if (worldItem.position.row === props.currentPlayer.position.row &&
+            worldItem.position.col === props.currentPlayer.position.col) {
+          actionIds.push(worldItem.id);
+        }
+      }
+    }
+    console.log("In actions, world item ids", actionIds);
     const actionTx = await props.actionsContract_write.doAction(
       props.currentGameNumber,
       props.currentPlayer.remoteId,
@@ -114,6 +125,7 @@ export default function ActionPicker(props: GameInfoInterface) {
               <MenuItem value={Action.LOOT.toString()}>Loot</MenuItem>
               <MenuItem value={Action.USE_ROOM.toString()}>Use Room</MenuItem>
               <MenuItem value={Action.PASS.toString()}>Pass</MenuItem>
+              <MenuItem value={Action.PICK_ITEMS.toString()}>Pick Up Items</MenuItem>
             </Select>
           </FormControl>
         </Grid>

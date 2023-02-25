@@ -89,6 +89,7 @@ export interface CharInterface {
 }
 
 export interface IWorldItem {
+  id: number;
   gameId: number;
   bcItemId: number; // ID 0 == unknown item (use WorldItemStatus for logic)
 
@@ -96,7 +97,7 @@ export interface IWorldItem {
 
   position: Position;
 
-  // itemData: ItemDataInterface;
+  // itemData: ItemDataInterface;  // TODO: Consider attaching item properties
 }
 
 export default function GameBoard(props: GameBoardProps) {
@@ -134,6 +135,7 @@ export default function GameBoard(props: GameBoardProps) {
 
     remoteWorldItems.forEach((worldItem: IWorldItem) => {
       const newItem: IWorldItem = {
+        id: worldItem.id,
         gameId: worldItem.gameId,
         bcItemId: worldItem.bcItemId,
 
@@ -533,6 +535,7 @@ export default function GameBoard(props: GameBoardProps) {
               eventResolved={eventResolved}
               setEventResolved={setEventResolved}
               roomsWithItems={roomsWithItems}
+              gameWorldItems={gameWorldItems}
             />
           </Card>
           <Box>
