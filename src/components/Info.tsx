@@ -90,7 +90,7 @@ export default function Info() {
           Moving, looting, some events.  Dying if you go into space, or stand in fire (icon in lower left next to vents)
         </Typography>
         <Typography variant="body1" align="left">
-          Rooms with Bug events will trigger, but many events are not implemented fully.
+          Rooms events will trigger, but many events are not implemented fully.
         </Typography>
         <Typography variant="body1" align="left">
           The Medbay should heal you if you "Use Room"
@@ -99,7 +99,7 @@ export default function Info() {
           What Doesn't Work
         </Typography>
         <Typography variant="body1" align="left">
-          Most consequences for dying, carrying limits, enemy spawns, endgame, nft player and item transfer, combat, dropping items, random events, some room events.
+          Most consequences for dying, enemy spawns, endgame, nft player and item transfer, combat, many random events, some room events.
         </Typography>
       </CardContent>
     </Card>
