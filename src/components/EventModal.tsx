@@ -158,6 +158,7 @@ export default function EventModal(props: GameInfoInterface) {
             col={props.currentGameProps.eventPosition.col}
             currentGame={props.currentGameProps}
             roomTiles={props.roomTiles}
+            roomsWithItems={props.roomsWithItems}
           />
           {renderModalTextAndButton()}
         </Box>

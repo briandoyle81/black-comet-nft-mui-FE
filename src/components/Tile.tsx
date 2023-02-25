@@ -109,6 +109,7 @@ export interface TilePropsInterface {
   col: number;
   currentGame: GameInterface;
   roomTiles: RoomTile[];
+  roomsWithItems: Position[];
 }
 
 export default function Tile(props: TilePropsInterface) {
@@ -260,6 +261,21 @@ export default function Tile(props: TilePropsInterface) {
       iconRenders.push(
         <Grid item xs={3} key={(iconRenders.length - 1) + "bottom_icon"}>
           <img src={Hazard} alt="Hazard" style={{ width: '100%', zIndex: 1299 }} />
+        </Grid>
+      )
+    }
+
+    const tilePosition = { row: props.row, col: props.col };
+    let hasItem = false;
+    for (let pos of props.roomsWithItems) {
+      if (pos.row === tilePosition.row && pos.col === tilePosition.col) {
+        hasItem = true;
+      }
+    }
+    if (hasItem) {
+      iconRenders.push(
+        <Grid item xs={3} key={(iconRenders.length - 1) + "bottom_icon"}>
+          <img src={ItemIcon} alt="Item" style={{ width: '100%', zIndex: 1299 }} />
         </Grid>
       )
     }

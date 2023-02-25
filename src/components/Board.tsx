@@ -3,8 +3,10 @@ import { ReactNode, useEffect, useState } from 'react';
 import GamePanel, { BCEventType, EventTrackerInterface, GameInterface } from './GamePanel';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import { Position } from './Utils';
 
 import { DoorInterface } from './Doors';
+import { ItemDataInterface } from './ItemCard';
 
 import Door from "./Doors";
 
@@ -15,6 +17,8 @@ import Tile, { EmptyRoomTile, EmptyTile, GameTileInterface, RoomTile } from './T
 let timesBoardPulled = 0;
 
 const DISPLAY_COLUMNS = 13;
+
+export enum WorldItemStatus { UNKNOWN=0, KNOWN, DISCARDED, REMOVED }
 
 const EmptyEventTracker: EventTrackerInterface = {
   bugEvents: -1,
@@ -84,6 +88,17 @@ export interface CharInterface {
   id: number;
 }
 
+export interface IWorldItem {
+  gameId: number;
+  bcItemId: number; // ID 0 == unknown item (use WorldItemStatus for logic)
+
+  status: WorldItemStatus;
+
+  position: Position;
+
+  // itemData: ItemDataInterface;
+}
+
 export default function GameBoard(props: GameBoardProps) {
   const n = 11; // TODO: Hardcoded board size, can't use await here
 
@@ -98,6 +113,8 @@ export default function GameBoard(props: GameBoardProps) {
   const [gameLoaded, setGameLoaded] = useState(false);
   const [formGameNumber, setFormGameNumber] = useState(props.currentGameNumber);
   const [currentPlayerItems, setCurrentPlayerItems] = useState<any[]>(); // TODO: Any
+  const [gameWorldItems, setGameWorldItems] = useState<IWorldItem[]>([]);
+  const [roomsWithItems, setRoomsWithItem] = useState<Position[]>([]); // TODO: This should be a set
 
   const [lastDieRoll, setLastDieRoll] = useState("None");
   const [eventFlipper, setEventFlipper] = useState(true); // TODO: Confusing name, think this should be actionFlipper
@@ -105,6 +122,36 @@ export default function GameBoard(props: GameBoardProps) {
   const [eventResolved, setEventResolved] = useState(false);
 
   const [zoomed, setZoomed] = useState(true);
+
+  const updateWorldItemsFromChain = async () => {
+    console.log("Getting game world items for", props.currentGameNumber);
+    const remoteWorldItems = await props.gameContract_read.getGameWorldItems(props.currentGameNumber);
+    console.log("Loaded remote", remoteWorldItems);
+    // const remoteWorldItems: IWorldItem[] = [];
+    const newRemoteItems: IWorldItem[] = [];
+
+    const newPosWithItem: Position[] = [];
+
+    remoteWorldItems.forEach((worldItem: IWorldItem) => {
+      const newItem: IWorldItem = {
+        gameId: worldItem.gameId,
+        bcItemId: worldItem.bcItemId,
+
+        status: worldItem.status,
+
+        position: worldItem.position,
+        // TODO: Refine
+        // itemData: await props.itemContract_read.items(worldItem.gameId)
+      }
+
+      newRemoteItems.push(newItem);
+      newPosWithItem.push(newItem.position);
+    });
+
+    setGameWorldItems([...newRemoteItems]);
+    setRoomsWithItem([...newPosWithItem]);
+    // console.log("Loaded World Items", gameWorldItems);
+  }
 
   const updateCurrentPlayerItemsFromChain = async () => {
     const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
@@ -226,6 +273,7 @@ export default function GameBoard(props: GameBoardProps) {
       await updateCurrentPlayerItemsFromChain();
 
       await updateCharsFromChain();
+      await updateWorldItemsFromChain();
 
       setEventFlipper(false);
     }
@@ -319,6 +367,7 @@ export default function GameBoard(props: GameBoardProps) {
             col={col}
             currentGame={currentGame}
             roomTiles={roomTiles}
+            roomsWithItems={roomsWithItems}
           />
         </Grid>
       ));
@@ -483,6 +532,7 @@ export default function GameBoard(props: GameBoardProps) {
               setEventFlipper={setEventFlipper}
               eventResolved={eventResolved}
               setEventResolved={setEventResolved}
+              roomsWithItems={roomsWithItems}
             />
           </Card>
           <Box>

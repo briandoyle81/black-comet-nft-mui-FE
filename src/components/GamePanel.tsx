@@ -43,7 +43,8 @@ export interface GameInfoInterface {
   currentTile: GameTileInterface,
   setEventFlipper: Function,
   eventResolved: boolean,
-  setEventResolved: Function
+  setEventResolved: Function,
+  roomsWithItems: Position[]
 }
 
 export interface EventTrackerInterface {

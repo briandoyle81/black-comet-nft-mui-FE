@@ -17,7 +17,7 @@ const ItemOverlay = styled(Box)(({ theme }) => ({
   background: 'transparent',
 }));
 
-interface ItemDataInterface {
+export interface ItemDataInterface {
     genHash: string,
     id: number,
     uifID: number,
