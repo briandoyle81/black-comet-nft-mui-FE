@@ -139,7 +139,7 @@ export default function EventModal(props: GameInfoInterface) {
 
   return (
     <div>
-      <Button onClick={handleOpen}>Event</Button>
+      <Button onClick={handleOpen}>Zoom to Room</Button>
       <Modal
         open={open}
         onClose={handleClose}

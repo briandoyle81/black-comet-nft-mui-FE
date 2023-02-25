@@ -241,7 +241,9 @@ export default function Tile(props: TilePropsInterface) {
           </Grid>
         </TileOverlay>
         <BottomOverlay>
-          {renderBottomRowIcons()}
+          <Grid container>
+            {renderBottomRowIcons()}
+          </Grid>
         </BottomOverlay>
       </Box>
     );
