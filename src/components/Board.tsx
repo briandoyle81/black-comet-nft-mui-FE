@@ -434,13 +434,6 @@ export default function GameBoard(props: GameBoardProps) {
     return rowOfDoors;
   }
 
-  // function getCurrentPlayerPosition() {
-  //   return {
-  //     row: players[currentGame.currentPlayerTurnIndex].position.col,
-  //     col: players[currentGame.currentPlayerTurnIndex].position.row
-  //   }
-  // }
-
   function getZoomedRowStart() {
     if (zoomed) {
       if (currentPlayerPos.row <= 3) {
@@ -456,12 +449,10 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   function getZoomedRowEnd() {
-    console.log(currentPlayerPos);
     if (zoomed) {
       if (currentPlayerPos.row <= 3) {
         return 5;
       } else if (currentPlayerPos.row >= 8) {
-        console.log("return 11")
         return 11;
       } else {
         return currentPlayerPos.row + 3;  // + 2 for desired rows and 1 for < in other loop
