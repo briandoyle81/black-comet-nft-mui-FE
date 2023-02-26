@@ -99,7 +99,7 @@ export default function Info() {
           What Doesn't Work
         </Typography>
         <Typography variant="body1" align="left">
-          Most consequences for dying, enemy spawns, endgame, nft player and item transfer, combat, many random events, some room events.
+          Most consequences for dying, enemy spawns, endgame, nft player and item transfer, combat, many random events, some room events, rendering doors/windows on the right edge.
         </Typography>
       </CardContent>
     </Card>

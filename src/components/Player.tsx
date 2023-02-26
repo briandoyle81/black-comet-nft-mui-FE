@@ -107,7 +107,7 @@ export default function Player(props: PlayerProps) {
   function getArt() {
     const archTypeString = props.genHash[4];
 
-    console.log(props.genHash, props.genHash[4]);
+    // console.log(props.genHash, props.genHash[4]);
     if (archTypeString === "0" || archTypeString === "1") {
       return (
         <Archetype0 {...buildArchetype(props.genHash)} />

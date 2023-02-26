@@ -16,7 +16,8 @@ import Tile, { EmptyRoomTile, EmptyTile, GameTileInterface, RoomTile } from './T
 
 let timesBoardPulled = 0;
 
-const DISPLAY_COLUMNS = 13;
+const DISPLAY_COLUMNS = 13; // TODO: I really need to refigure out and document the reasoning here
+const ZOOMED_COLUMNS = 8;
 
 export enum WorldItemStatus { UNKNOWN=0, KNOWN, DISCARDED, REMOVED }
 
@@ -122,12 +123,11 @@ export default function GameBoard(props: GameBoardProps) {
   const [eventsLoaded, setEventsLoaded] = useState(false);
   const [eventResolved, setEventResolved] = useState(false);
 
-  const [zoomed, setZoomed] = useState(true);
+  const [zoomed, setZoomed] = useState(false);
+  const [currentPlayerPos, setCurrentPlayerPos] = useState<Position>({ row: -1, col: -1 });
 
   const updateWorldItemsFromChain = async () => {
-    console.log("Getting game world items for", props.currentGameNumber);
     const remoteWorldItems = await props.gameContract_read.getGameWorldItems(props.currentGameNumber);
-    console.log("Loaded remote", remoteWorldItems);
     // const remoteWorldItems: IWorldItem[] = [];
     const newRemoteItems: IWorldItem[] = [];
 
@@ -152,17 +152,14 @@ export default function GameBoard(props: GameBoardProps) {
 
     setGameWorldItems([...newRemoteItems]);
     setRoomsWithItem([...newPosWithItem]);
-    // console.log("Loaded World Items", gameWorldItems);
   }
 
   const updateCurrentPlayerItemsFromChain = async () => {
     const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
-    // console.log("Player indexes", playerIndexes);
 
     let playerItems: any[][] = [];
     for (let i = 0; i < playerIndexes.length; i++) {
       const currentPlayerId = playerIndexes[i];
-      console.log("Getting items for player", currentPlayerId);
       // TODO: Debug this.  Works fine in unit test trying to get items from null set, crashes here
       const remoteItems = await props.itemContract_read.getItemsByPlayer(currentPlayerId);
 
@@ -193,7 +190,6 @@ export default function GameBoard(props: GameBoardProps) {
     // TODO: Hack for broken reactor.  Remove next time you see this!
     localRoomTiles[100] = EmptyRoomTile;
 
-    // console.log(localRoomTiles);
     setGameTiles(localBoard);
     setRoomTiles(localRoomTiles);
   }
@@ -214,7 +210,6 @@ export default function GameBoard(props: GameBoardProps) {
 
   const updateDoorsFromChain = async () => {
     const remoteDoors = await props.mapContract_read.extGetDoors(props.currentGameNumber); // TODO: Get game first and get board number from it
-    // console.log(remoteDoors);
 
     const newDoors: DoorInterface[] = [];
 
@@ -301,20 +296,25 @@ export default function GameBoard(props: GameBoardProps) {
   useEffect(() => {
     console.log("Start of useEffect in Board");
 
-    loadGameBoard();
+    loadGameBoard().then(() => {
+      setCurrentPlayerPos({
+        row: players[currentGame.currentPlayerTurnIndex].position.row,
+        col: players[currentGame.currentPlayerTurnIndex].position.col
+      });
+    });
     if (props.walletLoaded && !eventsLoaded) {
       // TODO: Find appropriate home
       // WARNING:  This is creating a stale closure, but it's not impacted because the listener is destroyed and recreated when the game changes
       // TODO: This is here because if it's in App, for some reason, events cause the tab content to unmount and remount, completely reloading Board
       props.actionsContract_read.on("ActionCompleteEvent", (gameId: any, game: any, playerId: any, player: any, action: any, event: any) => {
-        console.log("Event Game ID", gameId)
-        console.log("Event Game", game);
-        console.log("Event Action", action);
+        // console.log("Event Game ID", gameId)
+        // console.log("Event Game", game);
+        // console.log("Event Action", action);
 
         const { mapId } = game;
-        console.log("MapID", mapId)
+        // console.log("MapID", mapId)
         // TODO: Hack using mapID instead of gameId
-        console.log("Test is", mapId == props.currentGameNumber)
+        // console.log("Test is", mapId == props.currentGameNumber)
         // DO NOT USE ===, will always be false!!
         if (mapId == props.currentGameNumber) {
           setEventFlipper(true);
@@ -322,7 +322,7 @@ export default function GameBoard(props: GameBoardProps) {
       });
 
       props.utilsContract_read.on("DiceRollEvent", (gameId: any, roll: any, event: any) => {
-        console.log("Roll Event roll", roll);
+        // console.log("Roll Event roll", roll);
         // TODO: Hack using mapID instead of gameId
         // DO NOT USE ===, will always be false!!
         if (gameId == props.currentGameNumber) {
@@ -332,12 +332,12 @@ export default function GameBoard(props: GameBoardProps) {
 
       props.playersContract_read.on("EventResolvedEvent", (gameId: any, playerId: any, currentEvent: any, appliedEffects: any, event: any) => {
         // DO NOT USE ===, will always be false!!
-        console.log("Triggered Event Resolved Event");
+        // console.log("Triggered Event Resolved Event");
         if (gameId == props.currentGameNumber) {
           setEventResolved(true);
           setEventFlipper(true);
-          console.log("currentEvent", currentEvent);
-          console.log("appliedEffects", appliedEffects);
+          // console.log("currentEvent", currentEvent);
+          // console.log("appliedEffects", appliedEffects);
         }
       });
       setEventsLoaded(true);
@@ -354,7 +354,9 @@ export default function GameBoard(props: GameBoardProps) {
 
   function renderRowWithDoors(row: number) {
     const rowWithDoors: ReactNode[] = [];
-    gameTiles[row].forEach((tile: GameTileInterface, col) => {
+    // gameTiles[row].forEach((tile: GameTileInterface, col) => {
+    for (let col = getZoomedColStart(); col < getZoomedColEnd(); col++) {
+      const tile = gameTiles[row][col];
       if (col === 0 || col === n - 1) {
         return;
       }
@@ -384,7 +386,7 @@ export default function GameBoard(props: GameBoardProps) {
             key={itemKey+"-door-id-"+tile.doors[2]}
           />);
       }
-    })
+    }
     return rowWithDoors;
   }
 
@@ -399,10 +401,12 @@ export default function GameBoard(props: GameBoardProps) {
         </Card>
       </Grid>
     ));
-    gameTiles[row].forEach((tile: GameTileInterface, col) => {
-      if (col === 0 || col === n - 1) {
-        return;
-      }
+    // gameTiles[row].forEach((tile: GameTileInterface, col) => {
+      // if (col === 0 || col === n - 1) {
+      //   return;
+      // }
+    for (let col = getZoomedColStart(); col < getZoomedColEnd(); col++) {
+      const tile = gameTiles[row][col];
       const itemKey = row + "," + col;
       rowOfDoors.push(
         <Door
@@ -425,24 +429,91 @@ export default function GameBoard(props: GameBoardProps) {
         ));
       }
 
-    })
+    }
 
     return rowOfDoors;
   }
 
+  // function getCurrentPlayerPosition() {
+  //   return {
+  //     row: players[currentGame.currentPlayerTurnIndex].position.col,
+  //     col: players[currentGame.currentPlayerTurnIndex].position.row
+  //   }
+  // }
+
+  function getZoomedRowStart() {
+    if (zoomed) {
+      if (currentPlayerPos.row <= 3) {
+        return 1;
+      } else if (currentPlayerPos.row >= 8) {
+        return 6;
+      } else {
+        return currentPlayerPos.row - 2;
+      }
+    } else {
+      return 1;
+    }
+  }
+
+  function getZoomedRowEnd() {
+    console.log(currentPlayerPos);
+    if (zoomed) {
+      if (currentPlayerPos.row <= 3) {
+        return 5;
+      } else if (currentPlayerPos.row >= 8) {
+        console.log("return 11")
+        return 11;
+      } else {
+        return currentPlayerPos.row + 3;  // + 2 for desired rows and 1 for < in other loop
+      }
+    } else {
+      return n; // Not n-1 to render Donghaijiu
+    }
+  }
+
+  function getZoomedColStart(){
+    if (zoomed) {
+      if (currentPlayerPos.col <= 3) {
+        return 1;
+      } else if (currentPlayerPos.col >= 8) {
+        return 6;
+      } else {
+        return currentPlayerPos.col - 2;
+      }
+    } else {
+      return 1;
+    }
+  }
+
+  function getZoomedColEnd() {
+    if (zoomed) {
+      if (currentPlayerPos.col <= 3) {
+        return 5;
+      } else if (currentPlayerPos.col >= 8) {
+        return 11;
+      } else {
+        return currentPlayerPos.col + 3;
+      }
+    } else {
+      return n-1;
+    }
+  }
+
   function renderMapWithDoors() {
     const rows: ReactNode[] = [];
-    gameTiles.forEach((rowData: GameTileInterface[], row) => {
+    // gameTiles.forEach((rowData: GameTileInterface[], row) => {
+    for (let row = getZoomedRowStart(); row < getZoomedRowEnd(); row++) {
+      const rowData = gameTiles[row];
       if (row === 0) {
         return;
       }
       if (row < n - 1) {
         rows.push(
           <Box key={row+"-withDoors"}>
-            <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
+            <Grid container spacing={0} columns={zoomed ? ZOOMED_COLUMNS : DISPLAY_COLUMNS}>
               {renderRowWithDoors(row)}
             </Grid>
-            <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
+            <Grid container spacing={0} columns={zoomed ? ZOOMED_COLUMNS : DISPLAY_COLUMNS}>
               {renderRowOfDoors(row)}
             </Grid>
           </Box>
@@ -450,13 +521,13 @@ export default function GameBoard(props: GameBoardProps) {
       } else { // Don't print a row of doors at the bottom
         rows.push(
           <Box key={row+"-withDoors"}>
-            <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
+            <Grid container spacing={0} columns={zoomed ? ZOOMED_COLUMNS : DISPLAY_COLUMNS}>
               {renderRowWithDoors(row)}
             </Grid>
           </Box>
         );
       }
-    })
+    }
     return rows;
   }
 
@@ -512,50 +583,55 @@ export default function GameBoard(props: GameBoardProps) {
 
   function renderGameArea() {
     return (!gameLoaded ? "Loading Game Area..." :
-      <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
-        <Grid item xs={3}>
-          <Card>
-            <GamePanel
-              currentPlayer={players[currentGame.currentPlayerTurnIndex]}
-              currentChar={chars[currentGame.currentPlayerTurnIndex]}
-              currentGameProps={currentGame}
-              currentGameNumber={props.currentGameNumber}
-              playerSignerAddress={props.playerSignerAddress}
-              actionsContract_write={props.actionsContract_write}
-              gameContract_write={props.gameContract_write}
-              lastDieRoll={lastDieRoll}
-              setLastDieRoll={setLastDieRoll}
-              numItems={getNumItems()}
-              allHeldItems={currentPlayerItems}
-              roomTiles={roomTiles}
-              players={players}
-              chars={chars}
-              currentTile={gameTiles[players[currentGame.currentPlayerTurnIndex].position.row][players[currentGame.currentPlayerTurnIndex].position.col]}
-              setEventFlipper={setEventFlipper}
-              eventResolved={eventResolved}
-              setEventResolved={setEventResolved}
-              roomsWithItems={roomsWithItems}
-              gameWorldItems={gameWorldItems}
-            />
-          </Card>
-          <Box>
-            <FormControl fullWidth>
-              <InputLabel id="game-selector-label">Change Game</InputLabel>
-              <Select
-                labelId="game-selector-dd-label"
-                id="game-selector-dd"
-                value={props.currentGameNumber.toString()}
-                onChange={handleGameSelectorChange}
-              >
-                {buildGamesDropDown()}
-              </Select>
-            </FormControl>
-          </Box>
+      <Box>
+        <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
+          <Grid item xs={3}>
+            <Card>
+              <Box alignContent="right">
+                <Button onClick={() => { setZoomed(!zoomed) }}>{ zoomed ? "Zoom Out" : "Zoom In" }</Button>
+              </Box>
+              <GamePanel
+                currentPlayer={players[currentGame.currentPlayerTurnIndex]}
+                currentChar={chars[currentGame.currentPlayerTurnIndex]}
+                currentGameProps={currentGame}
+                currentGameNumber={props.currentGameNumber}
+                playerSignerAddress={props.playerSignerAddress}
+                actionsContract_write={props.actionsContract_write}
+                gameContract_write={props.gameContract_write}
+                lastDieRoll={lastDieRoll}
+                setLastDieRoll={setLastDieRoll}
+                numItems={getNumItems()}
+                allHeldItems={currentPlayerItems}
+                roomTiles={roomTiles}
+                players={players}
+                chars={chars}
+                currentTile={gameTiles[players[currentGame.currentPlayerTurnIndex].position.row][players[currentGame.currentPlayerTurnIndex].position.col]}
+                setEventFlipper={setEventFlipper}
+                eventResolved={eventResolved}
+                setEventResolved={setEventResolved}
+                roomsWithItems={roomsWithItems}
+                gameWorldItems={gameWorldItems}
+              />
+            </Card>
+            <Box>
+              <FormControl fullWidth>
+                <InputLabel id="game-selector-label">Change Game</InputLabel>
+                <Select
+                  labelId="game-selector-dd-label"
+                  id="game-selector-dd"
+                  value={props.currentGameNumber.toString()}
+                  onChange={handleGameSelectorChange}
+                >
+                  {buildGamesDropDown()}
+                </Select>
+              </FormControl>
+            </Box>
+          </Grid>
+          <Grid item xs={9}>
+            {renderMapArea()}
+          </Grid>
         </Grid>
-        <Grid item xs={9}>
-          {renderMapArea()}
-        </Grid>
-      </Grid>
+      </Box>
     )
   }
 
