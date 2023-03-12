@@ -7,7 +7,7 @@ import ArtifactBG from "../assets/img/misc/artifact_bg.png";
 
 
 enum ItemCategory { COMPANY = 0, ARTIFACT, SCAVENGER }
-enum ItemType { MELEE = 0, GUN, ARMOR, TODO_ITEM }
+enum ItemType { CONSUMABLE = 0, HEALTH, CARRY, DEFENSE, HACK, BREACH, HAZARD, ARMOR, RANGED, MELEE, SPECIAL }
 
 const ItemOverlay = styled(Box)(({ theme }) => ({
   position: 'absolute',
@@ -18,38 +18,45 @@ const ItemOverlay = styled(Box)(({ theme }) => ({
 }));
 
 export interface ItemDataInterface {
-    genHash: string,
-    id: number,
-    uifID: number,
-    holdingPlayerId: number,
+  genHash: string,
+  id: number,
+  uifID: number,
+  holdingPlayerId: number,
 
-    weight: number,
+  weight: number,
 
-    traitModID: number,
+  traitModID: number,
 
-    itemCategory: ItemCategory,
+  itemCategory: ItemCategory,
 
-    grantsAbility: number,
-    grantsFlaw: number,
+  grantsAbility: number,
+  grantsFlaw: number,
 
-    itemType: ItemType,
+  itemType: ItemType,
 
-    power: number,
+  power: number,
 
-    inGame: boolean
+  inGame: boolean
 }
 
 const ItemCategoryToString = new Map([
-    [ItemCategory.COMPANY, "Company"],
-    [ItemCategory.ARTIFACT, "Artifact"],
-    [ItemCategory.SCAVENGER, "Scavenger"]
+  [ItemCategory.COMPANY, "Company"],
+  [ItemCategory.ARTIFACT, "Artifact"],
+  [ItemCategory.SCAVENGER, "Scavenger"]
 ]);
 
 const ItemTypeToString = new Map([
-    [ItemType.ARMOR, "Armor"],
-    [ItemType.GUN, "Gun"],
-    [ItemType.MELEE, "Melee"],
-    [ItemType.TODO_ITEM, "TODO"]
+  [ItemType.CONSUMABLE, "Consumable"],
+  [ItemType.HEALTH, "Health"],
+  [ItemType.CARRY, "Backpack"],
+  [ItemType.DEFENSE, "Kevlar"],
+  [ItemType.HACK, "Hackatron"],
+  [ItemType.HEALTH, "Crowbar"],
+  [ItemType.HAZARD, "Hazmat"],
+  [ItemType.ARMOR, "Armor"],
+  [ItemType.RANGED, "Gun"],
+  [ItemType.MELEE, "Sword"],
+  [ItemType.SPECIAL, "Special"],
 ]);
 
 export default function ItemCard(props: ItemDataInterface) {
@@ -75,35 +82,24 @@ export default function ItemCard(props: ItemDataInterface) {
         <Grid container spacing={0}>
           <Grid item xs={12}>
             <Typography variant="body1" color="black">
-              {props.genHash.slice(4, 8)}
+              {props.genHash.slice(4, 8) + "/" + props.id.toString()}
             </Typography>
           </Grid>
-          {/* <Grid item xs={12}>
-              <Typography variant="body1">
-                  { '#' + props.id.toString()}
-              </Typography>
-          </Grid> */}
           <Grid item xs={12}>
             <Typography variant="body1" color="black">
-              {props.weight.toString()}
+              {"Wt " + props.weight.toString()}
             </Typography>
           </Grid>
-
           <Grid item xs={12}>
             <Typography variant="body1" color="black">
               {ItemTypeToString.get(props.itemType)}
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="body1" color="black">
-              {props.id.toString()}
-            </Typography>
-          </Grid>
-          {/* <Grid item xs={12}>
-              <Typography variant="body1">
-                  {props.power.toString()}
+              <Typography variant="body1" color="black">
+                  {"Pwr " + props.power.toString()}
               </Typography>
-          </Grid> */}
+          </Grid>
           <Grid item xs={12}>
             <Typography variant="body1" color="black">
               {ItemCategoryToString.get(props.itemCategory)}

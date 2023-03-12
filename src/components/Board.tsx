@@ -234,8 +234,9 @@ export default function GameBoard(props: GameBoardProps) {
         remoteId: playerIndexes[i],
 
         owner: remotePlayer.owner,
-        charContractAddress: remotePlayer.charContractAddress,
         characterId: remotePlayer.characterId,
+
+        currentTraits: remotePlayer.currentTraits,
 
         position: position,
 

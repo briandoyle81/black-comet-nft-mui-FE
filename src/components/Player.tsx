@@ -10,6 +10,7 @@ import Archetype4 from "../assets/img/arch_svg/archetype_4";
 import Archetype5 from "../assets/img/arch_svg/archetype_5";
 import Archetype6 from "../assets/img/arch_svg/archetype_6";
 import Archetype7 from "../assets/img/arch_svg/archetype_7";
+import { TraitsInterface } from "./Board";
 
 // Names must be lowercase to keep React from getting upset about custom
 // attributes in the DOM
@@ -52,8 +53,9 @@ export interface PlayerInterface {
   remoteId: number;
 
   owner: string;
-  charContractAddress: string;
   characterId: number;
+
+  currentTraits: TraitsInterface;
 
   position: Position;
   // 20,000 to write a word vs. 3 to add numbers, will not store updated characteristics

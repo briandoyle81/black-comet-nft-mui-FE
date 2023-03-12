@@ -3,6 +3,15 @@ import { GameInterface, GameInfoInterface } from "./GamePanel";
 import Player, { PlayerInterface } from "./Player";
 
 export default function GameInfo(props: GameInfoInterface) {
+  function getTraitColor(charTrait: number, modifiedTrait: number) {
+    if (charTrait > modifiedTrait) {
+      return "red";
+    }
+    if (charTrait < modifiedTrait) {
+      return "green";
+    }
+    return "white";
+  }
   return (
     <Card>
       <Grid container spacing={1}>
@@ -123,26 +132,26 @@ export default function GameInfo(props: GameInfoInterface) {
               />
             </Grid>
             <Grid item xs={8}>
-              <Typography variant="body1">
-                Dmg. Taken: {props.currentPlayer.healthDmgTaken.toString()}/{props.currentChar.traits.health}
+              <Typography variant="body1" color={getTraitColor(props.currentChar.traits.health, props.currentPlayer.currentTraits.health)}>
+                Dmg. Taken: {props.currentPlayer.healthDmgTaken.toString()}/{props.currentPlayer.currentTraits.health}
               </Typography>
-              <Typography variant="body1">
-                Carrying: {props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex].length}/{props.currentChar.traits.carry}
+              <Typography variant="body1" color={getTraitColor(props.currentChar.traits.carry, props.currentPlayer.currentTraits.carry)}>
+                Carrying: {props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex].length}/{props.currentPlayer.currentTraits.carry}
               </Typography>
-              <Typography variant="body1">
-                Defense: {props.currentChar.traits.defense}
+              <Typography variant="body1" color={getTraitColor(props.currentChar.traits.defense, props.currentPlayer.currentTraits.defense)}>
+                Defense: {props.currentPlayer.currentTraits.defense}
               </Typography>
-              <Typography variant="body1">
-                Vs. Hack: {props.currentChar.traits.hack}
+              <Typography variant="body1" color={getTraitColor(props.currentChar.traits.hack, props.currentPlayer.currentTraits.hack)}>
+                Vs. Hack: {props.currentPlayer.currentTraits.hack}
               </Typography>
-              <Typography variant="body1">
-                Vs. Breach: {props.currentChar.traits.breach}
+              <Typography variant="body1" color={getTraitColor(props.currentChar.traits.breach, props.currentPlayer.currentTraits.breach)}>
+                Vs. Breach: {props.currentPlayer.currentTraits.breach}
               </Typography>
-              <Typography variant="body1">
-                Shoot: {props.currentChar.traits.shoot}
+              <Typography variant="body1" color={getTraitColor(props.currentChar.traits.shoot, props.currentPlayer.currentTraits.shoot)}>
+                Shoot: {props.currentPlayer.currentTraits.shoot}
               </Typography>
-              <Typography variant="body1">
-                Melee: {props.currentChar.traits.melee}
+              <Typography variant="body1" color={getTraitColor(props.currentChar.traits.melee, props.currentPlayer.currentTraits.melee)}>
+                Melee: {props.currentPlayer.currentTraits.melee}
               </Typography>
             </Grid>
           </Grid>
