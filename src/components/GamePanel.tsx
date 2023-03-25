@@ -68,13 +68,16 @@ export interface GameInterface {
 
   eventTracker: EventTrackerInterface;
 
-  mapContract: string; // TODO: Handle if game contract changes!!!!
+  // mapContract: string; // TODO: Handle if game contract changes!!!!
   mapId: number;
 
   eventPlayerId: number;
   eventNumber: number;
   eventType: BCEventType;
   eventPosition: Position;
+
+  turnTimeLimit: number;
+  lastTurnTimestamp: number;
 
   gameNumber: number;
 }
@@ -84,12 +87,18 @@ export default function GamePanel(props: GameInfoInterface) {
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          <Typography variant="body1">
-            Roll:
-          </Typography>
-          <Typography variant="h3">
-            {props.lastDieRoll.toString()}
-          </Typography>
+          <Grid container>
+            <Grid item xs={2}>
+              <Typography variant="body1">
+                Last Roll:
+              </Typography>
+            </Grid>
+            <Grid item xs={10}>
+              <Typography variant="h4">
+                {props.lastDieRoll.toString()}
+              </Typography>
+            </Grid>
+          </Grid>
         </Grid>
         <Grid item xs={12}>
           <GameInfo {...props}/>

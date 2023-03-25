@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from '@mui/material';
+import { Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import { ReactNode, useEffect, useState } from 'react';
 import GamePanel, { BCEventType, EventTrackerInterface, GameInterface } from './GamePanel';
 import Box from '@mui/material/Box';
@@ -39,13 +39,15 @@ export const EmptyGame: GameInterface = {
 
   eventTracker: EmptyEventTracker,
 
-  mapContract: "",
   mapId: 0,
 
   eventPlayerId: 0,
   eventNumber: 0,
   eventType: BCEventType.NONE,
-  eventPosition: {row: 0, col: 0},
+  eventPosition: { row: 0, col: 0 },
+
+  turnTimeLimit: 0,
+  lastTurnTimestamp: 0,
 
   gameNumber: -1
 }
@@ -122,6 +124,8 @@ export default function GameBoard(props: GameBoardProps) {
   const [eventFlipper, setEventFlipper] = useState(true); // TODO: Confusing name, think this should be actionFlipper
   const [eventsLoaded, setEventsLoaded] = useState(false);
   const [eventResolved, setEventResolved] = useState(false);
+
+  const [dateInSeconds, setDateInSeconds] = useState(Math.floor(Date.now() / 1000));
 
   const [zoomed, setZoomed] = useState(false);
   const [currentPlayerPos, setCurrentPlayerPos] = useState<Position>({ row: -1, col: -1 });
@@ -293,6 +297,17 @@ export default function GameBoard(props: GameBoardProps) {
     // Maybe need to have await tx.await() here?
     // setLoading(false);
   }
+
+  function refreshClock() {
+    setDateInSeconds(Math.floor(Date.now() / 1000));
+  }
+
+  useEffect(() => {
+    const timerId = setInterval(refreshClock, 1000);
+    return function cleanup() {
+      clearInterval(timerId);
+    };
+  }, [dateInSeconds]);
 
   useEffect(() => {
     console.log("Start of useEffect in Board");
@@ -573,15 +588,81 @@ export default function GameBoard(props: GameBoardProps) {
     return menuItems;
   }
 
+  // TODO: Rewrite all of this
+  function getSecondsRemaining() {
+    // TODO: Figure out this insanity.  Why are they behaving as strings when added, type of object, but think they're numbers, when they're bigNumbers?
+    const endOfTurnSeconds: number = parseInt(currentGame.lastTurnTimestamp.toString()) + parseInt(currentGame.turnTimeLimit.toString());
+    return dateInSeconds - endOfTurnSeconds;
+  }
+
+  function getTurnTimeRemaining() {
+
+    const remaining = getSecondsRemaining();
+
+    const negative = remaining <= 0 ? "" : "-";
+    return negative + fancyTimeFormat(Math.abs(remaining)); // TODO: Minutes and seconds
+  }
+
+  function fancyTimeFormat(duration: number) {
+    // Hours, minutes and seconds
+    const hrs = ~~(duration / 3600);
+    const mins = ~~((duration % 3600) / 60);
+    const secs = ~~duration % 60;
+
+    // Output like "1:01" or "4:03:59" or "123:03:59"
+    let ret = "";
+
+    if (hrs > 0) {
+      ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+    }
+
+    ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+    ret += "" + secs;
+
+    return ret;
+  }
+
+  function getTimeColor() {
+    const secondsRemaining = -getSecondsRemaining();
+
+    if (secondsRemaining < 0) {
+      return "red";
+    } else if (secondsRemaining < 60) {
+      return "yellow";
+    } else {
+      return "white";
+    }
+  }
+
+  function handleEndTurnClick() {
+    props.gameContract_write.forceNextTurn(props.currentGameNumber);
+    setEventFlipper(true);
+  }
+
   function renderGameArea() {
     return (!gameLoaded ? "Loading Game Area..." :
       <Box>
         <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
           <Grid item xs={3}>
             <Card>
-              <Box alignContent="right">
-                <Button onClick={() => { setZoomed(!zoomed) }}>{ zoomed ? "Zoom Out" : "Zoom In" }</Button>
-              </Box>
+              <Grid container>
+                <Grid item xs={4}>
+                  <Typography variant="body1" align="left" color={getTimeColor}>
+                    {"Time Left: " + getTurnTimeRemaining()}
+                  </Typography>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box alignContent="right">
+                    <Button disabled={getTurnTimeRemaining()[0] === '-' ? false : true} onClick={handleEndTurnClick}>Skip Player</Button>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box alignContent="right">
+                    <Button onClick={() => { setZoomed(!zoomed) }}>{ zoomed ? "Zoom Out" : "Zoom In" }</Button>
+                  </Box>
+                </Grid>
+              </Grid>
+
               <GamePanel
                 currentPlayer={players[currentGame.currentPlayerTurnIndex]}
                 currentChar={chars[currentGame.currentPlayerTurnIndex]}

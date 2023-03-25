@@ -87,7 +87,7 @@ export default function EventModal(props: GameInfoInterface) {
         return ShipEventDisplayData[id];
     }
     // TODO: throw error
-    console.log("Didn't find correct event");
+    // console.log("Didn't find correct event");
     return ({
       name: "Event Missing",
       desc: "Fallback to prevent crash.",
