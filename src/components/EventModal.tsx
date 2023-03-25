@@ -3,6 +3,7 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { EventDataDisplay, BugEventDisplayData, TileEventDisplayData, MysteryEventDisplayData, ScavEventDisplayData, ShipEventDisplayData } from "./EventData";
 import { BCEventType, GameInfoInterface, GameInterface } from "./GamePanel";
+import { roomDisplayDataList } from "./RoomTiles";
 import Tile, { EmptyTile } from "./Tile";
 
 
@@ -73,7 +74,7 @@ export default function EventModal(props: GameInfoInterface) {
     }
   }
 
-  function getEventData(id: number) {
+  function getEventData(id: number, roomId: number) {
     switch (props.currentGameProps.eventType) {
       case BCEventType.ROOM:
         return TileEventDisplayData[id];
@@ -89,8 +90,8 @@ export default function EventModal(props: GameInfoInterface) {
     // TODO: throw error
     // console.log("Didn't find correct event");
     return ({
-      name: "Event Missing",
-      desc: "Fallback to prevent crash.",
+      name: roomDisplayDataList[roomId].name,
+      desc: roomDisplayDataList[roomId].desc,
       id: 0
     })
   }
@@ -100,7 +101,7 @@ export default function EventModal(props: GameInfoInterface) {
       return (
         <Box>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            No event is currently active.
+            {getEventData(0, props.currentTile.roomId).desc}
           </Typography>
           <Button onClick={handleClose} >Ok</Button>
         </Box>
@@ -118,7 +119,7 @@ export default function EventModal(props: GameInfoInterface) {
       return (
         <Box>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {getEventData(props.currentGameProps.eventNumber).desc}
+            {getEventData(props.currentGameProps.eventNumber, props.currentTile.roomId).desc}
           </Typography>
           {renderResolveButton(isPlayerTurn(props.playerSignerAddress, props.currentPlayer.owner))}
         </Box>
@@ -148,7 +149,7 @@ export default function EventModal(props: GameInfoInterface) {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            {getEventData(props.currentGameProps.eventNumber).name}
+            {getEventData(props.currentGameProps.eventNumber, props.currentTile.roomId).name}
           </Typography>
           <Tile
             tile={props.currentTile}

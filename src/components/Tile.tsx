@@ -36,6 +36,7 @@ const TileOverlay = styled(Box)(({ theme }) => ({
   top: '0',
   zIndex: 1299,
   background: 'transparent',
+  width: '100%'
 }));
 
 const BottomOverlay = styled(Box)(({ theme }) => ({
@@ -44,6 +45,7 @@ const BottomOverlay = styled(Box)(({ theme }) => ({
   bottom: '0',
   zIndex: 1299,
   background: 'transparent',
+  width: '100%'
 }));
 
 const RoomName = styled(Typography)(({ theme }) => ({
@@ -53,6 +55,7 @@ const RoomName = styled(Typography)(({ theme }) => ({
   padding: 5,
   color: 'white',
   background: 'transparent',
+  height: '5%'
 }));
 
 export interface RoomTile {
@@ -116,9 +119,6 @@ export default function Tile(props: TilePropsInterface) {
 
   function renderTopRowIcons() {
     const lootRenders: ReactNode[] = [];
-    const roomId = props.tile.roomId;
-    // const roomData = props.currentGame.
-    // TODO: Don't show this if there was never loot?
 
     if (props.tile.looted) {
       lootRenders.push(
