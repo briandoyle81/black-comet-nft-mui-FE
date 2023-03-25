@@ -46,7 +46,7 @@ export default function CharactersList(props: CharactersDataInterface) {
   }
 
   async function handleEnlistClick(id: number) {
-    const tx = await props.charContract_write.enlistChar(id, { value: ethers.utils.parseEther(".0001"), gasLimit: 25074186 });
+    const tx = await props.charContract_write.enlistChar(id, { value: ethers.utils.parseEther(".0001") });
     await tx.wait();
     setCharsLoaded(false);
   }
