@@ -4,6 +4,7 @@ import { styled } from '@mui/material/styles';
 import CompanyItemBG from "../assets/img/misc/companyitem_bg.jpg";
 import ScavengerBG from "../assets/img/misc/scavenger_bg.jpg";
 import ArtifactBG from "../assets/img/misc/artifact_bg.png";
+import { Position } from "./Utils";
 
 
 enum ItemCategory { COMPANY = 0, ARTIFACT, SCAVENGER }
@@ -16,6 +17,8 @@ const ItemOverlay = styled(Box)(({ theme }) => ({
   zIndex: 1299,
   background: 'transparent',
 }));
+
+export enum WorldItemStatus { DESTROYED = 0, HELD, ON_GROUND, DISCARDED }
 
 export interface ItemDataInterface {
   genHash: string,
@@ -36,7 +39,11 @@ export interface ItemDataInterface {
 
   power: number,
 
-  inGame: boolean
+  currentGame: number,
+
+  status: WorldItemStatus,
+
+  position: Position
 }
 
 const ItemCategoryToString = new Map([

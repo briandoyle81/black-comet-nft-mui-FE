@@ -6,10 +6,10 @@ import Grid from '@mui/material/Grid';
 import GameInfo from './GameInfo';
 import { PlayerInterface } from './Player';
 import ActionPicker from './ActionPicker';
-import { CharInterface, IWorldItem } from './Board';
+import { CharInterface } from './Board';
 import { Card, CardContent, CardHeader, Typography } from '@mui/material';
 import { isPropertySignature } from 'typescript';
-import ItemCard from './ItemCard';
+import ItemCard, { ItemDataInterface } from './ItemCard';
 import EventModal from './EventModal';
 import { Position } from './Utils';
 import { GameTileInterface, RoomTile, TilePropsInterface } from './Tile';
@@ -45,7 +45,7 @@ export interface GameInfoInterface {
   eventResolved: boolean,
   setEventResolved: Function,
   roomsWithItems: Position[],
-  gameWorldItems: IWorldItem[]
+  gameWorldItems: ItemDataInterface[]
 }
 
 export interface EventTrackerInterface {

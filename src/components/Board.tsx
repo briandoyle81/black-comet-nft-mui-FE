@@ -91,18 +91,6 @@ export interface CharInterface {
   id: number;
 }
 
-export interface IWorldItem {
-  id: number;
-  gameId: number;
-  bcItemId: number; // ID 0 == unknown item (use WorldItemStatus for logic)
-
-  status: WorldItemStatus;
-
-  position: Position;
-
-  // itemData: ItemDataInterface;  // TODO: Consider attaching item properties
-}
-
 export default function GameBoard(props: GameBoardProps) {
   const n = 11; // TODO: Hardcoded board size, can't use await here
 
@@ -117,7 +105,7 @@ export default function GameBoard(props: GameBoardProps) {
   const [gameLoaded, setGameLoaded] = useState(false);
   const [formGameNumber, setFormGameNumber] = useState(props.currentGameNumber);
   const [currentPlayerItems, setCurrentPlayerItems] = useState<any[]>(); // TODO: Any
-  const [gameWorldItems, setGameWorldItems] = useState<IWorldItem[]>([]);
+  const [gameWorldItems, setGameWorldItems] = useState<ItemDataInterface[]>([]);
   const [roomsWithItems, setRoomsWithItem] = useState<Position[]>([]); // TODO: This should be a set
 
   const [lastDieRoll, setLastDieRoll] = useState("None");
@@ -131,27 +119,17 @@ export default function GameBoard(props: GameBoardProps) {
   const [currentPlayerPos, setCurrentPlayerPos] = useState<Position>({ row: -1, col: -1 });
 
   const updateWorldItemsFromChain = async () => {
-    const remoteWorldItems = await props.gameContract_read.getGameWorldItems(props.currentGameNumber);
+    const remoteWorldItems = await props.itemContract_read.getWorldItems(props.currentGameNumber);
     // const remoteWorldItems: IWorldItem[] = [];
-    const newRemoteItems: IWorldItem[] = [];
+    const newRemoteItems: ItemDataInterface[] = [];
 
     const newPosWithItem: Position[] = [];
 
-    remoteWorldItems.forEach((worldItem: IWorldItem) => {
-      const newItem: IWorldItem = {
-        id: worldItem.id,
-        gameId: worldItem.gameId,
-        bcItemId: worldItem.bcItemId,
+    remoteWorldItems.forEach((worldItem: ItemDataInterface) => {
 
-        status: worldItem.status,
 
-        position: worldItem.position,
-        // TODO: Refine
-        // itemData: await props.itemContract_read.items(worldItem.gameId)
-      }
-
-      newRemoteItems.push(newItem);
-      newPosWithItem.push(newItem.position);
+      newRemoteItems.push(worldItem);
+      newPosWithItem.push(worldItem.position);
     });
 
     setGameWorldItems([...newRemoteItems]);
