@@ -46,7 +46,7 @@ export default function CharactersList(props: CharactersDataInterface) {
   }
 
   async function handleEnlistClick(id: number) {
-    const tx = await props.charContract_write.enlistChar(id, { value: ethers.utils.parseEther(".0001") });
+    const tx = await props.charContract_write.enlistChar(id, [], { value: ethers.utils.parseEther(".0001") });
     await tx.wait();
     setCharsLoaded(false);
   }
@@ -64,7 +64,7 @@ export default function CharactersList(props: CharactersDataInterface) {
   }
 
   async function handleSoloClick(id: number) {
-    const tx = await props.charContract_write.enlistSolo(id, { value: ethers.utils.parseEther(".0005") });
+    const tx = await props.charContract_write.enlistSolo(id, [], { value: ethers.utils.parseEther(".0005") });
     await tx.wait();
     setCharsLoaded(false);
   }
