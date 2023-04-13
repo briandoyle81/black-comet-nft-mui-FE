@@ -21,7 +21,7 @@ export default function ItemVault(props: ItemVaultDataInterface) {
     console.log("Start of useEffect in Item Vault");
 
     async function updateVaultFromChain() {
-      const remoteChars = await props.itemsContract_read.getOwnedItemIds(props.address);
+      const remoteChars = await props.itemsContract_read.getOwnedItems(props.address);
 
       const newItems: ItemDataInterface[] = [];
 

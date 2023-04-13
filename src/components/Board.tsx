@@ -265,7 +265,7 @@ export default function GameBoard(props: GameBoardProps) {
       console.log("Loading game number from start:", props.currentGameNumber)
       const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
       setCurrentGame(remoteGame);
-      if (currentGame.active) {
+      if (remoteGame.active) {
         await updateDoorsFromChain();
         await updateBoardFromChain();
         await updateRemotePlayers();
