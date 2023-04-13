@@ -29,6 +29,7 @@ import GameList from './components/GameList';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { grey } from '@mui/material/colors';
 import Info from './components/Info';
+import ItemVault from './components/ItemVault';
 
 const theme = createTheme({
   palette: {
@@ -220,6 +221,7 @@ function App() {
                 <Tab label="Game" {...a11yProps(2)} />
                 <Tab label="Lobbies" {...a11yProps(3)} />
                 <Tab label="Info" {...a11yProps(4)} />
+                <Tab label="Item Vault" {...a11yProps(5)} />
               </Tabs>
             </Box>
             <TabPanel value={tabValue} index={0}>
@@ -261,6 +263,12 @@ function App() {
             </TabPanel>
             <TabPanel value={tabValue} index={4}>
               <Info />
+            </TabPanel>
+            <TabPanel value={tabValue} index={5}>
+              <ItemVault
+                itemsContract_read={itemsContract_read}
+                address={playerAddress}
+              />
             </TabPanel>
             <Typography>Dev Notes</Typography>
             <Typography>UI/UX is temporary.  Feedback is not required.  I know ;)</Typography>

@@ -118,6 +118,8 @@ export default function GameBoard(props: GameBoardProps) {
   const [zoomed, setZoomed] = useState(false);
   const [currentPlayerPos, setCurrentPlayerPos] = useState<Position>({ row: -1, col: -1 });
 
+  const [debugGameOver, setDebugGameOver] = useState(false);
+
   const updateWorldItemsFromChain = async () => {
     const remoteWorldItems = await props.itemContract_read.getWorldItems(props.currentGameNumber);
     // const remoteWorldItems: IWorldItem[] = [];
@@ -263,13 +265,17 @@ export default function GameBoard(props: GameBoardProps) {
       console.log("Loading game number from start:", props.currentGameNumber)
       const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
       setCurrentGame(remoteGame);
-      await updateDoorsFromChain();
-      await updateBoardFromChain();
-      await updateRemotePlayers();
-      await updateCurrentPlayerItemsFromChain();
+      if (currentGame.active) {
+        await updateDoorsFromChain();
+        await updateBoardFromChain();
+        await updateRemotePlayers();
+        await updateCurrentPlayerItemsFromChain();
+        await updateCharsFromChain();
+        setGameLoaded(true);
+      } else {
+        setDebugGameOver(true);
+      }
 
-      await updateCharsFromChain();
-      setGameLoaded(true);
     }
 
     // Maybe need to have await tx.await() here?
@@ -291,10 +297,12 @@ export default function GameBoard(props: GameBoardProps) {
     console.log("Start of useEffect in Board");
 
     loadGameBoard().then(() => {
-      setCurrentPlayerPos({
-        row: players[currentGame.currentPlayerTurnIndex].position.row,
-        col: players[currentGame.currentPlayerTurnIndex].position.col
-      });
+      if (currentGame.numPlayers > 0) {
+        setCurrentPlayerPos({
+          row: players[currentGame.currentPlayerTurnIndex].position.row,
+          col: players[currentGame.currentPlayerTurnIndex].position.col
+        });
+      }
     });
     if (props.walletLoaded && !eventsLoaded) {
       // TODO: Find appropriate home
@@ -618,6 +626,9 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   function renderGameArea() {
+    if (debugGameOver) {
+      return ("Game is over.  Will add seeing old games later")
+    }
     return (!gameLoaded ? "Loading Game Area..." :
       <Box>
         <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
@@ -686,7 +697,7 @@ export default function GameBoard(props: GameBoardProps) {
     )
   }
 
-  return (!gameLoaded ? <Box>"Loading Board..."</Box> :
+  return (
     <Box>
       {renderGameArea()}
     </Box>
