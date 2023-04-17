@@ -1,22 +1,33 @@
-import { Button, Card, CardMedia, Grid, Typography } from "@mui/material";
+import { Button, Card, CardMedia, Chip, Grid, Typography } from "@mui/material";
 import { Box } from "@mui/system"
 import { ethers } from "ethers";
 import { ReactNode, useEffect, useState } from "react";
 import { CharInterface } from "./Board";
+import { ItemDataInterface } from "./ItemCard";
+import ItemSelector from "./ItemSelector";
 import Player, { ArchetypeProps, PlayerInterface } from "./Player";
 
 interface CharactersDataInterface {
   charContract_read: any, // todo any
   charContract_write: any,
   lobbiesContract_write: any,
+  itemsContract_read: any,
   address: string
 }
+
+interface SelectedItemsInterface { [charId: number]: Set<number>; }
 
 // TODO: Rename to CharactersList
 export default function CharactersList(props: CharactersDataInterface) {
 
   const [charsLoaded, setCharsLoaded] = useState(false);
   const [chars, setChars] = useState<CharInterface[]>([]);
+
+  const [itemsLoaded, setItemsLoaded] = useState(false);
+  const [items, setItems] = useState<ItemDataInterface[]>([]);
+
+  const [selectedItems, setSelectedItems] = useState<SelectedItemsInterface>({});
+  const [clearChoices, setClearChoices] = useState(false);
 
   useEffect(() => {
     console.log("Start of useEffect in characters");
@@ -26,18 +37,42 @@ export default function CharactersList(props: CharactersDataInterface) {
 
       const newChars: CharInterface[] = [];
 
+      let newSelectedItems: SelectedItemsInterface = {};
+
       remoteChars.forEach((char: any) => {
         newChars.push(char);
+        newSelectedItems[char.id] = new Set();
       });
       setChars(newChars);
+      setSelectedItems(newSelectedItems);
       setCharsLoaded(true);
+    }
+
+    async function updateVaultFromChain() {
+      const remoteChars = await props.itemsContract_read.getOwnedItems(props.address);
+
+      const newItems: ItemDataInterface[] = [];
+
+      remoteChars.forEach((item: any) => {
+        newItems.push(item);
+      });
+      setItems(newItems);
+      setItemsLoaded(true);
+    }
+
+    if (!itemsLoaded) {
+      updateVaultFromChain();
     }
 
     if (!charsLoaded) {
       updateCharsFromChain();
     }
 
-  }, [props.address, charsLoaded, props.charContract_read]);
+  }, [props.address, charsLoaded, props.charContract_read, itemsLoaded, props.itemsContract_read]);
+
+  function resetClear() {
+    setClearChoices(false);
+  }
 
   async function handleDecantClick() {
     const tx = await props.charContract_write.decantNewClone({ value: ethers.utils.parseEther(".01") });
@@ -46,9 +81,10 @@ export default function CharactersList(props: CharactersDataInterface) {
   }
 
   async function handleEnlistClick(id: number) {
-    const tx = await props.charContract_write.enlistChar(id, [], { value: ethers.utils.parseEther(".0001") });
+    const tx = await props.charContract_write.enlistChar(id, Array.from(selectedItems[id].values()).values(), { value: ethers.utils.parseEther(".0001") });
     await tx.wait();
     setCharsLoaded(false);
+    setClearChoices(true);
   }
 
   function renderEnlistButton(char: CharInterface) {
@@ -64,9 +100,20 @@ export default function CharactersList(props: CharactersDataInterface) {
   }
 
   async function handleSoloClick(id: number) {
-    const tx = await props.charContract_write.enlistSolo(id, [], { value: ethers.utils.parseEther(".0005") });
+    console.log(selectedItems)
+    console.log("Items", Array.from(selectedItems[id].values()))
+    const tx = await props.charContract_write.enlistSolo(id, Array.from(selectedItems[id].values()), { value: ethers.utils.parseEther(".0005") });
     await tx.wait();
     setCharsLoaded(false);
+    setClearChoices(true);
+  }
+
+  function addToSelectedItems(charId: number, itemId: number) {
+    selectedItems[charId].add(itemId);
+  }
+
+  function removeFromSelectedItems(charId: number, itemId: number) {
+    selectedItems[charId].delete(itemId);
   }
 
   function renderSoloButton(char: CharInterface) {
@@ -143,6 +190,23 @@ export default function CharactersList(props: CharactersDataInterface) {
                       <Typography variant="body1">
                         Melee: {char.traits.melee}
                       </Typography>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Card>
+                      <Typography variant="h6">
+                        Items
+                      </Typography>
+                      <Grid container spacing={1}>
+                        <ItemSelector
+                          charId={parseInt(char.id.toString())}
+                          items={items}
+                          addToSelectedItems={addToSelectedItems}
+                          removeFromSelectedItems={removeFromSelectedItems}
+                          clearChoices={clearChoices}
+                          resetClear={resetClear}
+                        />
+                      </Grid>
                     </Card>
                   </Grid>
                 </Grid>

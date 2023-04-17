@@ -229,6 +229,7 @@ function App() {
                 charContract_read={charContract_read}
                 charContract_write={charContract_write}
                 lobbiesContract_write={lobbiesContract_write}
+                itemsContract_read={itemsContract_read}
                 address={playerAddress}
               />
             </TabPanel>
