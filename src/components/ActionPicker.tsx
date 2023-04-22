@@ -64,7 +64,7 @@ export default function ActionPicker(props: GameInfoInterface) {
       actionIds,
       {
         value: cost,
-        gasLimit: 4000000 // TODO: Find a more elegant solution here
+        // gasLimit: 4000000 // TODO: Find a more elegant solution here
       }
     );
 
@@ -107,6 +107,20 @@ export default function ActionPicker(props: GameInfoInterface) {
       )
     }
 
+    function setSecondaryDD() {
+      if (
+        action == Action.LEAVE_GAME ||
+        action == Action.LOOT ||
+        action == Action.PASS ||
+        action == Action.PICK_ITEMS ||
+        action == Action.USE_ROOM
+      ) {
+        return true;
+      }
+
+      return false;
+    }
+
     return (playerTurn ?
       <Grid container spacing={1}>
         <Grid item xs={6}>
@@ -131,7 +145,7 @@ export default function ActionPicker(props: GameInfoInterface) {
           </FormControl>
         </Grid>
         <Grid item xs={6}>
-          <FormControl fullWidth>
+          { !setSecondaryDD() && <FormControl fullWidth>
             <InputLabel id="firstDir-label">Direction</InputLabel>
             <Select
               labelId="firstDir-label"
@@ -139,13 +153,14 @@ export default function ActionPicker(props: GameInfoInterface) {
               value={firstDir.toString()}
               label="Direction"
               onChange={handleFirstDir}
+              disabled={setSecondaryDD()}
             >
               <MenuItem value={Direction.NORTH.toString()}>North</MenuItem>
               <MenuItem value={Direction.SOUTH.toString()}>South</MenuItem>
               <MenuItem value={Direction.EAST.toString()}>East</MenuItem>
               <MenuItem value={Direction.WEST.toString()}>West</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl>}
         </Grid>
         <Grid item xs={6}>
           <FormControl fullWidth>
@@ -156,6 +171,7 @@ export default function ActionPicker(props: GameInfoInterface) {
               value={followthrough.toString()}
               label="Direction"
               onChange={handleFollowthrough}
+              disabled={setSecondaryDD()}
             >
               <MenuItem value={Followthrough.NONE.toString()}>None</MenuItem>
               <MenuItem value={Followthrough.MOVE.toString()}>Move</MenuItem>
@@ -163,7 +179,7 @@ export default function ActionPicker(props: GameInfoInterface) {
           </FormControl>
         </Grid>
         <Grid item xs={6}>
-          <FormControl fullWidth>
+          { !setSecondaryDD() && <FormControl fullWidth>
             <InputLabel id="secondDir-label">Direction</InputLabel>
             <Select
               labelId="secondDir-label"
@@ -171,13 +187,14 @@ export default function ActionPicker(props: GameInfoInterface) {
               value={secondDir.toString()}
               label="Direction"
               onChange={handleSecondDir}
+              disabled={setSecondaryDD()}
             >
               <MenuItem value={Direction.NORTH.toString()}>North</MenuItem>
               <MenuItem value={Direction.SOUTH.toString()}>South</MenuItem>
               <MenuItem value={Direction.EAST.toString()}>East</MenuItem>
               <MenuItem value={Direction.WEST.toString()}>West</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl>}
         </Grid>
         <Grid item xs={12}>
           <Button
