@@ -12,8 +12,7 @@ import { ItemDataInterface } from './ItemCard';
 interface ItemSelectorInterface {
   charId: number;
   items: ItemDataInterface[];
-  addToSelectedItems: Function;
-  removeFromSelectedItems: Function;
+  updateItemsForChar: Function;
   clearChoices: boolean;
   resetClear: Function;
 }
@@ -58,6 +57,7 @@ export default function ItemSelector(props: ItemSelectorInterface) {
       typeof value === 'string' ? value.split(',') : value,
     );
     console.log("VALUE", value);
+    props.updateItemsForChar(props.charId, value)
   };
 
   return (

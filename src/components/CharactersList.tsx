@@ -15,7 +15,7 @@ interface CharactersDataInterface {
   address: string
 }
 
-interface SelectedItemsInterface { [charId: number]: Set<number>; }
+interface SelectedItemsInterface { [charId: number]: number[]; }
 
 // TODO: Rename to CharactersList
 export default function CharactersList(props: CharactersDataInterface) {
@@ -41,7 +41,7 @@ export default function CharactersList(props: CharactersDataInterface) {
 
       remoteChars.forEach((char: any) => {
         newChars.push(char);
-        newSelectedItems[char.id] = new Set();
+        newSelectedItems[char.id] = [];
       });
       setChars(newChars);
       setSelectedItems(newSelectedItems);
@@ -81,7 +81,7 @@ export default function CharactersList(props: CharactersDataInterface) {
   }
 
   async function handleEnlistClick(id: number) {
-    const tx = await props.charContract_write.enlistChar(id, Array.from(selectedItems[id].values()).values(), { value: ethers.utils.parseEther(".0001") });
+    const tx = await props.charContract_write.enlistChar(id, selectedItems[id], { value: ethers.utils.parseEther(".0001") });
     await tx.wait();
     setCharsLoaded(false);
     setClearChoices(true);
@@ -101,19 +101,17 @@ export default function CharactersList(props: CharactersDataInterface) {
 
   async function handleSoloClick(id: number) {
     console.log(selectedItems)
-    console.log("Items", Array.from(selectedItems[id].values()))
-    const tx = await props.charContract_write.enlistSolo(id, Array.from(selectedItems[id].values()), { value: ethers.utils.parseEther(".0005") });
+    console.log("Items sent to game", Array.from(selectedItems[id].values()))
+    const tx = await props.charContract_write.enlistSolo(id, selectedItems[id], { value: ethers.utils.parseEther(".0005") });
     await tx.wait();
     setCharsLoaded(false);
     setClearChoices(true);
   }
 
-  function addToSelectedItems(charId: number, itemId: number) {
-    selectedItems[charId].add(itemId);
-  }
-
-  function removeFromSelectedItems(charId: number, itemId: number) {
-    selectedItems[charId].delete(itemId);
+  function updateItemsForChar(charId: number, itemIds: number[]) {
+    let newSelectedItems = { ...selectedItems };
+    newSelectedItems[charId] = itemIds;
+    setSelectedItems(newSelectedItems);
   }
 
   function renderSoloButton(char: CharInterface) {
@@ -201,8 +199,7 @@ export default function CharactersList(props: CharactersDataInterface) {
                         <ItemSelector
                           charId={parseInt(char.id.toString())}
                           items={items}
-                          addToSelectedItems={addToSelectedItems}
-                          removeFromSelectedItems={removeFromSelectedItems}
+                          updateItemsForChar={updateItemsForChar}
                           clearChoices={clearChoices}
                           resetClear={resetClear}
                         />
@@ -236,6 +233,9 @@ export default function CharactersList(props: CharactersDataInterface) {
           <Button variant="contained" onClick={handleDecantClick}>Buy New Character NFT</Button>
           <Typography variant="body1">
             Owned Characters in Barracks: {chars.length}
+          </Typography>
+          <Typography variant="body1">
+            Please retry if joining/starting a mission fails.
           </Typography>
         </Card>
       </Grid>
