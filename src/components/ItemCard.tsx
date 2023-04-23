@@ -58,7 +58,7 @@ const ItemTypeToString = new Map([
   [ItemType.CARRY, "Backpack"],
   [ItemType.DEFENSE, "Kevlar"],
   [ItemType.HACK, "Hackatron"],
-  [ItemType.HEALTH, "Crowbar"],
+  [ItemType.BREACH, "Crowbar"],
   [ItemType.HAZARD, "Hazmat"],
   [ItemType.ARMOR, "Armor"],
   [ItemType.RANGED, "Gun"],
