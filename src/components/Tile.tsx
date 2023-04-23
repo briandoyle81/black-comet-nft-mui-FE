@@ -1,6 +1,6 @@
 import { Button, Card, CardMedia, TextField, Typography } from '@mui/material';
 import React, { ReactNode, useEffect, useState } from 'react';
-import GamePanel, { GameInterface } from './GamePanel';
+import GamePanel, { DenizenInterface, GameInterface } from './GamePanel';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -27,6 +27,7 @@ import DataIcon from '../assets/img/overlays/data.png';
 import ItemIcon from '../assets/img/overlays/item.png';
 
 import Hazard from '../assets/img/overlays/hazard.png';
+import Denizen from './Denizen';
 
 export enum EventType { NONE=0, BUG, MYSTERY, SCAVENGER, SHIP_SECURITY }
 
@@ -202,14 +203,14 @@ export default function Tile(props: TilePropsInterface) {
   }
 
   function renderOverlays(position: Position) {
-    const playerRenders: ReactNode[] = [];
+    const playerAndDenizenRenders: ReactNode[] = [];
     // console.log(players.length || "no players")
     // TODO: Why isn't the loading mechanism catching no players?
     if (props.players.length > 0) {
       props.players.forEach((player: PlayerInterface, index) => { // TODO: any
         // console.log(position, player.position)
         if (position.row === player.position.row && position.col === player.position.col) {
-          playerRenders.push(
+          playerAndDenizenRenders.push(
             <Grid item xs={3} key={index + "player"}>
               <Player
                 {...{
@@ -220,8 +221,27 @@ export default function Tile(props: TilePropsInterface) {
                 }
               />
             </Grid>
-          )
-            ;
+          );
+        }
+      });
+    }
+    // TODO: Hack
+    // console.log("Game in tile", props.currentGame);
+    if (props.currentGame.denizens !== undefined && props.currentGame.denizens.length > 0) {
+      // console.log("DRAWING DENIZENS");
+      props.currentGame.denizens.forEach((denizen: DenizenInterface, index) => {
+        if (position.row === denizen.position.row && position.col === denizen.position.col) {
+          playerAndDenizenRenders.push(
+            <Grid item xs={3} key={index + "denizen"}>
+              <Denizen
+                {...{
+                  denizen: denizen,
+                  portrait: false,
+                }
+                }
+              />
+            </Grid>
+          );
         }
       });
     }
@@ -235,7 +255,7 @@ export default function Tile(props: TilePropsInterface) {
             </Grid>
             <Grid item xs={12}>
               <Grid container>
-                {playerRenders}
+                {playerAndDenizenRenders}
               </Grid>
             </Grid>
           </Grid>

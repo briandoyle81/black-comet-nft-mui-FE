@@ -23,7 +23,8 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export enum BCEventType {NONE=0, BUG, MYSTERY, SCAVENGER, SHIP_SECURITY, ROOM}
+export enum BCEventType { NONE = 0, BUG, MYSTERY, SCAVENGER, SHIP_SECURITY, ROOM }
+export enum DenizenType { NONE = 0, BUG, SCAV, TURRET, ROBOT, QUEEN, BUTCHER, BEHEMOTH, DOCTOR }
 
 export interface GameInfoInterface {
   currentPlayer: PlayerInterface,
@@ -46,6 +47,16 @@ export interface GameInfoInterface {
   setEventResolved: Function,
   roomsWithItems: Position[],
   gameWorldItems: ItemDataInterface[]
+}
+
+export interface DenizenInterface{
+    id: BigInt;
+    gameId: BigInt;
+    denizenType: DenizenType; // Traits are derived from type
+
+    position: Position;
+
+    healthRemaining: BigInt;
 }
 
 export interface EventTrackerInterface {
@@ -78,6 +89,8 @@ export interface GameInterface {
 
   turnTimeLimit: number;
   lastTurnTimestamp: number;
+
+  denizens: DenizenInterface[];
 
   gameNumber: number;
 }

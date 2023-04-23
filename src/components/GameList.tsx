@@ -41,6 +41,7 @@ export default function GameList(props: GameListDataInterface) {
           eventPosition,
           turnTimeLimit,
           lastTurnTimestamp,
+          denizens,
         } = newGame;
 
         const localGame = {
@@ -57,6 +58,7 @@ export default function GameList(props: GameListDataInterface) {
           eventPosition: eventPosition,
           turnTimeLimit: turnTimeLimit,
           lastTurnTimestamp: lastTurnTimestamp,
+          denizens: denizens,
           gameNumber: gameIds[i]
         }
         newGames.push(localGame);

@@ -49,6 +49,8 @@ export const EmptyGame: GameInterface = {
   turnTimeLimit: 0,
   lastTurnTimestamp: 0,
 
+  denizens: [],
+
   gameNumber: -1
 }
 
@@ -172,6 +174,7 @@ export default function GameBoard(props: GameBoardProps) {
     });
 
     // TODO: Hack for broken reactor.  Remove next time you see this!
+    // I saw it 4-23 and I don't remember what it does and am not sure if I should remove
     localRoomTiles[100] = EmptyRoomTile;
 
     setGameTiles(localBoard);
@@ -247,6 +250,7 @@ export default function GameBoard(props: GameBoardProps) {
       console.log("Loading game number from event:", props.currentGameNumber)
       const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
       setCurrentGame(remoteGame);
+
       console.log("updating doors, board, players from chain")
 
       await updateDoorsFromChain();
@@ -296,13 +300,17 @@ export default function GameBoard(props: GameBoardProps) {
   useEffect(() => {
     console.log("Start of useEffect in Board");
 
-    loadGameBoard().then(() => {
+    loadGameBoard().then(async () => {
       if (currentGame.numPlayers > 0) {
         setCurrentPlayerPos({
           row: players[currentGame.currentPlayerTurnIndex].position.row,
           col: players[currentGame.currentPlayerTurnIndex].position.col
         });
       }
+      const denizens = await props.gameContract_read.getDenizensInGame(props.currentGameNumber);
+      let newGame = { ...currentGame };
+      newGame.denizens = denizens;
+      setCurrentGame(newGame);
     });
     if (props.walletLoaded && !eventsLoaded) {
       // TODO: Find appropriate home
