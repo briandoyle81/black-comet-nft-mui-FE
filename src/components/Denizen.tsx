@@ -13,7 +13,7 @@ const OnBoardDenizen = styled(Card)(({ theme }) => ({
   zIndex: 1299, // TODO
   width: '90%',
   height: '90%',
-  background: 'gray',
+  // background: 'grey',
   border: 'black'
 }));
 
@@ -55,11 +55,26 @@ export default function Denizen(props: DenizenProps) {
     }
   }
 
+  function getBackground() {
+    switch (props.denizen.denizenType) {
+      case DenizenType.BUG:
+        return 'lightgreen';
+      case DenizenType.SCAV:
+        return 'gray';
+      case DenizenType.TURRET:
+        return 'pink';
+      case DenizenType.ROBOT:
+        return 'pink';
+      default:
+       throw("ERROR: Missing denizen type");
+    }
+  }
+
   function renderDenizen(portrait: boolean) {
     if (!portrait) {
       return (
 
-        <OnBoardDenizen>
+        <OnBoardDenizen sx={{background: getBackground()}}>
           <img src={getArt()} style={OnBoardStyle} alt="TODO Denizen"/>
        </OnBoardDenizen>
 
