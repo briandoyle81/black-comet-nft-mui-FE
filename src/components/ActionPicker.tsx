@@ -1,13 +1,44 @@
-import { Button, Card, CardContent, FormControl, Grid, InputLabel, MenuItem, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardContent,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { GameInfoInterface } from "./GamePanel";
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { ethers } from "ethers";
 
-export enum Action { HACK=0, BREACH, MOVE, PASS, LOOT, USE_ROOM, USE_ITEM, DROP_ITEMS, PICK_ITEMS, LEAVE_GAME } // TODO: Add rest
-export enum Followthrough { NONE = 0, MOVE }
-enum Direction { NORTH = 0, SOUTH, EAST, WEST }
-enum PanelState { LIVE=0, WAITING }
+export enum Action {
+  HACK = 0,
+  BREACH,
+  MOVE,
+  PASS,
+  LOOT,
+  USE_ROOM,
+  USE_ITEM,
+  DROP_ITEMS,
+  PICK_ITEMS,
+  LEAVE_GAME,
+} // TODO: Add rest
+export enum Followthrough {
+  NONE = 0,
+  MOVE,
+}
+enum Direction {
+  NORTH = 0,
+  SOUTH,
+  EAST,
+  WEST,
+}
+enum PanelState {
+  LIVE = 0,
+  WAITING,
+}
 
 export default function ActionPicker(props: GameInfoInterface) {
   const [action, setAction] = useState(Action.PASS);
@@ -38,17 +69,19 @@ export default function ActionPicker(props: GameInfoInterface) {
   };
 
   const submitAction = async () => {
-    let cost = ethers.utils.parseUnits("0", 'gwei'); // TODO: Hardcoding
+    let cost = ethers.utils.parseUnits("0", "gwei"); // TODO: Hardcoding
     let actionIds: number[] = [];
     setPanelState(PanelState.WAITING);
     if (action === Action.LOOT) {
-      cost = ethers.utils.parseUnits((100 * props.numItems).toString(), 'gwei')
+      cost = ethers.utils.parseUnits((100 * props.numItems).toString(), "gwei");
     }
     if (action === Action.PICK_ITEMS) {
       for (let worldItem of props.gameWorldItems) {
         console.log("In actions, world item", worldItem);
-        if (worldItem.position.row === props.currentPlayer.position.row &&
-            worldItem.position.col === props.currentPlayer.position.col) {
+        if (
+          worldItem.position.row === props.currentPlayer.position.row &&
+          worldItem.position.col === props.currentPlayer.position.col
+        ) {
           actionIds.push(worldItem.id);
         }
       }
@@ -64,7 +97,10 @@ export default function ActionPicker(props: GameInfoInterface) {
       actionIds,
       {
         value: cost,
-        gasLimit: 4000000 // TODO: Find a more elegant solution here
+        gasLimit: 4000000, // TODO: Find a more elegant solution here
+        // What is likely happening is that for random numbers
+        // the client side simulation picks a cheaper outcome
+        // than what actually happens onchain
       }
     );
 
@@ -89,22 +125,23 @@ export default function ActionPicker(props: GameInfoInterface) {
     // console.log("walletAddress", walletAddress);
     // console.log("charOwner", charOwner);
     return walletAddress === charOwner;
-  };
+  }
 
   function renderActionPicker(playerTurn: boolean) {
-    if (props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex].length > props.currentChar.traits.carry) {
+    if (
+      props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex].length >
+      props.currentChar.traits.carry
+    ) {
       return (
         <Card>
           <CardContent>
             <Typography align="left">
               You are carrying too many items.
             </Typography>
-            <Typography align="left">
-              You must drop some to act.
-            </Typography>
+            <Typography align="left">You must drop some to act.</Typography>
           </CardContent>
         </Card>
-      )
+      );
     }
 
     function setSecondaryDD() {
@@ -121,7 +158,7 @@ export default function ActionPicker(props: GameInfoInterface) {
       return false;
     }
 
-    return (playerTurn ?
+    return playerTurn ? (
       <Grid container spacing={1}>
         <Grid item xs={6}>
           <FormControl fullWidth>
@@ -139,28 +176,34 @@ export default function ActionPicker(props: GameInfoInterface) {
               <MenuItem value={Action.LOOT.toString()}>Loot</MenuItem>
               <MenuItem value={Action.USE_ROOM.toString()}>Use Room</MenuItem>
               <MenuItem value={Action.PASS.toString()}>Pass</MenuItem>
-              <MenuItem value={Action.PICK_ITEMS.toString()}>Pick Up Items</MenuItem>
-              <MenuItem value={Action.LEAVE_GAME.toString()}>Leave Game</MenuItem>
+              <MenuItem value={Action.PICK_ITEMS.toString()}>
+                Pick Up Items
+              </MenuItem>
+              <MenuItem value={Action.LEAVE_GAME.toString()}>
+                Leave Game
+              </MenuItem>
             </Select>
           </FormControl>
         </Grid>
         <Grid item xs={6}>
-          { !setSecondaryDD() && <FormControl fullWidth>
-            <InputLabel id="firstDir-label">Direction</InputLabel>
-            <Select
-              labelId="firstDir-label"
-              id="firstDir-select"
-              value={firstDir.toString()}
-              label="Direction"
-              onChange={handleFirstDir}
-              disabled={setSecondaryDD()}
-            >
-              <MenuItem value={Direction.NORTH.toString()}>North</MenuItem>
-              <MenuItem value={Direction.SOUTH.toString()}>South</MenuItem>
-              <MenuItem value={Direction.EAST.toString()}>East</MenuItem>
-              <MenuItem value={Direction.WEST.toString()}>West</MenuItem>
-            </Select>
-          </FormControl>}
+          {!setSecondaryDD() && (
+            <FormControl fullWidth>
+              <InputLabel id="firstDir-label">Direction</InputLabel>
+              <Select
+                labelId="firstDir-label"
+                id="firstDir-select"
+                value={firstDir.toString()}
+                label="Direction"
+                onChange={handleFirstDir}
+                disabled={setSecondaryDD()}
+              >
+                <MenuItem value={Direction.NORTH.toString()}>North</MenuItem>
+                <MenuItem value={Direction.SOUTH.toString()}>South</MenuItem>
+                <MenuItem value={Direction.EAST.toString()}>East</MenuItem>
+                <MenuItem value={Direction.WEST.toString()}>West</MenuItem>
+              </Select>
+            </FormControl>
+          )}
         </Grid>
         <Grid item xs={6}>
           <FormControl fullWidth>
@@ -179,22 +222,24 @@ export default function ActionPicker(props: GameInfoInterface) {
           </FormControl>
         </Grid>
         <Grid item xs={6}>
-          { !setSecondaryDD() && <FormControl fullWidth>
-            <InputLabel id="secondDir-label">Direction</InputLabel>
-            <Select
-              labelId="secondDir-label"
-              id="secondDir-select"
-              value={secondDir.toString()}
-              label="Direction"
-              onChange={handleSecondDir}
-              disabled={setSecondaryDD()}
-            >
-              <MenuItem value={Direction.NORTH.toString()}>North</MenuItem>
-              <MenuItem value={Direction.SOUTH.toString()}>South</MenuItem>
-              <MenuItem value={Direction.EAST.toString()}>East</MenuItem>
-              <MenuItem value={Direction.WEST.toString()}>West</MenuItem>
-            </Select>
-          </FormControl>}
+          {!setSecondaryDD() && (
+            <FormControl fullWidth>
+              <InputLabel id="secondDir-label">Direction</InputLabel>
+              <Select
+                labelId="secondDir-label"
+                id="secondDir-select"
+                value={secondDir.toString()}
+                label="Direction"
+                onChange={handleSecondDir}
+                disabled={setSecondaryDD()}
+              >
+                <MenuItem value={Direction.NORTH.toString()}>North</MenuItem>
+                <MenuItem value={Direction.SOUTH.toString()}>South</MenuItem>
+                <MenuItem value={Direction.EAST.toString()}>East</MenuItem>
+                <MenuItem value={Direction.WEST.toString()}>West</MenuItem>
+              </Select>
+            </FormControl>
+          )}
         </Grid>
         <Grid item xs={12}>
           <Button
@@ -209,20 +254,17 @@ export default function ActionPicker(props: GameInfoInterface) {
           </Typography>
         </Grid>
       </Grid>
-      :
-      <Typography variant="body1">
-        Not your turn or player
-      </Typography>
-    )
+    ) : (
+      <Typography variant="body1">Not your turn or player</Typography>
+    );
   }
 
   return (
     <Card>
-      <Typography variant="body1">
-        Action Selector
-      </Typography>
-      {renderActionPicker(isPlayerTurn(props.playerSignerAddress, props.currentPlayer.owner))}
-
+      <Typography variant="body1">Action Selector</Typography>
+      {renderActionPicker(
+        isPlayerTurn(props.playerSignerAddress, props.currentPlayer.owner)
+      )}
     </Card>
-  )
+  );
 }
