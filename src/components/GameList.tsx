@@ -1,20 +1,18 @@
 import { Button, Card, CardContent, Grid, Typography } from "@mui/material";
-import { Box } from "@mui/system"
+import { Box } from "@mui/system";
 import { ethers } from "ethers";
 import { ReactNode, useEffect, useState } from "react";
 import { CharInterface } from "./Board";
 import { GameInterface } from "./GamePanel";
 
-
 interface GameListDataInterface {
-  gameContract_read: any, // todo any
-  setCurrentGameNumber: Function,
-  setTabValue: Function,
-  address: string
+  gameContract_read: any; // todo any
+  setCurrentGameNumber: Function;
+  setTabValue: Function;
+  address: string;
 }
 
 export default function GameList(props: GameListDataInterface) {
-
   const [gamesLoaded, setGamesLoaded] = useState(false);
   const [games, setGames] = useState<GameInterface[]>([]);
 
@@ -22,7 +20,9 @@ export default function GameList(props: GameListDataInterface) {
     console.log("Start of useEffect in GameList");
 
     async function updateGamesFromChain() {
-      const gameIds = await props.gameContract_read.extGetGamesOfPlayer(props.address);
+      const gameIds = await props.gameContract_read.extGetGamesOfPlayer(
+        props.address
+      );
 
       const newGames: GameInterface[] = [];
 
@@ -30,6 +30,7 @@ export default function GameList(props: GameListDataInterface) {
         const newGame = await props.gameContract_read.games(gameIds[i]);
         const {
           active,
+          denizenTurn,
           currentPlayerTurnIndex,
           numPlayers,
           turnsTaken,
@@ -46,7 +47,10 @@ export default function GameList(props: GameListDataInterface) {
 
         const localGame = {
           active: active,
-          playerIndexes: await props.gameContract_read.extGetGamePlayerIndexes(gameIds[i]),
+          denizenTurn: denizenTurn,
+          playerIndexes: await props.gameContract_read.extGetGamePlayerIndexes(
+            gameIds[i]
+          ),
           currentPlayerTurnIndex: currentPlayerTurnIndex,
           numPlayers: numPlayers,
           turnsTaken: turnsTaken,
@@ -59,8 +63,8 @@ export default function GameList(props: GameListDataInterface) {
           turnTimeLimit: turnTimeLimit,
           lastTurnTimestamp: lastTurnTimestamp,
           denizens: denizens,
-          gameNumber: gameIds[i]
-        }
+          gameNumber: gameIds[i],
+        };
         newGames.push(localGame);
       }
 
@@ -71,18 +75,16 @@ export default function GameList(props: GameListDataInterface) {
     if (!gamesLoaded) {
       updateGamesFromChain();
     }
-
   }, [gamesLoaded, props.address, props.gameContract_read]);
 
-
   function handleGameButtonClick(id: number) {
-    localStorage.setItem("lastGame", id.toString())
+    localStorage.setItem("lastGame", id.toString());
     // props.setCurrentGameNumber(id);
     props.setTabValue(2);
   }
 
   function renderGameData() {
-    const gameList: ReactNode[] = []
+    const gameList: ReactNode[] = [];
     games.forEach((game: GameInterface, index: number) => {
       gameList.push(
         <Grid item key={index + " Game card"}>
@@ -98,7 +100,8 @@ export default function GameList(props: GameListDataInterface) {
                 Players: {game.playerIndexes.toString()}
               </Typography>
               <Typography variant="body1">
-                Current Player Turn Index: {game.currentPlayerTurnIndex.toString()}
+                Current Player Turn Index:{" "}
+                {game.currentPlayerTurnIndex.toString()}
               </Typography>
               <Typography variant="body1">
                 Turns Taken: {game.turnsTaken.toString()}
@@ -107,11 +110,18 @@ export default function GameList(props: GameListDataInterface) {
                 Map ID: {game.mapId.toString()}
               </Typography>
             </CardContent>
-            <Button variant="contained" onClick={() => { handleGameButtonClick(game.gameNumber) }}>Load Game</Button>
-            </Card>
-          </Grid>
-      )
-    })
+            <Button
+              variant="contained"
+              onClick={() => {
+                handleGameButtonClick(game.gameNumber);
+              }}
+            >
+              Load Game
+            </Button>
+          </Card>
+        </Grid>
+      );
+    });
     return gameList;
   }
 
@@ -121,10 +131,8 @@ export default function GameList(props: GameListDataInterface) {
         Number of Games In: {games.length}
       </Typography>
       <Box>
-        <Grid container>
-          {renderGameData()}
-        </Grid>
+        <Grid container>{renderGameData()}</Grid>
       </Box>
     </Box>
-  )
+  );
 }

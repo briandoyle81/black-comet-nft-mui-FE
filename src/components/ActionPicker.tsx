@@ -158,7 +158,7 @@ export default function ActionPicker(props: GameInfoInterface) {
       return false;
     }
 
-    return playerTurn ? (
+    return playerTurn && !props.currentGameProps.denizenTurn ? (
       <Grid container spacing={1}>
         <Grid item xs={6}>
           <FormControl fullWidth>

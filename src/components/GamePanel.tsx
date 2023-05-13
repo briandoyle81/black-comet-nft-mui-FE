@@ -1,62 +1,79 @@
-import { ReactNode } from 'react';
-import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
-import GameInfo from './GameInfo';
-import { PlayerInterface } from './Player';
-import ActionPicker from './ActionPicker';
-import { CharInterface } from './Board';
-import { Card, CardContent, CardHeader, Typography } from '@mui/material';
-import { isPropertySignature } from 'typescript';
-import ItemCard, { ItemDataInterface } from './ItemCard';
-import EventModal from './EventModal';
-import { Position } from './Utils';
-import { GameTileInterface, RoomTile, TilePropsInterface } from './Tile';
-import Inventory from './Inventory';
+import { ReactNode } from "react";
+import { styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Grid";
+import GameInfo from "./GameInfo";
+import { PlayerInterface } from "./Player";
+import ActionPicker from "./ActionPicker";
+import { CharInterface } from "./Board";
+import { Card, CardContent, CardHeader, Typography } from "@mui/material";
+import { isPropertySignature } from "typescript";
+import ItemCard, { ItemDataInterface } from "./ItemCard";
+import EventModal from "./EventModal";
+import { Position } from "./Utils";
+import { GameTileInterface, RoomTile, TilePropsInterface } from "./Tile";
+import Inventory from "./Inventory";
 
 const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
   ...theme.typography.body2,
   padding: theme.spacing(1),
-  textAlign: 'center',
+  textAlign: "center",
   color: theme.palette.text.secondary,
 }));
 
-export enum BCEventType { NONE = 0, BUG, MYSTERY, SCAVENGER, SHIP_SECURITY, ROOM }
-export enum DenizenType { NONE = 0, BUG, SCAV, TURRET, ROBOT, QUEEN, BUTCHER, BEHEMOTH, DOCTOR }
-
-export interface GameInfoInterface {
-  currentPlayer: PlayerInterface,
-  currentChar: CharInterface,
-  currentGameProps: GameInterface,
-  currentGameNumber: number,
-  playerSignerAddress: string,
-  actionsContract_write: any, // TODO: Any
-  gameContract_write: any,
-  lastDieRoll: string,
-  setLastDieRoll: Function,
-  numItems: number, // number of items in the current room
-  allHeldItems: any, // TODO: any
-  roomTiles: RoomTile[],
-  players: PlayerInterface[],
-  chars: CharInterface[],
-  currentTile: GameTileInterface,
-  setEventFlipper: Function,
-  eventResolved: boolean,
-  setEventResolved: Function,
-  roomsWithItems: Position[],
-  gameWorldItems: ItemDataInterface[]
+export enum BCEventType {
+  NONE = 0,
+  BUG,
+  MYSTERY,
+  SCAVENGER,
+  SHIP_SECURITY,
+  ROOM,
+}
+export enum DenizenType {
+  NONE = 0,
+  BUG,
+  SCAV,
+  TURRET,
+  ROBOT,
+  QUEEN,
+  BUTCHER,
+  BEHEMOTH,
+  DOCTOR,
 }
 
-export interface DenizenInterface{
-    id: BigInt;
-    gameId: BigInt;
-    denizenType: DenizenType; // Traits are derived from type
+export interface GameInfoInterface {
+  currentPlayer: PlayerInterface;
+  currentChar: CharInterface;
+  currentGameProps: GameInterface;
+  currentGameNumber: number;
+  playerSignerAddress: string;
+  actionsContract_write: any; // TODO: Any
+  gameContract_write: any;
+  lastDieRoll: string;
+  setLastDieRoll: Function;
+  numItems: number; // number of items in the current room
+  allHeldItems: any; // TODO: any
+  roomTiles: RoomTile[];
+  players: PlayerInterface[];
+  chars: CharInterface[];
+  currentTile: GameTileInterface;
+  setEventFlipper: Function;
+  eventResolved: boolean;
+  setEventResolved: Function;
+  roomsWithItems: Position[];
+  gameWorldItems: ItemDataInterface[];
+}
 
-    position: Position;
+export interface DenizenInterface {
+  id: BigInt;
+  gameId: BigInt;
+  denizenType: DenizenType; // Traits are derived from type
 
-    healthRemaining: BigInt;
+  position: Position;
+
+  healthRemaining: BigInt;
 }
 
 export interface EventTrackerInterface {
@@ -67,8 +84,8 @@ export interface EventTrackerInterface {
 }
 
 export interface GameInterface {
-
   active: boolean;
+  denizenTurn: boolean;
 
   playerIndexes: number[];
   currentPlayerTurnIndex: number;
@@ -102,9 +119,7 @@ export default function GamePanel(props: GameInfoInterface) {
         <Grid item xs={12}>
           <Grid container>
             <Grid item xs={2}>
-              <Typography variant="body1">
-                Last Roll:
-              </Typography>
+              <Typography variant="body1">Last Roll:</Typography>
             </Grid>
             <Grid item xs={10}>
               <Typography variant="h4">
@@ -114,22 +129,20 @@ export default function GamePanel(props: GameInfoInterface) {
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <GameInfo {...props}/>
+          <GameInfo {...props} />
         </Grid>
         <Grid item xs={12}>
-          <EventModal {...props}/>
+          <EventModal {...props} />
         </Grid>
         <Grid item xs={12}>
-          <ActionPicker {...props}/>
+          <ActionPicker {...props} />
         </Grid>
         <Grid item xs={12}>
           {Inventory(props)}
         </Grid>
         <Grid item xs={12}>
           <Card>
-            <CardHeader
-              title="Game Info"
-            />
+            <CardHeader title="Game Info" />
             <CardContent>
               <Grid container spacing={1}>
                 <Grid item xs={9}>

@@ -1,35 +1,61 @@
-import { Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
-import { ReactNode, useEffect, useState } from 'react';
-import GamePanel, { BCEventType, EventTrackerInterface, GameInterface } from './GamePanel';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import { Position } from './Utils';
+import {
+  Button,
+  Card,
+  CardContent,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { ReactNode, useEffect, useState } from "react";
+import GamePanel, {
+  BCEventType,
+  EventTrackerInterface,
+  GameInterface,
+} from "./GamePanel";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import { Position } from "./Utils";
 
-import { DoorInterface } from './Doors';
-import { ItemDataInterface } from './ItemCard';
+import { DoorInterface } from "./Doors";
+import { ItemDataInterface } from "./ItemCard";
 
 import Door from "./Doors";
 
-import { PlayerInterface } from './Player';
+import { PlayerInterface } from "./Player";
 
-import Tile, { EmptyRoomTile, EmptyTile, GameTileInterface, RoomTile } from './Tile';
+import Tile, {
+  EmptyRoomTile,
+  EmptyTile,
+  GameTileInterface,
+  RoomTile,
+} from "./Tile";
 
 let timesBoardPulled = 0;
 
 const DISPLAY_COLUMNS = 13; // TODO: I really need to refigure out and document the reasoning here
 const ZOOMED_COLUMNS = 8;
 
-export enum WorldItemStatus { UNKNOWN=0, KNOWN, DISCARDED, REMOVED }
+export enum WorldItemStatus {
+  UNKNOWN = 0,
+  KNOWN,
+  DISCARDED,
+  REMOVED,
+}
 
 const EmptyEventTracker: EventTrackerInterface = {
   bugEvents: -1,
   mysteryEvents: -1,
   scavEvents: -1,
-  shipEvents: -1
-}
+  shipEvents: -1,
+};
 
 export const EmptyGame: GameInterface = {
   active: false,
+  denizenTurn: false,
 
   playerIndexes: [0, 0, 0, 0],
   currentPlayerTurnIndex: 0,
@@ -51,12 +77,12 @@ export const EmptyGame: GameInterface = {
 
   denizens: [],
 
-  gameNumber: -1
-}
+  gameNumber: -1,
+};
 
 export interface GameBoardProps {
   currentGameNumber: number;
-  mapContract_read: any;  // TODO anys
+  mapContract_read: any; // TODO anys
   gameContract_read: any;
   gameContract_write: any;
   charContract_read: any;
@@ -84,7 +110,7 @@ export interface TraitsInterface {
 export interface CharInterface {
   genHash: string; // TODO: Tie to universal inventory
   traits: TraitsInterface;
-  cloneNumber: number;  // High but possibly reachable limit
+  cloneNumber: number; // High but possibly reachable limit
   maxClones: number; // Eventually exit them from the economy??
   ability: number;
   flaw: number;
@@ -100,7 +126,9 @@ export default function GameBoard(props: GameBoardProps) {
   const [numGames, setNumGames] = useState(0);
   const [currentGame, setCurrentGame] = useState<GameInterface>(EmptyGame);
   const [roomTiles, setRoomTiles] = useState<RoomTile[]>([]);
-  const [gameTiles, setGameTiles] = useState(Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile)));
+  const [gameTiles, setGameTiles] = useState(
+    Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile))
+  );
   const [doors, setDoors] = useState<DoorInterface[]>([]);
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
   const [chars, setChars] = useState<CharInterface[]>([]);
@@ -115,58 +143,73 @@ export default function GameBoard(props: GameBoardProps) {
   const [eventsLoaded, setEventsLoaded] = useState(false);
   const [eventResolved, setEventResolved] = useState(false);
 
-  const [dateInSeconds, setDateInSeconds] = useState(Math.floor(Date.now() / 1000));
+  const [dateInSeconds, setDateInSeconds] = useState(
+    Math.floor(Date.now() / 1000)
+  );
 
   const [zoomed, setZoomed] = useState(false);
-  const [currentPlayerPos, setCurrentPlayerPos] = useState<Position>({ row: -1, col: -1 });
+  const [currentPlayerPos, setCurrentPlayerPos] = useState<Position>({
+    row: -1,
+    col: -1,
+  });
 
   const [debugGameOver, setDebugGameOver] = useState(false);
 
   const updateWorldItemsFromChain = async () => {
-    const remoteWorldItems = await props.itemContract_read.getWorldItems(props.currentGameNumber);
+    const remoteWorldItems = await props.itemContract_read.getWorldItems(
+      props.currentGameNumber
+    );
     // const remoteWorldItems: IWorldItem[] = [];
     const newRemoteItems: ItemDataInterface[] = [];
 
     const newPosWithItem: Position[] = [];
 
     remoteWorldItems.forEach((worldItem: ItemDataInterface) => {
-
-
       newRemoteItems.push(worldItem);
       newPosWithItem.push(worldItem.position);
     });
 
     setGameWorldItems([...newRemoteItems]);
     setRoomsWithItem([...newPosWithItem]);
-  }
+  };
 
   const updateCurrentPlayerItemsFromChain = async () => {
-    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
+    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(
+      props.currentGameNumber
+    );
 
     let playerItems: any[][] = [];
     for (let i = 0; i < playerIndexes.length; i++) {
       const currentPlayerId = playerIndexes[i];
       // TODO: Debug this.  Works fine in unit test trying to get items from null set, crashes here
-      const remoteItems = await props.itemContract_read.getItemsByPlayer(currentPlayerId);
+      const remoteItems = await props.itemContract_read.getItemsByPlayer(
+        currentPlayerId
+      );
 
       playerItems.push(remoteItems);
     }
     setCurrentPlayerItems(playerItems);
-  }
+  };
 
   const updateBoardFromChain = async () => {
     timesBoardPulled++;
     console.log("timesBoardPulled", timesBoardPulled);
-    const remoteBoard = await props.mapContract_read.extGetBoard(props.currentGameNumber); // TODO: Confirm that game and map numbers will always match
-    const localBoard = Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile));
+    const remoteBoard = await props.mapContract_read.extGetBoard(
+      props.currentGameNumber
+    ); // TODO: Confirm that game and map numbers will always match
+    const localBoard = Array.from({ length: n }, () =>
+      Array.from({ length: n }, () => EmptyTile)
+    );
 
     remoteBoard.forEach((rowData: GameTileInterface[], row: number) => {
       rowData.forEach((gameTile: GameTileInterface, col) => {
         localBoard[row][col] = gameTile;
-      })
-    })
+      });
+    });
 
-    const remoteRoomTiles = await props.mapContract_read.extGetRoomList(props.currentGameNumber);// TODO: Confirm that game and map numbers will always match
+    const remoteRoomTiles = await props.mapContract_read.extGetRoomList(
+      props.currentGameNumber
+    ); // TODO: Confirm that game and map numbers will always match
     const localRoomTiles: RoomTile[] = [];
 
     remoteRoomTiles.forEach((roomTile: RoomTile) => {
@@ -179,43 +222,60 @@ export default function GameBoard(props: GameBoardProps) {
 
     setGameTiles(localBoard);
     setRoomTiles(localRoomTiles);
-  }
+  };
 
   const updateCharsFromChain = async () => {
     const updatedChars: CharInterface[] = [];
     // TODO: Get the cached char id list instead of loading it
-    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
+    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(
+      props.currentGameNumber
+    );
 
     for (let i = 0; i < playerIndexes.length; i++) {
-      const remotePlayer = await props.playersContract_read.players(playerIndexes[i]);
-      const remoteChar = await props.charContract_read.characters(remotePlayer.characterId);
+      const remotePlayer = await props.playersContract_read.players(
+        playerIndexes[i]
+      );
+      const remoteChar = await props.charContract_read.characters(
+        remotePlayer.characterId
+      );
       updatedChars.push(remoteChar);
     }
 
     setChars(updatedChars);
-  }
+  };
 
   const updateDoorsFromChain = async () => {
-    const remoteDoors = await props.mapContract_read.extGetDoors(props.currentGameNumber); // TODO: Get game first and get board number from it
+    const remoteDoors = await props.mapContract_read.extGetDoors(
+      props.currentGameNumber
+    ); // TODO: Get game first and get board number from it
 
     const newDoors: DoorInterface[] = [];
 
     remoteDoors.forEach((door: DoorInterface, index: number) => {
-      const newDoor: DoorInterface = { vsBreach: door.vsBreach, vsHack: door.vsHack, status: door.status, rotate: false };
+      const newDoor: DoorInterface = {
+        vsBreach: door.vsBreach,
+        vsHack: door.vsHack,
+        status: door.status,
+        rotate: false,
+      };
       // newDoors[index] = newDoor;
       newDoors.push(newDoor);
     });
 
     setDoors(newDoors);
-  }
+  };
 
   const updateRemotePlayers = async () => {
     const newPlayers: PlayerInterface[] = [];
 
-    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(props.currentGameNumber);
+    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(
+      props.currentGameNumber
+    );
 
     for (let i = 0; i < playerIndexes.length; i++) {
-      const remotePlayer = await props.playersContract_read.players(playerIndexes[i]);
+      const remotePlayer = await props.playersContract_read.players(
+        playerIndexes[i]
+      );
       const { position } = remotePlayer;
       const newPlayer: PlayerInterface = {
         remoteId: playerIndexes[i],
@@ -236,22 +296,23 @@ export default function GameBoard(props: GameBoardProps) {
         inventoryIDs: remotePlayer.inventoryIDs,
 
         canHarmOthers: remotePlayer.canHarmOthers,
-        dead: remotePlayer.dead
-      }
+        dead: remotePlayer.dead,
+      };
       newPlayers.push(newPlayer);
     }
     setPlayers(newPlayers);
-  }
+  };
 
   const loadGameBoard = async () => {
-
     if (eventFlipper === true) {
       setNumGames(await props.gameContract_read.extGetNumGames());
-      console.log("Loading game number from event:", props.currentGameNumber)
-      const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
+      console.log("Loading game number from event:", props.currentGameNumber);
+      const remoteGame = await props.gameContract_read.games(
+        props.currentGameNumber
+      );
       setCurrentGame(remoteGame);
 
-      console.log("updating doors, board, players from chain")
+      console.log("updating doors, board, players from chain");
 
       await updateDoorsFromChain();
       await updateBoardFromChain();
@@ -266,8 +327,10 @@ export default function GameBoard(props: GameBoardProps) {
 
     if (gameLoaded === false) {
       setNumGames(await props.gameContract_read.extGetNumGames());
-      console.log("Loading game number from start:", props.currentGameNumber)
-      const remoteGame = await props.gameContract_read.games(props.currentGameNumber);
+      console.log("Loading game number from start:", props.currentGameNumber);
+      const remoteGame = await props.gameContract_read.games(
+        props.currentGameNumber
+      );
       setCurrentGame(remoteGame);
       if (remoteGame.active) {
         await updateDoorsFromChain();
@@ -279,12 +342,11 @@ export default function GameBoard(props: GameBoardProps) {
       } else {
         setDebugGameOver(true);
       }
-
     }
 
     // Maybe need to have await tx.await() here?
     // setLoading(false);
-  }
+  };
 
   function refreshClock() {
     setDateInSeconds(Math.floor(Date.now() / 1000));
@@ -304,10 +366,12 @@ export default function GameBoard(props: GameBoardProps) {
       if (currentGame.numPlayers > 0) {
         setCurrentPlayerPos({
           row: players[currentGame.currentPlayerTurnIndex].position.row,
-          col: players[currentGame.currentPlayerTurnIndex].position.col
+          col: players[currentGame.currentPlayerTurnIndex].position.col,
         });
       }
-      const denizens = await props.gameContract_read.getDenizensInGame(props.currentGameNumber);
+      const denizens = await props.gameContract_read.getDenizensInGame(
+        props.currentGameNumber
+      );
       let newGame = { ...currentGame };
       newGame.denizens = denizens;
       setCurrentGame(newGame);
@@ -316,49 +380,70 @@ export default function GameBoard(props: GameBoardProps) {
       // TODO: Find appropriate home
       // WARNING:  This is creating a stale closure, but it's not impacted because the listener is destroyed and recreated when the game changes
       // TODO: This is here because if it's in App, for some reason, events cause the tab content to unmount and remount, completely reloading Board
-      props.actionsContract_read.on("ActionCompleteEvent", (gameId: any, game: any, playerId: any, player: any, action: any, event: any) => {
-        // console.log("Event Game ID", gameId)
-        // console.log("Event Game", game);
-        // console.log("Event Action", action);
+      props.actionsContract_read.on(
+        "ActionCompleteEvent",
+        (
+          gameId: any,
+          game: any,
+          playerId: any,
+          player: any,
+          action: any,
+          event: any
+        ) => {
+          // console.log("Event Game ID", gameId)
+          // console.log("Event Game", game);
+          // console.log("Event Action", action);
 
-        const { mapId } = game;
-        // console.log("MapID", mapId)
-        // TODO: Hack using mapID instead of gameId
-        // console.log("Test is", mapId == props.currentGameNumber)
-        // DO NOT USE ===, will always be false!!
-        if (mapId == props.currentGameNumber) {
-          setEventFlipper(true);
+          const { mapId } = game;
+          // console.log("MapID", mapId)
+          // TODO: Hack using mapID instead of gameId
+          // console.log("Test is", mapId == props.currentGameNumber)
+          // DO NOT USE ===, will always be false!!
+          if (mapId == props.currentGameNumber) {
+            setEventFlipper(true);
+          }
         }
-      });
+      );
 
-      props.utilsContract_read.on("DiceRollEvent", (gameId: any, roll: any, event: any) => {
-        // console.log("Roll Event roll", roll);
-        // TODO: Hack using mapID instead of gameId
-        // DO NOT USE ===, will always be false!!
-        if (gameId == props.currentGameNumber) {
-          setLastDieRoll(roll.toString());
+      props.utilsContract_read.on(
+        "DiceRollEvent",
+        (gameId: any, roll: any, event: any) => {
+          // console.log("Roll Event roll", roll);
+          // TODO: Hack using mapID instead of gameId
+          // DO NOT USE ===, will always be false!!
+          if (gameId == props.currentGameNumber) {
+            setLastDieRoll(roll.toString());
+          }
         }
-      });
+      );
 
-      props.playersContract_read.on("EventResolvedEvent", (gameId: any, playerId: any, currentEvent: any, appliedEffects: any, event: any) => {
-        // DO NOT USE ===, will always be false!!
-        // console.log("Triggered Event Resolved Event");
-        if (gameId == props.currentGameNumber) {
-          setEventResolved(true);
-          setEventFlipper(true);
-          // console.log("currentEvent", currentEvent);
-          // console.log("appliedEffects", appliedEffects);
+      props.playersContract_read.on(
+        "EventResolvedEvent",
+        (
+          gameId: any,
+          playerId: any,
+          currentEvent: any,
+          appliedEffects: any,
+          event: any
+        ) => {
+          // DO NOT USE ===, will always be false!!
+          // console.log("Triggered Event Resolved Event");
+          if (gameId == props.currentGameNumber) {
+            setEventResolved(true);
+            setEventFlipper(true);
+            // console.log("currentEvent", currentEvent);
+            // console.log("appliedEffects", appliedEffects);
+          }
         }
-      });
+      );
       setEventsLoaded(true);
     }
-
   }, [gameLoaded, props.currentGameNumber, eventFlipper, props.walletLoaded]);
 
   function onUpdateGameClick() {
     setGameLoaded(false);
     // setLoading(true);
-    localStorage.setItem("lastGame", formGameNumber.toString())
+    localStorage.setItem("lastGame", formGameNumber.toString());
     props.setCurrentGameNumber(formGameNumber);
   }
 
@@ -371,7 +456,7 @@ export default function GameBoard(props: GameBoardProps) {
         return;
       }
       const itemKey = row + "," + col;
-      rowWithDoors.push((
+      rowWithDoors.push(
         <Grid item xs={1} key={itemKey}>
           <Tile
             tile={tile}
@@ -384,7 +469,7 @@ export default function GameBoard(props: GameBoardProps) {
             roomsWithItems={roomsWithItems}
           />
         </Grid>
-      ));
+      );
       // Don't render the last door.  -2 because other process skips outer ring
       if (col < n - 2) {
         rowWithDoors.push(
@@ -393,8 +478,9 @@ export default function GameBoard(props: GameBoardProps) {
             vsHack={doors[tile.doors[2]].vsHack}
             status={doors[tile.doors[2]].status}
             rotate={true}
-            key={itemKey+"-door-id-"+tile.doors[2]}
-          />);
+            key={itemKey + "-door-id-" + tile.doors[2]}
+          />
+        );
       }
     }
     return rowWithDoors;
@@ -404,17 +490,15 @@ export default function GameBoard(props: GameBoardProps) {
   function renderRowOfDoors(row: number) {
     const rowOfDoors: ReactNode[] = [];
     // Start with a small, empty item to offset doors for alignment
-    rowOfDoors.push((
-      <Grid item xs={.25} key={row+"-starter"}>
-        <Card>
-
-        </Card>
+    rowOfDoors.push(
+      <Grid item xs={0.25} key={row + "-starter"}>
+        <Card></Card>
       </Grid>
-    ));
+    );
     // gameTiles[row].forEach((tile: GameTileInterface, col) => {
-      // if (col === 0 || col === n - 1) {
-      //   return;
-      // }
+    // if (col === 0 || col === n - 1) {
+    //   return;
+    // }
     for (let col = getZoomedColStart(); col < getZoomedColEnd(); col++) {
       const tile = gameTiles[row][col];
       const itemKey = row + "," + col;
@@ -424,21 +508,18 @@ export default function GameBoard(props: GameBoardProps) {
           vsHack={doors[tile.doors[1]].vsHack}
           status={doors[tile.doors[1]].status}
           rotate={false}
-          key={itemKey+"-door-id-"+tile.doors[1]}
-        />);
-
+          key={itemKey + "-door-id-" + tile.doors[1]}
+        />
+      );
 
       // Push an "empty" card to maintain grid, except the last
       if (col < n - 1) {
-        rowOfDoors.push((
-          <Grid item xs={1} key={row+','+col+'-empty'}>
-            <Card>
-
-            </Card>
+        rowOfDoors.push(
+          <Grid item xs={1} key={row + "," + col + "-empty"}>
+            <Card></Card>
           </Grid>
-        ));
+        );
       }
-
     }
 
     return rowOfDoors;
@@ -465,14 +546,14 @@ export default function GameBoard(props: GameBoardProps) {
       } else if (currentPlayerPos.row >= 8) {
         return 11;
       } else {
-        return currentPlayerPos.row + 3;  // + 2 for desired rows and 1 for < in other loop
+        return currentPlayerPos.row + 3; // + 2 for desired rows and 1 for < in other loop
       }
     } else {
       return n; // Not n-1 to render Donghaijiu
     }
   }
 
-  function getZoomedColStart(){
+  function getZoomedColStart() {
     if (zoomed) {
       if (currentPlayerPos.col <= 3) {
         return 1;
@@ -496,7 +577,7 @@ export default function GameBoard(props: GameBoardProps) {
         return currentPlayerPos.col + 3;
       }
     } else {
-      return n-1;
+      return n - 1;
     }
   }
 
@@ -510,19 +591,32 @@ export default function GameBoard(props: GameBoardProps) {
       }
       if (row < n - 1) {
         rows.push(
-          <Box key={row+"-withDoors"}>
-            <Grid container spacing={0} columns={zoomed ? ZOOMED_COLUMNS : DISPLAY_COLUMNS}>
+          <Box key={row + "-withDoors"}>
+            <Grid
+              container
+              spacing={0}
+              columns={zoomed ? ZOOMED_COLUMNS : DISPLAY_COLUMNS}
+            >
               {renderRowWithDoors(row)}
             </Grid>
-            <Grid container spacing={0} columns={zoomed ? ZOOMED_COLUMNS : DISPLAY_COLUMNS}>
+            <Grid
+              container
+              spacing={0}
+              columns={zoomed ? ZOOMED_COLUMNS : DISPLAY_COLUMNS}
+            >
               {renderRowOfDoors(row)}
             </Grid>
           </Box>
         );
-      } else { // Don't print a row of doors at the bottom
+      } else {
+        // Don't print a row of doors at the bottom
         rows.push(
-          <Box key={row+"-withDoors"}>
-            <Grid container spacing={0} columns={zoomed ? ZOOMED_COLUMNS : DISPLAY_COLUMNS}>
+          <Box key={row + "-withDoors"}>
+            <Grid
+              container
+              spacing={0}
+              columns={zoomed ? ZOOMED_COLUMNS : DISPLAY_COLUMNS}
+            >
               {renderRowWithDoors(row)}
             </Grid>
           </Box>
@@ -540,25 +634,24 @@ export default function GameBoard(props: GameBoardProps) {
     // }
 
     if (props.currentGameNumber > numGames) {
-      return (
-        <Box>Selected game does not exist!</Box>
-      )
+      return <Box>Selected game does not exist!</Box>;
     }
 
-    return (!gameLoaded ? "Loading..." :
+    return !gameLoaded ? (
+      "Loading..."
+    ) : (
       <Card>
         <CardContent>
-          <Box sx={{ flexGrow: 1 }}>
-            {renderMapWithDoors()}
-          </Box>
+          <Box sx={{ flexGrow: 1 }}>{renderMapWithDoors()}</Box>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   function getNumItems() {
     const currentPlayer = players[currentGame.currentPlayerTurnIndex];
-    const currentRoomId = gameTiles[currentPlayer.position.row][currentPlayer.position.col].roomId;
+    const currentRoomId =
+      gameTiles[currentPlayer.position.row][currentPlayer.position.col].roomId;
     // console.log("there are this many items:", roomTiles[currentRoomId].numItems)
     // console.log(typeof(roomTiles[currentRoomId].numItems))
 
@@ -568,7 +661,7 @@ export default function GameBoard(props: GameBoardProps) {
   function handleGameSelectorChange(event: SelectChangeEvent) {
     const gameNum = event.target.value;
     setGameLoaded(false);
-    localStorage.setItem("lastGame", gameNum.toString())
+    localStorage.setItem("lastGame", gameNum.toString());
     props.setCurrentGameNumber(gameNum);
   }
 
@@ -576,7 +669,9 @@ export default function GameBoard(props: GameBoardProps) {
     const menuItems: ReactNode[] = [];
     for (let i = 0; i < numGames; i++) {
       menuItems.push(
-        <MenuItem key={"games-dd-" + i} value={i}>{i}</MenuItem>
+        <MenuItem key={"games-dd-" + i} value={i}>
+          {i}
+        </MenuItem>
       );
     }
     return menuItems;
@@ -585,12 +680,13 @@ export default function GameBoard(props: GameBoardProps) {
   // TODO: Rewrite all of this
   function getSecondsRemaining() {
     // TODO: Figure out this insanity.  Why are they behaving as strings when added, type of object, but think they're numbers, when they're bigNumbers?
-    const endOfTurnSeconds: number = parseInt(currentGame.lastTurnTimestamp.toString()) + parseInt(currentGame.turnTimeLimit.toString());
+    const endOfTurnSeconds: number =
+      parseInt(currentGame.lastTurnTimestamp.toString()) +
+      parseInt(currentGame.turnTimeLimit.toString());
     return dateInSeconds - endOfTurnSeconds;
   }
 
   function getTurnTimeRemaining() {
-
     const remaining = getSecondsRemaining();
 
     const negative = remaining <= 0 ? "" : "-";
@@ -633,29 +729,61 @@ export default function GameBoard(props: GameBoardProps) {
     setEventFlipper(true);
   }
 
+  function handleDenizenTurnClick() {
+    props.gameContract_write.processDenizenMoves(props.currentGameNumber, {
+      // gasLimit: 15000000,
+    });
+    setEventFlipper(true);
+  }
+
   function renderGameArea() {
     if (debugGameOver) {
-      return ("Game is over.  Will add seeing old games later")
+      return "Game is over.  Will add seeing old games later";
     }
-    return (!gameLoaded ? "Loading Game Area..." :
+    return !gameLoaded ? (
+      "Loading Game Area..."
+    ) : (
       <Box>
         <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
           <Grid item xs={3}>
             <Card>
               <Grid container>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                   <Typography variant="body1" align="left" color={getTimeColor}>
                     {"Time Left: " + getTurnTimeRemaining()}
                   </Typography>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                   <Box alignContent="right">
-                    <Button disabled={getTurnTimeRemaining()[0] === '-' ? false : true} onClick={handleEndTurnClick}>Skip Player</Button>
+                    <Button
+                      disabled={
+                        getTurnTimeRemaining()[0] === "-" ? false : true
+                      }
+                      onClick={handleEndTurnClick}
+                    >
+                      Skip Player
+                    </Button>
                   </Box>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                   <Box alignContent="right">
-                    <Button onClick={() => { setZoomed(!zoomed) }}>{ zoomed ? "Zoom Out" : "Zoom In" }</Button>
+                    <Button
+                      disabled={!currentGame.denizenTurn}
+                      onClick={handleDenizenTurnClick}
+                    >
+                      Denizen Turn
+                    </Button>
+                  </Box>
+                </Grid>
+                <Grid item xs={3}>
+                  <Box alignContent="right">
+                    <Button
+                      onClick={() => {
+                        setZoomed(!zoomed);
+                      }}
+                    >
+                      {zoomed ? "Zoom Out" : "Zoom In"}
+                    </Button>
                   </Box>
                 </Grid>
               </Grid>
@@ -675,7 +803,11 @@ export default function GameBoard(props: GameBoardProps) {
                 roomTiles={roomTiles}
                 players={players}
                 chars={chars}
-                currentTile={gameTiles[players[currentGame.currentPlayerTurnIndex].position.row][players[currentGame.currentPlayerTurnIndex].position.col]}
+                currentTile={
+                  gameTiles[
+                    players[currentGame.currentPlayerTurnIndex].position.row
+                  ][players[currentGame.currentPlayerTurnIndex].position.col]
+                }
                 setEventFlipper={setEventFlipper}
                 eventResolved={eventResolved}
                 setEventResolved={setEventResolved}
@@ -702,12 +834,8 @@ export default function GameBoard(props: GameBoardProps) {
           </Grid>
         </Grid>
       </Box>
-    )
+    );
   }
 
-  return (
-    <Box>
-      {renderGameArea()}
-    </Box>
-  );
+  return <Box>{renderGameArea()}</Box>;
 }
