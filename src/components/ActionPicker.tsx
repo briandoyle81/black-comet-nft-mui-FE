@@ -6,10 +6,11 @@ import {
   Grid,
   InputLabel,
   MenuItem,
+  TextField,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { GameInfoInterface } from "./GamePanel";
+import { DenizenInterface, GameInfoInterface } from "./GamePanel";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { ethers } from "ethers";
 
@@ -24,7 +25,10 @@ export enum Action {
   DROP_ITEMS,
   PICK_ITEMS,
   LEAVE_GAME,
-} // TODO: Add rest
+  MELEE_ATTACK,
+  SHOOT_ATTACK,
+}
+
 export enum Followthrough {
   NONE = 0,
   MOVE,
@@ -46,11 +50,18 @@ export default function ActionPicker(props: GameInfoInterface) {
   const [followthrough, setFollowthrough] = useState(Followthrough.NONE);
   const [secondDir, setSecondDir] = useState(Direction.NORTH);
   const [panelState, setPanelState] = useState(PanelState.LIVE);
+  const [denizenTarget, setDenizenTarget] = useState(0);
   // const [actionIds, setActionIds] = useState<number[]>([]);
+
+  const handleTarget = (event: SelectChangeEvent) => {
+    const targetString = event.target.value as string;
+    const target = parseInt(targetString);
+    setDenizenTarget(target);
+  };
 
   const handleAction = (event: SelectChangeEvent) => {
     const act = event.target.value as string;
-    setAction(+act);
+    setAction(+act); // TODO: What is this plus for???
   };
 
   const handleFirstDir = (event: SelectChangeEvent) => {
@@ -85,6 +96,10 @@ export default function ActionPicker(props: GameInfoInterface) {
           actionIds.push(worldItem.id);
         }
       }
+    }
+    if (action === Action.MELEE_ATTACK || action === Action.SHOOT_ATTACK) {
+      actionIds.push(denizenTarget);
+      console.log(actionIds);
     }
     console.log("In actions, world item ids", actionIds);
     const actionTx = await props.actionsContract_write.doAction(
@@ -130,7 +145,7 @@ export default function ActionPicker(props: GameInfoInterface) {
   function renderActionPicker(playerTurn: boolean) {
     if (
       props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex].length >
-      props.currentChar.traits.carry
+      props.currentPlayer.currentTraits.carry
     ) {
       return (
         <Card>
@@ -150,12 +165,55 @@ export default function ActionPicker(props: GameInfoInterface) {
         action == Action.LOOT ||
         action == Action.PASS ||
         action == Action.PICK_ITEMS ||
-        action == Action.USE_ROOM
+        action == Action.USE_ROOM ||
+        action == Action.MELEE_ATTACK ||
+        action == Action.SHOOT_ATTACK
       ) {
         return true;
       }
 
       return false;
+    }
+
+    function getDenizenTargets() {
+      return props.currentGameProps.denizens
+        .filter((denizen: DenizenInterface) => {
+          if (denizen.healthRemaining.toString() === "0") {
+            return false;
+          }
+          return true;
+        })
+        .map((denizen: DenizenInterface) => {
+          return (
+            <MenuItem
+              value={parseInt(denizen.id.toString())}
+              key={denizen.id.toString() + "-denizen-target"}
+            >
+              {denizen.id.toString()}
+            </MenuItem>
+          );
+        });
+    }
+
+    function renderDenizenField() {
+      if (action == Action.MELEE_ATTACK || action == Action.SHOOT_ATTACK) {
+        return (
+          <FormControl fullWidth>
+            <InputLabel id="denizen-target-label">Denizen Target</InputLabel>
+            <Select
+              labelId="denizen-target-label"
+              id="denizen-target-select"
+              value={denizenTarget.toString()}
+              label="DenizenTarget"
+              onChange={handleTarget}
+            >
+              {getDenizenTargets()}
+            </Select>
+          </FormControl>
+        );
+      }
+
+      return <></>;
     }
 
     return playerTurn && !props.currentGameProps.denizenTurn ? (
@@ -181,6 +239,12 @@ export default function ActionPicker(props: GameInfoInterface) {
               </MenuItem>
               <MenuItem value={Action.LEAVE_GAME.toString()}>
                 Leave Game
+              </MenuItem>
+              <MenuItem value={Action.MELEE_ATTACK.toString()}>
+                Melee Attack
+              </MenuItem>
+              <MenuItem value={Action.SHOOT_ATTACK.toString()}>
+                Shoot Attack
               </MenuItem>
             </Select>
           </FormControl>
@@ -240,6 +304,9 @@ export default function ActionPicker(props: GameInfoInterface) {
               </Select>
             </FormControl>
           )}
+        </Grid>
+        <Grid item xs={12}>
+          {renderDenizenField()}
         </Grid>
         <Grid item xs={12}>
           <Button
