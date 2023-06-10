@@ -13,6 +13,7 @@ import {
 import { ReactNode, useEffect, useState } from "react";
 import GamePanel, {
   BCEventType,
+  DenizenType,
   EventTrackerInterface,
   GameInterface,
 } from "./GamePanel";
@@ -33,6 +34,7 @@ import Tile, {
   GameTileInterface,
   RoomTile,
 } from "./Tile";
+import { BigNumber } from "ethers";
 
 let timesBoardPulled = 0;
 
@@ -408,7 +410,7 @@ export default function GameBoard(props: GameBoardProps) {
       props.utilsContract_read.on(
         "DiceRollEvent",
         (gameId: any, roll: any, event: any) => {
-          // console.log("Roll Event roll", roll);
+          console.log("Roll Event roll:", roll);
           // TODO: Hack using mapID instead of gameId
           // DO NOT USE ===, will always be false!!
           if (gameId == props.currentGameNumber) {
@@ -416,6 +418,54 @@ export default function GameBoard(props: GameBoardProps) {
           }
         }
       );
+
+      props.gameContract_read.on(
+        "DenizenAttack",
+        (
+          gameId: BigNumber,
+          denizenType: DenizenType,
+          denizenId: BigNumber,
+          playerTarget: BigNumber,
+          damage: BigNumber,
+          turnabout: BigNumber
+        ) => {
+          console.log(
+            "Denizen Attack",
+            gameId,
+            denizenType,
+            denizenId,
+            playerTarget,
+            damage,
+            turnabout
+          );
+        }
+      );
+
+      props.gameContract_read.on(
+        "PlayerAttack",
+        (
+          gameId: BigNumber,
+          playerId: BigNumber,
+          denizenType: DenizenType,
+          denizenId: BigNumber,
+          damage: BigNumber,
+          turnabout: BigNumber
+        ) => {
+          console.log(
+            "Player Attack",
+            gameId,
+            playerId,
+            denizenType,
+            denizenId,
+            damage,
+            turnabout
+          );
+        }
+      );
+
+      props.gameContract_read.on("DenizenTurnOver", (gameId: BigNumber) => {
+        console.log("Denizen Turn Over");
+      });
 
       props.playersContract_read.on(
         "EventResolvedEvent",
@@ -731,7 +781,7 @@ export default function GameBoard(props: GameBoardProps) {
 
   function handleDenizenTurnClick() {
     props.gameContract_write.processDenizenMoves(props.currentGameNumber, {
-      // gasLimit: 5_000_000,
+      gasLimit: 10_000_000,
     });
     setEventFlipper(true);
   }

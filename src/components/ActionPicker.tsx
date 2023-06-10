@@ -176,6 +176,9 @@ export default function ActionPicker(props: GameInfoInterface) {
     }
 
     function getDenizenTargets() {
+      if (!props.currentGameProps.denizens) {
+        return [];
+      }
       return props.currentGameProps.denizens
         .filter((denizen: DenizenInterface) => {
           if (denizen.healthRemaining.toString() === "0") {
