@@ -96,7 +96,7 @@ export default function Denizen(props: DenizenProps) {
         >
           <DenizenId
             sx={{
-              fontSize: "0.5rem",
+              fontSize: "0.75rem",
               fontWeight: "bold",
               textAlign: "right",
             }}
@@ -105,7 +105,7 @@ export default function Denizen(props: DenizenProps) {
           </DenizenId>
           <DenizenHP
             sx={{
-              fontSize: "0.5rem",
+              fontSize: "0.75rem",
               fontWeight: "bold",
               textAlign: "right",
             }}
@@ -122,7 +122,7 @@ export default function Denizen(props: DenizenProps) {
             <img src={getArt()} style={PortraitStyle} alt="TODO Denizen" />
             <DenizenId
               sx={{
-                fontSize: "0.5rem",
+                fontSize: "0.75rem",
                 fontWeight: "bold",
                 textAlign: "right",
               }}

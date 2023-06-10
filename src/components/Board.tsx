@@ -731,7 +731,7 @@ export default function GameBoard(props: GameBoardProps) {
 
   function handleDenizenTurnClick() {
     props.gameContract_write.processDenizenMoves(props.currentGameNumber, {
-      // gasLimit: 15000000,
+      // gasLimit: 5_000_000,
     });
     setEventFlipper(true);
   }
@@ -750,7 +750,8 @@ export default function GameBoard(props: GameBoardProps) {
               <Grid container>
                 <Grid item xs={3}>
                   <Typography variant="body1" align="left" color={getTimeColor}>
-                    {"Time Left: " + getTurnTimeRemaining()}
+                    {/* {"Time Left: " + getTurnTimeRemaining()} */}
+                    {"Time Left: ???"}
                   </Typography>
                 </Grid>
                 <Grid item xs={3}>
