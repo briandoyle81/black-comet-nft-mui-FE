@@ -1,5 +1,5 @@
 import { Button, Card, CardMedia, Chip, Grid, Typography } from "@mui/material";
-import { Box } from "@mui/system"
+import { Box } from "@mui/system";
 import { ethers } from "ethers";
 import { ReactNode, useEffect, useState } from "react";
 import { CharInterface } from "./Board";
@@ -8,32 +8,37 @@ import ItemSelector from "./ItemSelector";
 import Player, { ArchetypeProps, PlayerInterface } from "./Player";
 
 interface CharactersDataInterface {
-  charContract_read: any, // todo any
-  charContract_write: any,
-  lobbiesContract_write: any,
-  itemsContract_read: any,
-  address: string
+  charContract_read: any; // todo any
+  charContract_write: any;
+  lobbiesContract_write: any;
+  itemsContract_read: any;
+  address: string;
 }
 
-interface SelectedItemsInterface { [charId: number]: number[]; }
+interface SelectedItemsInterface {
+  [charId: number]: number[];
+}
 
 // TODO: Rename to CharactersList
 export default function CharactersList(props: CharactersDataInterface) {
-
   const [charsLoaded, setCharsLoaded] = useState(false);
   const [chars, setChars] = useState<CharInterface[]>([]);
 
   const [itemsLoaded, setItemsLoaded] = useState(false);
   const [items, setItems] = useState<ItemDataInterface[]>([]);
 
-  const [selectedItems, setSelectedItems] = useState<SelectedItemsInterface>({});
+  const [selectedItems, setSelectedItems] = useState<SelectedItemsInterface>(
+    {}
+  );
   const [clearChoices, setClearChoices] = useState(false);
 
   useEffect(() => {
     console.log("Start of useEffect in characters");
 
     async function updateCharsFromChain() {
-      const remoteChars = await props.charContract_read.getAllCharsByOwner(props.address);
+      const remoteChars = await props.charContract_read.getAllCharsByOwner(
+        props.address
+      );
 
       const newChars: CharInterface[] = [];
 
@@ -49,7 +54,9 @@ export default function CharactersList(props: CharactersDataInterface) {
     }
 
     async function updateVaultFromChain() {
-      const remoteChars = await props.itemsContract_read.getOwnedItems(props.address);
+      const remoteChars = await props.itemsContract_read.getOwnedItems(
+        props.address
+      );
 
       const newItems: ItemDataInterface[] = [];
 
@@ -67,21 +74,32 @@ export default function CharactersList(props: CharactersDataInterface) {
     if (!charsLoaded) {
       updateCharsFromChain();
     }
-
-  }, [props.address, charsLoaded, props.charContract_read, itemsLoaded, props.itemsContract_read]);
+  }, [
+    props.address,
+    charsLoaded,
+    props.charContract_read,
+    itemsLoaded,
+    props.itemsContract_read,
+  ]);
 
   function resetClear() {
     setClearChoices(false);
   }
 
   async function handleDecantClick() {
-    const tx = await props.charContract_write.decantNewClone({ value: ethers.utils.parseEther(".01") });
+    const tx = await props.charContract_write.decantNewClone({
+      value: ethers.utils.parseEther(".01"),
+    });
     await tx.wait();
     setCharsLoaded(false);
   }
 
   async function handleEnlistClick(id: number) {
-    const tx = await props.charContract_write.enlistChar(id, selectedItems[id], { value: ethers.utils.parseEther(".0001") });
+    const tx = await props.charContract_write.enlistChar(
+      id,
+      selectedItems[id],
+      { value: ethers.utils.parseEther(".0001"), gasLimit: 12000000 }
+    );
     await tx.wait();
     setCharsLoaded(false);
     setClearChoices(true);
@@ -90,19 +108,32 @@ export default function CharactersList(props: CharactersDataInterface) {
   function renderEnlistButton(char: CharInterface) {
     if (char.inGame) {
       return (
-        <Button variant="contained" disabled>Away on Mission</Button>
-      )
+        <Button variant="contained" disabled>
+          Away on Mission
+        </Button>
+      );
     } else {
       return (
-        <Button variant="contained" onClick={() => { handleEnlistClick(char.id) }}>Enlist for Mission</Button>
-      )
+        <Button
+          variant="contained"
+          onClick={() => {
+            handleEnlistClick(char.id);
+          }}
+        >
+          Enlist for Mission
+        </Button>
+      );
     }
   }
 
   async function handleSoloClick(id: number) {
-    console.log(selectedItems)
-    console.log("Items sent to game", Array.from(selectedItems[id].values()))
-    const tx = await props.charContract_write.enlistSolo(id, selectedItems[id], { value: ethers.utils.parseEther(".0005") });
+    console.log(selectedItems);
+    console.log("Items sent to game", Array.from(selectedItems[id].values()));
+    const tx = await props.charContract_write.enlistSolo(
+      id,
+      selectedItems[id],
+      { value: ethers.utils.parseEther(".0005"), gasLimit: 12000000 }
+    );
     await tx.wait();
     setCharsLoaded(false);
     setClearChoices(true);
@@ -117,26 +148,33 @@ export default function CharactersList(props: CharactersDataInterface) {
   function renderSoloButton(char: CharInterface) {
     if (char.inGame) {
       return (
-        <Button variant="contained" disabled>Away on Mission</Button>
-      )
+        <Button variant="contained" disabled>
+          Away on Mission
+        </Button>
+      );
     } else {
       return (
-        <Button variant="contained" onClick={() => { handleSoloClick(char.id) }}>Start Solo Mission</Button>
-      )
+        <Button
+          variant="contained"
+          onClick={() => {
+            handleSoloClick(char.id);
+          }}
+        >
+          Start Solo Mission
+        </Button>
+      );
     }
   }
 
   function buildPlayerProps(genHash: string) {
-    return (
-      {
-        portrait: true,
-        genHash: genHash
-      }
-    )
+    return {
+      portrait: true,
+      genHash: genHash,
+    };
   }
 
   function renderCharData() {
-    const charList: ReactNode[] = []
+    const charList: ReactNode[] = [];
     chars.forEach((char: CharInterface, index) => {
       charList.push(
         <Grid item xs={3} key={index + " Player card"}>
@@ -164,9 +202,7 @@ export default function CharactersList(props: CharactersDataInterface) {
                       <Typography variant="body1">
                         Id Number: {char.id.toString()}
                       </Typography>
-                      <Typography variant="body1">
-                        Traits
-                      </Typography>
+                      <Typography variant="body1">Traits</Typography>
                       <Typography variant="body1">
                         Health: {char.traits.health}
                       </Typography>
@@ -192,9 +228,7 @@ export default function CharactersList(props: CharactersDataInterface) {
                   </Grid>
                   <Grid item xs={12}>
                     <Card>
-                      <Typography variant="h6">
-                        Items
-                      </Typography>
+                      <Typography variant="h6">Items</Typography>
                       <Grid container spacing={1}>
                         <ItemSelector
                           charId={parseInt(char.id.toString())}
@@ -221,8 +255,8 @@ export default function CharactersList(props: CharactersDataInterface) {
             </Grid>
           </Card>
         </Grid>
-      )
-    })
+      );
+    });
     return charList;
   }
 
@@ -230,7 +264,9 @@ export default function CharactersList(props: CharactersDataInterface) {
     <Grid container spacing={1}>
       <Grid item xs={12}>
         <Card>
-          <Button variant="contained" onClick={handleDecantClick}>Buy New Character NFT</Button>
+          <Button variant="contained" onClick={handleDecantClick}>
+            Buy New Character NFT
+          </Button>
           <Typography variant="body1">
             Owned Characters in Barracks: {chars.length}
           </Typography>
@@ -245,5 +281,5 @@ export default function CharactersList(props: CharactersDataInterface) {
         </Grid>
       </Grid>
     </Grid>
-  )
+  );
 }
