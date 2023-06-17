@@ -29,6 +29,21 @@ export enum Action {
   SHOOT_ATTACK,
 }
 
+export const ActionString = {
+  0: "HACK",
+  1: "BREACH",
+  2: "MOVE",
+  3: "PASS",
+  4: "LOOT",
+  5: "USE_ROOM",
+  6: "USE_ITEM",
+  7: "DROP_ITEMS",
+  8: "PICK_ITEMS",
+  9: "LEAVE_GAME",
+  10: "MELEE_ATTACK",
+  11: "SHOOT_ATTACK",
+};
+
 export enum Followthrough {
   NONE = 0,
   MOVE,

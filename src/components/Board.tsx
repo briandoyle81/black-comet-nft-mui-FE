@@ -35,6 +35,9 @@ import Tile, {
   RoomTile,
 } from "./Tile";
 import { BigNumber } from "ethers";
+import { getEventFromId } from "./EventData";
+import Log from "./Log";
+import { Action, ActionString } from "./ActionPicker";
 
 let timesBoardPulled = 0;
 
@@ -121,6 +124,47 @@ export interface CharInterface {
   id: number;
 }
 
+export enum EffectTypes {
+  empty = 0,
+  permanant,
+  fullHealth,
+  instantDeath,
+  placeHazard,
+  grantEgg,
+  healAmt,
+  healArmorAmt,
+  hazardDamage,
+  physicalDamage,
+  numEnemyToPlace,
+  enemyType,
+  whereToPlace,
+  grantData,
+  grantNumItems,
+  takeNumItems,
+  dropNumItems, // drop items in the room in unknown state
+  moveType,
+  trapPlayerEscapeRoll,
+  grantAbility,
+  loseTurn,
+  lockDoorStrength,
+  traitModifiersID,
+}
+
+export interface BCEffect {
+  effect: EffectTypes;
+  value: BigNumber;
+}
+
+export interface BCEvent {
+  id: BigNumber;
+  permanent: boolean;
+  rollForLow: BigNumber; // Unused if zero
+  rollForHigh: BigNumber; // Unused if zero
+  defaultEffect: BCEffect[];
+  lowEffect: BCEffect[];
+  highEffect: BCEffect[];
+}
+
 export default function GameBoard(props: GameBoardProps) {
   const n = 11; // TODO: Hardcoded board size, can't use await here
 
@@ -144,6 +188,8 @@ export default function GameBoard(props: GameBoardProps) {
   const [eventFlipper, setEventFlipper] = useState(true); // TODO: Confusing name, think this should be actionFlipper
   const [eventsLoaded, setEventsLoaded] = useState(false);
   const [eventResolved, setEventResolved] = useState(false);
+
+  const [logs, setLogs] = useState(["Welcome to the Black Comet!"]);
 
   const [dateInSeconds, setDateInSeconds] = useState(
     Math.floor(Date.now() / 1000)
@@ -340,6 +386,17 @@ export default function GameBoard(props: GameBoardProps) {
         await updateRemotePlayers();
         await updateCurrentPlayerItemsFromChain();
         await updateCharsFromChain();
+
+        // TODO: Appears to not work because of plan limits in metamask.  See: https://ethereum.stackexchange.com/questions/115442/unable-to-get-events-in-polygons-test-network
+        // if (props.gameContract_read) {
+        //   const bcEventsEventFilter =
+        //     await props.playersContract_read.filters.EventResolvedEvent();
+        //   const bcEvents = await props.playersContract_read.queryFilter(
+        //     bcEventsEventFilter
+        //   );
+        //   console.log("ALL EVENTS", bcEvents);
+        // }
+
         setGameLoaded(true);
       } else {
         setDebugGameOver(true);
@@ -350,16 +407,16 @@ export default function GameBoard(props: GameBoardProps) {
     // setLoading(false);
   };
 
-  function refreshClock() {
-    setDateInSeconds(Math.floor(Date.now() / 1000));
-  }
+  // function refreshClock() {
+  //   setDateInSeconds(Math.floor(Date.now() / 1000));
+  // }
 
-  useEffect(() => {
-    const timerId = setInterval(refreshClock, 1000);
-    return function cleanup() {
-      clearInterval(timerId);
-    };
-  }, [dateInSeconds]);
+  // useEffect(() => {
+  //   const timerId = setInterval(refreshClock, 1000);
+  //   return function cleanup() {
+  //     clearInterval(timerId);
+  //   };
+  // }, [dateInSeconds]);
 
   useEffect(() => {
     console.log("Start of useEffect in Board");
@@ -409,12 +466,117 @@ export default function GameBoard(props: GameBoardProps) {
 
       props.utilsContract_read.on(
         "DiceRollEvent",
-        (gameId: any, roll: any, event: any) => {
+        (gameId: BigNumber, roll: BigNumber) => {
           console.log("Roll Event roll:", roll);
           // TODO: Hack using mapID instead of gameId
           // DO NOT USE ===, will always be false!!
-          if (gameId == props.currentGameNumber) {
+          if (gameId.toNumber() === props.currentGameNumber) {
             setLastDieRoll(roll.toString());
+            const newLog = "A " + roll.toString() + " was rolled.";
+            setLogs([...logs, newLog]);
+          }
+        }
+      );
+
+      props.utilsContract_read.on(
+        "ChallengeEvent",
+        (
+          gameId: BigNumber,
+          roll: BigNumber,
+          forValue: BigNumber,
+          against: BigNumber
+        ) => {
+          console.log("Challenge Event roll:", roll);
+          // TODO: Hack using mapID instead of gameId
+          // TODO: THe above might not be true an longer
+          if (gameId.toNumber() === props.currentGameNumber) {
+            setLastDieRoll(roll.toString());
+            const newLog =
+              "Challenge roll of: " +
+              roll.toString() +
+              ". For: " +
+              forValue.toString() +
+              " Against: " +
+              against.toString();
+            setLogs([...logs, newLog]);
+          }
+        }
+      );
+
+      props.gameContract_read.on(
+        "DiceRollEvent",
+        (gameId: BigNumber, roll: BigNumber) => {
+          console.log("Roll Event roll:", roll);
+          // TODO: Hack using mapID instead of gameId
+          // DO NOT USE ===, will always be false!!
+          if (gameId.toNumber() === props.currentGameNumber) {
+            setLastDieRoll(roll.toString());
+            const newLog = "A " + roll.toString() + " was rolled.";
+            setLogs([...logs, newLog]);
+          }
+        }
+      );
+
+      props.gameContract_read.on(
+        "ChallengeEvent",
+        (
+          gameId: BigNumber,
+          roll: BigNumber,
+          forValue: BigNumber,
+          against: BigNumber
+        ) => {
+          console.log("Challenge Event roll:", roll);
+          // TODO: Hack using mapID instead of gameId
+          // TODO: THe above might not be true an longer
+          if (gameId.toNumber() === props.currentGameNumber) {
+            setLastDieRoll(roll.toString());
+            const newLog =
+              "A challenge roll was" +
+              roll.toString() +
+              ". For: " +
+              forValue.toString() +
+              " Against: " +
+              against.toString();
+            setLogs([...logs, newLog]);
+          }
+        }
+      );
+
+      props.actionsContract_read.on(
+        "DiceRollEvent",
+        (gameId: BigNumber, roll: BigNumber) => {
+          console.log("Roll Event roll:", roll);
+          // TODO: Hack using mapID instead of gameId
+          // DO NOT USE ===, will always be false!!
+          if (gameId.toNumber() === props.currentGameNumber) {
+            setLastDieRoll(roll.toString());
+            const newLog = "A " + roll.toString() + " was rolled.";
+            setLogs([...logs, newLog]);
+          }
+        }
+      );
+
+      props.actionsContract_read.on(
+        "ChallengeEvent",
+        (
+          gameId: BigNumber,
+          roll: BigNumber,
+          forValue: BigNumber,
+          against: BigNumber
+        ) => {
+          console.log("Challenge Event roll:", roll);
+          // TODO: Hack using mapID instead of gameId
+          // TODO: THe above might not be true an longer
+          if (gameId.toNumber() === props.currentGameNumber) {
+            setLastDieRoll(roll.toString());
+            const newLog =
+              "A challenge roll was" +
+              roll.toString() +
+              ". For: " +
+              forValue.toString() +
+              " Against: " +
+              against.toString();
+            setLogs([...logs, newLog]);
           }
         }
       );
@@ -438,6 +600,40 @@ export default function GameBoard(props: GameBoardProps) {
             damage,
             turnabout
           );
+          const newLog =
+            denizenType.toString() +
+            " with ID " +
+            denizenId.toString() +
+            " attacked player " +
+            playerTarget.toString() +
+            " for " +
+            damage.toString() +
+            "and took turnabout of " +
+            turnabout.toString();
+          setLogs([...logs, newLog]);
+        }
+      );
+
+      props.actionsContract_read.on(
+        "ActionCompleteEvent",
+        (
+          gameId: BigNumber,
+          game: GameInterface,
+          playerId: BigNumber,
+          player: PlayerInterface,
+          action: Action
+        ) => {
+          const { position } = player;
+          const newLog =
+            "Player " +
+            playerId.toString() +
+            " selected " +
+            ActionString[action] +
+            " at " +
+            position.row.toString() +
+            ", " +
+            position.col.toString();
+          setLogs([...logs, newLog]);
         }
       );
 
@@ -460,33 +656,61 @@ export default function GameBoard(props: GameBoardProps) {
             damage,
             turnabout
           );
+          const newLog =
+            "Player with ID " +
+            playerId.toString() +
+            " attacked " +
+            denizenType.toString() +
+            " #" +
+            denizenId.toString() +
+            " for " +
+            damage.toString() +
+            "and took turnabout of " +
+            turnabout.toString();
+          setLogs([...logs, newLog]);
         }
       );
 
       props.gameContract_read.on("DenizenTurnOver", (gameId: BigNumber) => {
-        console.log("Denizen Turn Over");
+        console.log("Denizen Turn Over", gameId);
+        const newLog = "Denizen Turn Over";
+        setLogs([...logs, newLog]);
       });
 
       props.playersContract_read.on(
         "EventResolvedEvent",
         (
-          gameId: any,
-          playerId: any,
-          currentEvent: any,
-          appliedEffects: any,
-          event: any
+          gameId: BigNumber,
+          playerId: BigNumber,
+          bcEvent: BCEvent,
+          bcEffect: BCEffect // The effect that actually happened
         ) => {
           // DO NOT USE ===, will always be false!!
           // console.log("Triggered Event Resolved Event");
-          if (gameId == props.currentGameNumber) {
+          if (gameId.toNumber() === props.currentGameNumber) {
             setEventResolved(true);
             setEventFlipper(true);
             // console.log("currentEvent", currentEvent);
             // console.log("appliedEffects", appliedEffects);
+            const { id } = bcEvent;
+            const eventData = getEventFromId(id);
+            const name = eventData[0].name;
+            console.log(
+              "Event Resolved:",
+              eventData,
+              gameId.toString(),
+              playerId.toString(),
+              bcEvent,
+              bcEffect
+            );
+
+            const newLog = playerId.toString() + " experienced " + name;
+            setLogs([...logs, newLog]);
+
+            setEventsLoaded(true);
           }
         }
       );
-      setEventsLoaded(true);
     }
   }, [gameLoaded, props.currentGameNumber, eventFlipper, props.walletLoaded]);
 
@@ -798,6 +1022,9 @@ export default function GameBoard(props: GameBoardProps) {
           <Grid item xs={3}>
             <Card>
               <Grid container>
+                <Grid item xs={12}>
+                  <Log logs={logs} />
+                </Grid>
                 <Grid item xs={3}>
                   <Typography variant="body1" align="left" color={getTimeColor}>
                     {/* {"Time Left: " + getTurnTimeRemaining()} */}

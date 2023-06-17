@@ -9,7 +9,6 @@ export default function Inventory(props: GameInfoInterface) {
   const [selectedCard, setSelectedCard] = useState<any>({});
   const [selectedId, setSelectedId] = useState<number[]>([]);
 
-
   const handleCardClick = (event: any, cardNumber: number, id: number) => {
     if (selectedCard[cardNumber] === true) {
       selectedCard[cardNumber] = undefined;
@@ -24,8 +23,8 @@ export default function Inventory(props: GameInfoInterface) {
     setSelectedCard({ ...selectedCard });
     setSelectedId([...selectedId]);
 
-    console.log(selectedId)
-  }
+    console.log(selectedId);
+  };
 
   const submitDrop = async () => {
     const dropTx = await props.actionsContract_write.doAction(
@@ -36,7 +35,7 @@ export default function Inventory(props: GameInfoInterface) {
       0,
       0,
       selectedId
-    )
+    );
 
     // Below works for the acting client, but not a hook, so others
     // won't get the update (they do through the events though)
@@ -46,25 +45,37 @@ export default function Inventory(props: GameInfoInterface) {
       setSelectedId([]);
       setSelectedCard({});
     });
-  }
+  };
 
   const itemCards: ReactNode[] = [];
-  const itemList = props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex];
+  const itemList =
+    props.allHeldItems[props.currentGameProps.currentPlayerTurnIndex];
+  // console.log(props.allHeldItems);
   for (let i = 0; i < itemList.length; i++) {
     itemCards.push(
       <Grid item xs={3} key={"item-card-for-" + itemList[i].genHash}>
-        {
-          selectedCard[i] ?
-            <Card variant="outlined" onClick={(e) => { handleCardClick(e, i, itemList[i].id) }} style={{borderColor: "red", borderWidth: 2}}>
-              <ItemCard {...itemList[i]} />
-            </Card>
-            :
-            <Card  variant="outlined" onClick={(e) => { handleCardClick(e, i, itemList[i].id) }}>
-              <ItemCard {...itemList[i]} />
-            </Card>
-        }
+        {selectedCard[i] ? (
+          <Card
+            variant="outlined"
+            onClick={(e) => {
+              handleCardClick(e, i, itemList[i].id);
+            }}
+            style={{ borderColor: "red", borderWidth: 2 }}
+          >
+            <ItemCard {...itemList[i]} />
+          </Card>
+        ) : (
+          <Card
+            variant="outlined"
+            onClick={(e) => {
+              handleCardClick(e, i, itemList[i].id);
+            }}
+          >
+            <ItemCard {...itemList[i]} />
+          </Card>
+        )}
       </Grid>
-    )
+    );
   }
   return (
     <Card>
@@ -79,7 +90,9 @@ export default function Inventory(props: GameInfoInterface) {
             <Button
               disabled={selectedId.length > 0 ? false : true}
               onClick={submitDrop}
-            >Drop Selected</Button>
+            >
+              Drop Selected
+            </Button>
           </Box>
         </Grid>
         <Grid item xs={12}>
@@ -89,6 +102,5 @@ export default function Inventory(props: GameInfoInterface) {
         </Grid>
       </Grid>
     </Card>
-
-  )
+  );
 }
