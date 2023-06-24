@@ -150,6 +150,32 @@ export enum EffectTypes {
   traitModifiersID,
 }
 
+const EffectNames = {
+  0: "empty,",
+  1: "permanant",
+  2: "fullHealth",
+  3: "instantDeath",
+  4: "placeHazard",
+  5: "grantEgg",
+  6: "healAmt",
+  7: "healArmorAmt",
+  8: "hazardDamage",
+  9: "physicalDamage",
+  10: "numEnemyToPlace",
+  11: "enemyType",
+  12: "whereToPlace",
+  13: "grantData",
+  14: "grantNumItems",
+  15: "takeNumItems",
+  16: "dropNumItems,",
+  17: "moveType",
+  18: "trapPlayerEscapeRoll",
+  19: "grantAbility",
+  20: "loseTurn",
+  21: "lockDoorStrength",
+  22: "traitModifiersID",
+};
+
 export interface BCEffect {
   effect: EffectTypes;
   value: BigNumber;
@@ -683,7 +709,7 @@ export default function GameBoard(props: GameBoardProps) {
           gameId: BigNumber,
           playerId: BigNumber,
           bcEvent: BCEvent,
-          bcEffect: BCEffect // The effect that actually happened
+          bcEffect: BCEffect[] // The effect that actually happened
         ) => {
           // DO NOT USE ===, will always be false!!
           // console.log("Triggered Event Resolved Event");
@@ -695,17 +721,25 @@ export default function GameBoard(props: GameBoardProps) {
             const { id } = bcEvent;
             const eventData = getEventFromId(id);
             const name = eventData[0].name;
-            console.log(
-              "Event Resolved:",
-              eventData,
-              gameId.toString(),
-              playerId.toString(),
-              bcEvent,
-              bcEffect
-            );
+            // console.log(
+            //   "Event Resolved:",
+            //   eventData,
+            //   gameId.toString(),
+            //   playerId.toString(),
+            //   bcEvent,
+            //   bcEffect
+            // );
+
+            console.log("EFFECT IS", bcEffect);
+
+            const effectNames = bcEffect.map((effect: BCEffect) => {
+              return effect + ", ";
+            });
 
             const newLog = playerId.toString() + " experienced " + name;
-            setLogs([...logs, newLog]);
+            const newLog2 = "The effects were " + { ...effectNames };
+
+            setLogs([...logs, newLog, newLog2]);
 
             setEventsLoaded(true);
           }
