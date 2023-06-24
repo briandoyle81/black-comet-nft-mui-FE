@@ -1,12 +1,12 @@
-import {Card, Tab, Tabs, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import './App.css';
-import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
+import { Card, Tab, Tabs, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import { styled } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
 
-import { ethers } from 'ethers';
-import { Network, Alchemy } from 'alchemy-sdk';
+import { ethers } from "ethers";
+import { Network, Alchemy } from "alchemy-sdk";
 
 // TODO: Figure out how to manage this automatically
 import eventsDeployData from "./deployments/BCEvents.json";
@@ -22,23 +22,56 @@ import playersContractDeployData from "./deployments/BCPlayers.json";
 import mapsContractDeployData from "./deployments/Maps.json";
 import lobbiesContractDeployData from "./deployments/Lobby.json";
 
-import GameBoard from './components/Board';
-import CharactersList from './components/CharactersList';
-import GameList from './components/GameList';
+import GameBoard from "./components/Board";
+import CharactersList from "./components/CharactersList";
+import GameList from "./components/GameList";
 
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { grey } from '@mui/material/colors';
-import Info from './components/Info';
-import ItemVault from './components/ItemVault';
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { grey } from "@mui/material/colors";
+import Info from "./components/Info";
+import ItemVault from "./components/ItemVault";
+
+import "@rainbow-me/rainbowkit/styles.css";
+import {
+  ConnectButton,
+  getDefaultWallets,
+  RainbowKitProvider,
+} from "@rainbow-me/rainbowkit";
+import {
+  configureChains,
+  createConfig,
+  WagmiConfig,
+  useWalletClient,
+} from "wagmi";
+import { polygonMumbai } from "wagmi/chains";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
 
 const theme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: "dark",
   },
 });
 
+const { chains, publicClient } = configureChains(
+  [polygonMumbai],
+  [publicProvider()]
+);
+
+const { connectors } = getDefaultWallets({
+  appName: "My RainbowKit App",
+  projectId: "YOUR_PROJECT_ID",
+  chains,
+});
+
+const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors,
+  publicClient,
+});
+
 // TODO: Internet suggested hack to stop window.ethereum from being broken
-declare var window: any;
+// declare var window: any;
 
 // TODO: Keys are fine here but need to allowlist on Alchemy
 // if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
@@ -75,7 +108,7 @@ let playersContract_write: ethers.Contract;
 
 let playerAddress: string;
 
-let provider: any; //TODO: any
+let provider: any;
 
 function App() {
   const [appLoading, setAppLoading] = useState(true);
@@ -91,80 +124,97 @@ function App() {
   const [currentGameNumber, setCurrentGameNumber] = useState(lastGame);
   const lastTabString = localStorage.getItem("lastTab");
   let lastTab: number;
-  if(lastTabString == null) {
+  if (lastTabString == null) {
     lastTab = 0;
   } else {
-    lastTab = parseInt(lastTabString)
+    lastTab = parseInt(lastTabString);
   }
   const [tabValue, setTabValue] = useState(lastTab);
 
+  provider = useWalletClient();
 
   const loadWallet = async () => {
     // TODO: Cleanup
-    const walletProvider = new ethers.providers.Web3Provider(window.ethereum, "any");
-    try {
-      // send a request to the wallet to switch the network and select the Ethereum mainnet
-      await window.ethereum.request({
-        method: "wallet_addEthereumChain",
-        params: [{
-          chainId: ethers.utils.hexValue(80001),
-          rpcUrls: ["https://rpc-mumbai.maticvigil.com"],
-          chainName: "Polygon Testnet Mumbai",
-          nativeCurrency: {
-            name: "MATIC",
-            symbol: "MATIC", // 2-6 characters long
-            decimals: 18,
-          },
-          blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
-        }]
-      })
-    } catch (error: any) {
-      if (error.code === 4001) {
-        console.log("the user doesn't want to change the network!")
-      }
-      else if (error.code === 4902) {
-        console.log("this network is not in the user's wallet")
-      }
-      else {
-        console.log(`Error ${error.code}: ${error.message}`)
-      }
-    }
 
-    // Prompt user for account connections
-    walletProvider.send("eth_requestAccounts", []);
-    playerSigner = walletProvider.getSigner();
-    playerAddress = await playerSigner.getAddress();
-    provider = playerSigner;
+    gameContract_read = new ethers.Contract(
+      gameContractDeployData.address,
+      gameContractDeployData.abi,
+      provider
+    );
+    lobbiesContract_read = new ethers.Contract(
+      lobbiesContractDeployData.address,
+      lobbiesContractDeployData.abi,
+      provider
+    );
+    charContract_read = new ethers.Contract(
+      charContractDeployData.address,
+      charContractDeployData.abi,
+      provider
+    );
+    mapContract_read = new ethers.Contract(
+      mapsContractDeployData.address,
+      mapsContractDeployData.abi,
+      provider
+    );
+    itemsContract_read = new ethers.Contract(
+      itemsContractDeployData.address,
+      itemsContractDeployData.abi,
+      provider
+    );
+    actionsContract_read = new ethers.Contract(
+      actionsContractDeployData.address,
+      actionsContractDeployData.abi,
+      provider
+    );
+    utilsContract_read = new ethers.Contract(
+      utilsContractDeployData.address,
+      utilsContractDeployData.abi,
+      provider
+    );
+    playersContract_read = new ethers.Contract(
+      playersContractDeployData.address,
+      playersContractDeployData.abi,
+      provider
+    );
 
-    // provider = await alchemy.config.getProvider();
-    gameContract_read = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
-    lobbiesContract_read = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
-    charContract_read = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
-    mapContract_read = new ethers.Contract(mapsContractDeployData.address, mapsContractDeployData.abi, provider);
-    itemsContract_read = new ethers.Contract(itemsContractDeployData.address, itemsContractDeployData.abi, provider);
-    actionsContract_read = new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, provider);
-    utilsContract_read = new ethers.Contract(utilsContractDeployData.address, utilsContractDeployData.abi, provider);
-    playersContract_read = new ethers.Contract(playersContractDeployData.address, playersContractDeployData.abi, provider);
-
-    gameContract_write = new ethers.Contract(gameContractDeployData.address, gameContractDeployData.abi, provider);
-    charContract_write = new ethers.Contract(charContractDeployData.address, charContractDeployData.abi, provider);
-    lobbiesContract_write = new ethers.Contract(lobbiesContractDeployData.address, lobbiesContractDeployData.abi, provider);
-    actionsContract_write = new ethers.Contract(actionsContractDeployData.address, actionsContractDeployData.abi, provider);
-    playersContract_write = new ethers.Contract(playersContractDeployData.address, playersContractDeployData.abi, provider);
+    gameContract_write = new ethers.Contract(
+      gameContractDeployData.address,
+      gameContractDeployData.abi,
+      provider
+    );
+    charContract_write = new ethers.Contract(
+      charContractDeployData.address,
+      charContractDeployData.abi,
+      provider
+    );
+    lobbiesContract_write = new ethers.Contract(
+      lobbiesContractDeployData.address,
+      lobbiesContractDeployData.abi,
+      provider
+    );
+    actionsContract_write = new ethers.Contract(
+      actionsContractDeployData.address,
+      actionsContractDeployData.abi,
+      provider
+    );
+    playersContract_write = new ethers.Contract(
+      playersContractDeployData.address,
+      playersContractDeployData.abi,
+      provider
+    );
 
     setWalletLoaded(true);
     setAppLoading(false);
-  }
+  };
 
   useEffect(() => {
     console.log("Start of useEffect");
 
     if (!walletLoaded) {
-      console.log("Loading wallet")
+      console.log("Loading wallet");
       loadWallet();
     }
   }, []);
-
 
   interface TabPanelProps {
     children?: React.ReactNode;
@@ -195,27 +245,33 @@ function App() {
   function a11yProps(index: number) {
     return {
       id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
+      "aria-controls": `simple-tabpanel-${index}`,
     };
   }
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     localStorage.setItem("lastTab", newValue.toString());
     setTabValue(newValue);
-  }
-  return (
-    appLoading ?
+  };
+
+  function renderApp() {
+    return appLoading ? (
       <ThemeProvider theme={theme}>
+        <ConnectButton />
         <Typography variant="body1" align="left" color="white">
-          Please connect or unlock your wallet.  Or wait for it to load.
+          Please connect or unlock your wallet. Or wait for it to load.
         </Typography>
       </ThemeProvider>
-      :
+    ) : (
       <ThemeProvider theme={theme}>
         <div className="App">
           <Card>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs value={tabValue} onChange={handleChange} aria-label="App Mode Selection">
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Tabs
+                value={tabValue}
+                onChange={handleChange}
+                aria-label="App Mode Selection"
+              >
                 <Tab label="Characters" {...a11yProps(0)} />
                 <Tab label="Games List" {...a11yProps(1)} />
                 <Tab label="Game" {...a11yProps(2)} />
@@ -223,6 +279,7 @@ function App() {
                 <Tab label="Info" {...a11yProps(4)} />
                 <Tab label="Item Vault" {...a11yProps(5)} />
               </Tabs>
+              <ConnectButton />
             </Box>
             <TabPanel value={tabValue} index={0}>
               <CharactersList
@@ -272,12 +329,28 @@ function App() {
               />
             </TabPanel>
             <Typography>Dev Notes</Typography>
-            <Typography>UI/UX is temporary.  Feedback is not required.  I know ;)</Typography>
-            <Typography>Pre-Alpha Test.  Bugs abound! Play at your own risk!  In-game NFTs will be reset regularly.  Use a dev wallet!</Typography>
-            <Typography>A transaction that is expected to fail means bad input.  If transactions are failing after submission, try again with double the gas limit.</Typography>
+            <Typography>
+              UI/UX is temporary. Feedback is not required. I know ;)
+            </Typography>
+            <Typography>
+              Pre-Alpha Test. Bugs abound! Play at your own risk! In-game NFTs
+              will be reset regularly. Use a dev wallet!
+            </Typography>
+            <Typography>
+              A transaction that is expected to fail means bad input. If
+              transactions are failing after submission, try again with double
+              the gas limit.
+            </Typography>
           </Card>
         </div>
       </ThemeProvider>
+    );
+  }
+
+  return (
+    <WagmiConfig config={wagmiConfig}>
+      <RainbowKitProvider chains={chains}>{renderApp()}</RainbowKitProvider>
+    </WagmiConfig>
   );
 }
 

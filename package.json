@@ -10,6 +10,7 @@
     "@maticnetwork/maticjs": "^3.4.0",
     "@maticnetwork/maticjs-web3": "^1.0.1",
     "@mui/material": "^5.9.0",
+    "@rainbow-me/rainbowkit": "^1.0.3",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
@@ -34,6 +35,8 @@
     "stream-http": "^3.2.0",
     "typescript": "^4.4.2",
     "url": "^0.11.0",
+    "viem": "^1.1.6",
+    "wagmi": "^1.2.1",
     "web-vitals": "^2.1.0",
     "web3": "^1.7.4"
   },
