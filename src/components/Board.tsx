@@ -36,8 +36,8 @@ import Tile, {
 } from "./Tile";
 import { BigNumber } from "ethers";
 import { getEventFromId } from "./EventData";
-import Log from "./Log";
 import { Action, ActionString } from "./ActionPicker";
+import ChatWindow from "./ChatWindow";
 
 let timesBoardPulled = 0;
 
@@ -699,8 +699,11 @@ export default function GameBoard(props: GameBoardProps) {
 
       props.gameContract_read.on("DenizenTurnOver", (gameId: BigNumber) => {
         console.log("Denizen Turn Over", gameId);
-        const newLog = "Denizen Turn Over";
-        setLogs([...logs, newLog]);
+        if (gameId.toNumber() === props.currentGameNumber) {
+          const newLog = "Denizen Turn Over";
+          setLogs([...logs, newLog]);
+          setEventFlipper(true);
+        }
       });
 
       props.playersContract_read.on(
@@ -1056,9 +1059,6 @@ export default function GameBoard(props: GameBoardProps) {
           <Grid item xs={3}>
             <Card>
               <Grid container>
-                <Grid item xs={12}>
-                  <Log logs={logs} />
-                </Grid>
                 <Grid item xs={3}>
                   <Typography variant="body1" align="left" color={getTimeColor}>
                     {/* {"Time Left: " + getTurnTimeRemaining()} */}
@@ -1149,5 +1149,10 @@ export default function GameBoard(props: GameBoardProps) {
     );
   }
 
-  return <Box>{renderGameArea()}</Box>;
+  return (
+    <Box>
+      {renderGameArea()}
+      <ChatWindow content={[...logs]} />
+    </Box>
+  );
 }

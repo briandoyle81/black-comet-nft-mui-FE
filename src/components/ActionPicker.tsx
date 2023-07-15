@@ -146,7 +146,6 @@ export default function ActionPicker(props: GameInfoInterface) {
     // won't get the update (they do through the events though)
     await actionTx.wait().then(() => {
       // TODO: Set waiting state to prevent action submission
-      props.setEventFlipper();
       setPanelState(PanelState.LIVE);
     });
   };
