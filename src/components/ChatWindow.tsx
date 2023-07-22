@@ -55,19 +55,19 @@ const ToggleButton = styled(Button)(({ theme }) => ({
 
 const ChatContent = styled("div")(({ theme }) => ({
   padding: theme.spacing(1),
-  flexGrow: 1,
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "flex-start",
-  alignItems: "flex-start",
-  overflowY: "auto", // Vertical scroll
-  overflowX: "hidden", // Hide horizontal scroll
+  // flexGrow: 1,
+  // display: "flex",
+  // flexDirection: "column",
+  // justifyContent: "flex-start",
+  // alignItems: "flex-start",
+  height: "352px", // Adjust height to fit within ChatWindow
+  overflowY: "scroll", // Enable vertical scrolling
 }));
 
 const CustomCard = styled(Card)(({ theme }) => ({
-  width: "100%",
   backgroundColor: "red",
   border: `1px solid ${theme.palette.text.primary}`,
+  // marginBottom: theme.spacing(1),
 }));
 
 const CustomCardContent = styled(CardContent)(({ theme }) => ({
@@ -117,15 +117,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ content }) => {
           {isOpen && (
             <Grid item xs={12}>
               <ChatContent>
-                {content.map((message, index) => (
-                  <CustomCard key={index} variant="outlined">
-                    <CustomCardContent>
-                      <CustomTypography variant="body1">
-                        {message}
-                      </CustomTypography>
-                    </CustomCardContent>
-                  </CustomCard>
-                ))}
+                <Grid container>
+                  {content.map((message, index) => (
+                    <Grid item xs={12} key={index}>
+                      <CustomCard variant="outlined">
+                        <CustomCardContent>
+                          <CustomTypography variant="body1">
+                            {message}
+                          </CustomTypography>
+                        </CustomCardContent>
+                      </CustomCard>
+                    </Grid>
+                  ))}
+                </Grid>
               </ChatContent>
             </Grid>
           )}
