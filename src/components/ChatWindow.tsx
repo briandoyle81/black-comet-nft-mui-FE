@@ -42,6 +42,8 @@ const StyledChatWindow = styled("div")<StyledChatWindowProps>(
     borderRadius: "4px",
     transition: "bottom 0.3s ease",
     zIndex: 1300,
+    paddingBottom: theme.spacing(3),
+    marginBottom: theme.spacing(1),
   })
 );
 
