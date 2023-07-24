@@ -64,19 +64,10 @@ const ChatContent = styled("div")(({ theme }) => ({
   overflowY: "scroll", // Enable vertical scrolling
 }));
 
-const CustomCard = styled(Card)(({ theme }) => ({
-  backgroundColor: "red",
-  border: `1px solid ${theme.palette.text.primary}`,
-  // marginBottom: theme.spacing(1),
-}));
-
-const CustomCardContent = styled(CardContent)(({ theme }) => ({
-  padding: theme.spacing(1),
-}));
-
 const CustomTypography = styled(Typography)(({ theme }) => ({
   margin: 0,
   textAlign: "left",
+  paddingBottom: theme.spacing(1),
 }));
 
 const OpenButton = styled(Button)(({ theme }) => ({
@@ -120,13 +111,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ content }) => {
                 <Grid container>
                   {content.map((message, index) => (
                     <Grid item xs={12} key={index}>
-                      <CustomCard variant="outlined">
-                        <CustomCardContent>
-                          <CustomTypography variant="body1">
-                            {message}
-                          </CustomTypography>
-                        </CustomCardContent>
-                      </CustomCard>
+                      <CustomTypography variant="body1">
+                        {message}
+                      </CustomTypography>
                     </Grid>
                   ))}
                 </Grid>
