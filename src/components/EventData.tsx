@@ -14,36 +14,36 @@ const ScavEventDisplayData: EventDataDisplay[] = [];
 const ShipEventDisplayData: EventDataDisplay[] = [];
 
 export function getEventFromId(eventId: BigNumber) {
-  console.log("GET EVENT FROM ID");
+  // console.log("GET EVENT FROM ID");
   if (eventId.toNumber() >= 600000) {
     const event = ShipEventDisplayData.filter((bcEvent) => {
       return bcEvent.id.toString() === eventId.toString();
     });
-    console.log("EVENT IS", event);
+    // console.log("EVENT IS", event);
     return event;
   } else if (eventId.toNumber() >= 500000) {
     const event = ScavEventDisplayData.filter((bcEvent) => {
       return bcEvent.id.toString() === eventId.toString();
     });
-    console.log("EVENT IS", event);
+    // console.log("EVENT IS", event);
     return event;
   } else if (eventId.toNumber() >= 400000) {
     const event = MysteryEventDisplayData.filter((bcEvent) => {
       return bcEvent.id.toString() === eventId.toString();
     });
-    console.log("EVENT IS", event);
+    // console.log("EVENT IS", event);
     return event;
   } else if (eventId.toNumber() >= 300000) {
     const event = BugEventDisplayData.filter((bcEvent) => {
       return bcEvent.id.toString() === eventId.toString();
     });
-    console.log("EVENT IS", event);
+    // console.log("EVENT IS", event);
     return event;
   } else if (eventId.toNumber() >= 200000) {
     const event = TileEventDisplayData.filter((bcEvent) => {
       return bcEvent.id.toString() === eventId.toString();
     });
-    console.log("EVENT IS", event);
+    // console.log("EVENT IS", event);
     return event;
   } else {
     throw "DIDN'T FIND EVENT!!!";
