@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Button,
   styled,
@@ -83,7 +83,8 @@ const OpenButton = styled(Button)(({ theme }) => ({
 }));
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ content }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
+  const chatContentRef = useRef<HTMLDivElement | null>(null);
 
   const toggleChatWindow = () => {
     setIsOpen((prevState) => !prevState);
@@ -92,6 +93,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ content }) => {
   const openChatWindow = () => {
     setIsOpen(true);
   };
+
+  // Scrolls chat content to bottom whenever it opens or content changes
+  useEffect(() => {
+    if (isOpen && chatContentRef.current) {
+      const { scrollHeight } = chatContentRef.current;
+      chatContentRef.current.scrollTo(0, scrollHeight);
+    }
+  }, [isOpen, content]);
 
   return (
     <>
@@ -109,7 +118,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ content }) => {
           </Grid>
           {isOpen && (
             <Grid item xs={12}>
-              <ChatContent>
+              <ChatContent ref={chatContentRef}>
                 <Grid container>
                   {content.map((message, index) => (
                     <Grid item xs={12} key={index}>
