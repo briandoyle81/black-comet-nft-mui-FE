@@ -709,10 +709,6 @@ export default function GameBoard(props: GameBoardProps) {
     setLogs([...newLogs]);
   };
 
-  // useEffect(() => {
-  //   console.log("logBlocks", logBlocks);
-  // }, [logBlocks]); // This useEffect hook will run every time logBlocks changes
-
   const loadGameBoard = async () => {
     if (eventFlipper === true) {
       setNumGames(await props.gameContract_read.extGetNumGames());
@@ -748,50 +744,12 @@ export default function GameBoard(props: GameBoardProps) {
         await updateRemotePlayers();
         await updateCurrentPlayerItemsFromChain();
         await updateCharsFromChain();
-
-        // TODO: Appears to not work because of plan limits in metamask.  See: https://ethereum.stackexchange.com/questions/115442/unable-to-get-events-in-polygons-test-network
-        // UPDATE:  The error tells you the limit, which is 1000 blocks with current provider
-        if (props.playersContract_read && props.provider) {
-          const bcEventsEventFilter =
-            await props.playersContract_read.filters.EventResolvedEvent();
-
-          // TODO:  This is provider.provider because I'm currently using the signer as the provider.  This function is buried inside
-          // UPDATE: 7-15.  It appears I can get the last ~100 thousand blocks for free, but not more
-          // And this is only ~24 hours.  I may need to find another solution here
-          // const currentBlockNumber =
-          //   await props.provider.provider.getBlockNumber();
-
-          // const bcEventsEvents: any = [];
-
-          // for (let i = 1; i < 100; i++) {
-          //   const newEvents = await props.playersContract_read.queryFilter(
-          //     bcEventsEventFilter,
-          //     currentBlockNumber - i * 1000,
-          //     currentBlockNumber - (i - 1) * 1000
-          //   );
-
-          //   // console.log("newEvents", newEvents);
-
-          //   bcEventsEvents.push(...newEvents);
-          // }
-
-          // const bcEventsEvents = await props.playersContract_read.queryFilter(
-          //   bcEventsEventFilter,
-          //   currentBlockNumber - 1000,
-          //   currentBlockNumber
-          // );
-
-          // console.log("bcEventsEvents", bcEventsEvents);
-        }
         await getLogBlocks();
         setGameLoaded(true);
       } else {
         setDebugGameOver(true);
       }
     }
-
-    // Maybe need to have await tx.await() here?
-    // setLoading(false);
   };
 
   // function refreshClock() {

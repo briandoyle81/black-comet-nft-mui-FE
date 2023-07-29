@@ -1,16 +1,11 @@
 import { Card, Tab, Tabs, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import Paper from "@mui/material/Paper";
 
 import { ethers } from "ethers";
-import { Network, Alchemy } from "alchemy-sdk";
 
 // TODO: Figure out how to manage this automatically
-import eventsDeployData from "./deployments/BCEvents.json";
-import roomTilesContractDeployData from "./deployments/RoomTiles.json";
 import charContractDeployData from "./deployments/BCChars.json";
 import itemsContractDeployData from "./deployments/BCItems.json";
 import gameContractDeployData from "./deployments/BCGames.json";
@@ -27,7 +22,7 @@ import CharactersList from "./components/CharactersList";
 import GameList from "./components/GameList";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { grey } from "@mui/material/colors";
+
 import Info from "./components/Info";
 import ItemVault from "./components/ItemVault";
 
@@ -40,22 +35,6 @@ const theme = createTheme({
 // TODO: Internet suggested hack to stop window.ethereum from being broken
 declare var window: any;
 
-// TODO: Keys are fine here but need to allowlist on Alchemy
-// if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
-//   var settings = {
-//     apiKey: 'removed',
-//     network: Network.MATIC_MUMBAI,
-//   };
-// } else {
-//   var settings = {
-//     apiKey: 'removed',
-//     network: Network.MATIC_MUMBAI,
-//   };
-// }
-
-// const alchemy = new Alchemy(settings);
-
-// let provider: any;
 let gameContract_read: ethers.Contract;
 let lobbiesContract_read: ethers.Contract;
 let charContract_read: ethers.Contract;
@@ -217,7 +196,7 @@ function App() {
       console.log("Loading wallet");
       loadWallet();
     }
-  }, []);
+  }, [walletLoaded]);
 
   interface TabPanelProps {
     children?: React.ReactNode;
