@@ -238,7 +238,8 @@ function App() {
   return appLoading ? (
     <ThemeProvider theme={theme}>
       <Typography variant="body1" align="left" color="white">
-        Please connect or unlock your wallet. Or wait for it to load.
+        Please connect or unlock your wallet. Or wait for it to load. You may
+        need to refresh the page. A better connection experience is pending.
       </Typography>
     </ThemeProvider>
   ) : (

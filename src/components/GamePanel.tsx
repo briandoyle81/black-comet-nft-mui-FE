@@ -125,37 +125,6 @@ export default function GamePanel(props: GameInfoInterface) {
         <Grid item xs={12}>
           {Inventory(props)}
         </Grid>
-        <Grid item xs={12}>
-          <Card>
-            <CardHeader title="Game Info" />
-            <CardContent>
-              <Grid container spacing={1}>
-                <Grid item xs={9}>
-                  <Typography variant="body1" align="left">
-                    Game #:
-                  </Typography>
-                  <Typography variant="body1" align="left">
-                    Current Player:
-                  </Typography>
-                  <Typography variant="body1" align="left">
-                    Id Number:
-                  </Typography>
-                </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="body1">
-                    {props.currentGameNumber}
-                  </Typography>
-                  <Typography variant="body1">
-                    {props.currentGameProps.currentPlayerTurnIndex.toString()}
-                  </Typography>
-                  <Typography variant="body1">
-                    {props.currentChar.id.toString()}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
       </Grid>
     </Box>
   );

@@ -46,6 +46,7 @@ import gamesContractDeployData from "../deployments/BCGames.json";
 import playersContractDeployData from "../deployments/BCPlayers.json";
 import EventTracker from "./EventTracker";
 import EventModal from "./EventModal";
+import GameInfoCard from "./GameInfoCard";
 
 let timesBoardPulled = 0;
 
@@ -1389,7 +1390,6 @@ export default function GameBoard(props: GameBoardProps) {
                   </Box>
                 </Grid>
               </Grid>
-
               <GamePanel
                 currentPlayer={players[currentGame.currentPlayerTurnIndex]}
                 currentChar={chars[currentGame.currentPlayerTurnIndex]}
@@ -1417,27 +1417,69 @@ export default function GameBoard(props: GameBoardProps) {
                 gameWorldItems={gameWorldItems}
               />
             </Card>
-            <Box>
-              <FormControl fullWidth>
-                <InputLabel id="game-selector-label">Change Game</InputLabel>
-                <Select
-                  labelId="game-selector-dd-label"
-                  id="game-selector-dd"
-                  value={props.currentGameNumber.toString()}
-                  onChange={handleGameSelectorChange}
-                >
-                  {buildGamesDropDown()}
-                </Select>
-              </FormControl>
-            </Box>
           </Grid>
           <Grid item xs={9}>
             <Grid container spacing={0}>
-              <Grid item xs={9}>
+              <Grid item xs={6}>
                 <EventTracker currentGameProps={currentGame} />
               </Grid>
               <Grid item xs={3}>
-                <EventModal
+                <Grid container spacing={1}>
+                  <Grid item xs={12}>
+                    <EventModal
+                      currentPlayer={
+                        players[currentGame.currentPlayerTurnIndex]
+                      }
+                      currentChar={chars[currentGame.currentPlayerTurnIndex]}
+                      currentGameProps={currentGame}
+                      currentGameNumber={props.currentGameNumber}
+                      playerSignerAddress={props.playerSignerAddress}
+                      actionsContract_write={props.actionsContract_write}
+                      gameContract_write={props.gameContract_write}
+                      lastDieRoll={lastDieRoll}
+                      setLastDieRoll={setLastDieRoll}
+                      numItems={getNumItems()}
+                      allHeldItems={currentPlayerItems}
+                      roomTiles={roomTiles}
+                      players={players}
+                      chars={chars}
+                      currentTile={
+                        gameTiles[
+                          players[currentGame.currentPlayerTurnIndex].position
+                            .row
+                        ][
+                          players[currentGame.currentPlayerTurnIndex].position
+                            .col
+                        ]
+                      }
+                      setEventFlipper={setEventFlipper}
+                      eventResolved={eventResolved}
+                      setEventResolved={setEventResolved}
+                      roomsWithItems={roomsWithItems}
+                      gameWorldItems={gameWorldItems}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Box>
+                      <FormControl fullWidth>
+                        <InputLabel id="game-selector-label">
+                          Change Game
+                        </InputLabel>
+                        <Select
+                          labelId="game-selector-dd-label"
+                          id="game-selector-dd"
+                          value={props.currentGameNumber.toString()}
+                          onChange={handleGameSelectorChange}
+                        >
+                          {buildGamesDropDown()}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Grid item xs={3}>
+                <GameInfoCard
                   currentPlayer={players[currentGame.currentPlayerTurnIndex]}
                   currentChar={chars[currentGame.currentPlayerTurnIndex]}
                   currentGameProps={currentGame}
