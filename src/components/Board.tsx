@@ -47,6 +47,8 @@ import playersContractDeployData from "../deployments/BCPlayers.json";
 import EventTracker from "./EventTracker";
 import EventModal from "./EventModal";
 import GameInfoCard from "./GameInfoCard";
+import { DenizenTypeToString } from "./Denizen";
+import { create } from "domain";
 
 let timesBoardPulled = 0;
 
@@ -580,7 +582,7 @@ export default function GameBoard(props: GameBoardProps) {
         // console.log("parsedEvent", parsedEvent);
         if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
           const newLog =
-            parsedEvent.args.denizenType.toString() +
+            DenizenTypeToString.get(parsedEvent.args.denizenType) +
             " with ID " +
             parsedEvent.args.denizenId.toString() +
             " attacked player " +
@@ -612,12 +614,12 @@ export default function GameBoard(props: GameBoardProps) {
             "Player with ID " +
             parsedEvent.args.playerId.toString() +
             " attacked " +
-            parsedEvent.args.denizenType.toString() +
+            DenizenTypeToString.get(parsedEvent.args.denizenType) +
             " #" +
             parsedEvent.args.denizenId.toString() +
             " for " +
             parsedEvent.args.damage.toString() +
-            "and took turnabout of " +
+            " and took turnabout of " +
             parsedEvent.args.turnabout.toString();
 
           historicLogs.push({
@@ -675,18 +677,13 @@ export default function GameBoard(props: GameBoardProps) {
           const eventData = getEventFromId(id);
           const name = eventData[0].name;
 
-          const effectNames = parsedEvent.args.appliedBCEffects.map(
-            (effect: BCEffect) => {
-              return effect + ", ";
-            }
-          );
-
           const newLog =
             "Player " +
             parsedEvent.args.playerId.toString() +
             " experienced " +
             name;
-          const newLog2 = "The effects were " + { ...effectNames };
+
+          const newLog2 = createEffectLog(parsedEvent.args.appliedBCEffects);
 
           historicLogs.push({
             blockNumber,
@@ -977,36 +974,20 @@ export default function GameBoard(props: GameBoardProps) {
           gameId: BigNumber,
           playerId: BigNumber,
           bcEvent: BCEvent,
-          bcEffect: BCEffect[] // The effect that actually happened
+          bcEffects: BCEffect[] // The effect that actually happened
         ) => {
           // DO NOT USE ===, will always be false!!
           // console.log("Triggered Event Resolved Event");
           if (gameId.toNumber() === props.currentGameNumber) {
             setEventResolved(true);
-            setEventFlipper(true);
-            // console.log("currentEvent", currentEvent);
-            // console.log("appliedEffects", appliedEffects);
+
             const { id } = bcEvent;
             const eventData = getEventFromId(id);
             const name = eventData[0].name;
-            // console.log(
-            //   "Event Resolved:",
-            //   eventData,
-            //   gameId.toString(),
-            //   playerId.toString(),
-            //   bcEvent,
-            //   bcEffect
-            // );
-
-            // console.log("EFFECT IS", bcEffect);
-
-            const effectNames = bcEffect.map((effect: BCEffect) => {
-              return effect + ", ";
-            });
 
             const newLog =
               "Player " + playerId.toString() + " experienced " + name;
-            const newLog2 = "The effects were " + { ...effectNames };
+            const newLog2 = createEffectLog(bcEffects);
 
             setLogs([...logs, newLog, newLog2]);
 
@@ -1016,6 +997,32 @@ export default function GameBoard(props: GameBoardProps) {
       );
     }
   }, [gameLoaded, props.currentGameNumber, eventFlipper, props.walletLoaded]);
+
+  function createEffectLog(effects: BCEffect[]) {
+    const effectNames = effects.map((effect: BCEffect) => {
+      return EffectNames[effect.effect] + ", ";
+    });
+
+    let newLog;
+
+    if (effectNames.length === 0) {
+      return "This event is not yet implemented";
+    }
+
+    if (effectNames[0] === "numEnemyToPlace, ") {
+      newLog =
+        effects[0].value +
+        " " +
+        DenizenTypeToString.get(
+          ethers.BigNumber.from(effects[1].value).toNumber()
+        ) +
+        " were placed"; // TODO: Add where
+    } else {
+      newLog = "The effects were " + effectNames.join("").slice(0, -2);
+    }
+
+    return newLog;
+  }
 
   function sortHistoricLogs(historicLogs: HistoricLog[]) {
     const logTypeOrder = [

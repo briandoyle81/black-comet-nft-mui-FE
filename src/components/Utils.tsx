@@ -1,4 +1,4 @@
 export interface Position {
-    row: number;
-    col: number;
+  row: number;
+  col: number;
 }

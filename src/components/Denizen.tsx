@@ -8,6 +8,17 @@ import Turret from "../assets/img/chars/Turret.png";
 import Sentry from "../assets/img/chars/Sentry.png";
 import { DenizenInterface, DenizenType } from "./GamePanel";
 
+export const DenizenTypeToString = new Map([
+  [DenizenType.BUG, "Bug"],
+  [DenizenType.SCAV, "Scavenger"],
+  [DenizenType.TURRET, "Turret"],
+  [DenizenType.ROBOT, "Robot"],
+  [DenizenType.QUEEN, "Queen"],
+  [DenizenType.BUTCHER, "Butcher"],
+  [DenizenType.BEHEMOTH, "Behemoth"],
+  [DenizenType.DOCTOR, "Doctor"],
+]);
+
 const OnBoardDenizen = styled(Card)(({ theme }) => ({
   zIndex: 1299, // TODO
   width: "90%",
