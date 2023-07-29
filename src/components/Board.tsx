@@ -1042,13 +1042,6 @@ export default function GameBoard(props: GameBoardProps) {
     return historicLogs.map((log) => log.log);
   }
 
-  function onUpdateGameClick() {
-    setGameLoaded(false);
-    // setLoading(true);
-    localStorage.setItem("lastGame", formGameNumber.toString());
-    props.setCurrentGameNumber(formGameNumber);
-  }
-
   function renderRowWithDoors(row: number) {
     const rowWithDoors: ReactNode[] = [];
     // gameTiles[row].forEach((tile: GameTileInterface, col) => {
@@ -1260,10 +1253,15 @@ export default function GameBoard(props: GameBoardProps) {
     return roomTiles[currentRoomId].numItems;
   }
 
+  useEffect(() => {
+    setGameLoaded(false);
+    localStorage.setItem("lastGame", props.currentGameNumber.toString());
+  }, [props.currentGameNumber]);
+
   function handleGameSelectorChange(event: SelectChangeEvent) {
     const gameNum = event.target.value;
-    setGameLoaded(false);
-    localStorage.setItem("lastGame", gameNum.toString());
+    // setGameLoaded(false); Happens above now
+    // localStorage.setItem("lastGame", gameNum.toString());
     props.setCurrentGameNumber(gameNum);
   }
 

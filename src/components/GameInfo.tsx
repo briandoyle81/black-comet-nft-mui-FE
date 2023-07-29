@@ -21,16 +21,16 @@ export default function GameInfo(props: GameInfoInterface) {
       props.currentPlayer.healthDmgTaken;
 
     let numNormal;
-    if (currentHealth > props.currentPlayer.currentTraits.health) {
-      numNormal = props.currentPlayer.currentTraits.health;
-    } else {
+    if (currentHealth <= props.currentPlayer.currentTraits.health) {
       numNormal = currentHealth;
+    } else {
+      numNormal = props.currentPlayer.currentTraits.health;
     }
 
     for (let i = 0; i < numNormal; i++) {
       healthIcons.push(
         <img
-          key={i}
+          key={"heart" + i}
           src={HeartIcon}
           alt="heart"
           style={{ height: "30px", width: "30px" }}
@@ -39,12 +39,12 @@ export default function GameInfo(props: GameInfoInterface) {
     }
 
     if (currentHealth < props.currentPlayer.currentTraits.health) {
-      const numLost = props.currentPlayer.currentTraits.health - currentHealth;
+      const numLost = props.currentPlayer.healthDmgTaken;
 
       for (let i = 0; i < numLost; i++) {
         healthIcons.push(
           <img
-            key={i}
+            key={"lost-hearts" + i}
             src={HeartIcon}
             alt="heart"
             style={{ height: "30px", width: "30px", filter: "grayscale(100%)" }}
@@ -52,13 +52,12 @@ export default function GameInfo(props: GameInfoInterface) {
         );
       }
     } else if (currentHealth > props.currentPlayer.currentTraits.health) {
-      const numGained =
-        currentHealth - props.currentPlayer.currentTraits.health;
+      const numGained = -1 * props.currentPlayer.healthDmgTaken;
 
       for (let i = 0; i < numGained; i++) {
         healthIcons.push(
           <img
-            key={i}
+            key={"extra-hearts" + i}
             src={HeartIcon}
             alt="heart"
             style={{

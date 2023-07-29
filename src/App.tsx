@@ -235,6 +235,7 @@ function App() {
     localStorage.setItem("lastTab", newValue.toString());
     setTabValue(newValue);
   };
+
   return appLoading ? (
     <ThemeProvider theme={theme}>
       <Typography variant="body1" align="left" color="white">

@@ -79,7 +79,9 @@ export default function GameList(props: GameListDataInterface) {
 
   function handleGameButtonClick(id: number) {
     localStorage.setItem("lastGame", id.toString());
-    // props.setCurrentGameNumber(id);
+    localStorage.setItem("lastTab", "2");
+    const intId = ethers.BigNumber.from(id).toNumber();
+    props.setCurrentGameNumber(intId);
     props.setTabValue(2);
   }
 
