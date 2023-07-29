@@ -45,6 +45,7 @@ import actionsContractDeployData from "../deployments/Actions.json";
 import gamesContractDeployData from "../deployments/BCGames.json";
 import playersContractDeployData from "../deployments/BCPlayers.json";
 import EventTracker from "./EventTracker";
+import EventModal from "./EventModal";
 
 let timesBoardPulled = 0;
 
@@ -1432,8 +1433,36 @@ export default function GameBoard(props: GameBoardProps) {
           </Grid>
           <Grid item xs={9}>
             <Grid container spacing={0}>
-              <Grid item xs={12}>
+              <Grid item xs={9}>
                 <EventTracker currentGameProps={currentGame} />
+              </Grid>
+              <Grid item xs={3}>
+                <EventModal
+                  currentPlayer={players[currentGame.currentPlayerTurnIndex]}
+                  currentChar={chars[currentGame.currentPlayerTurnIndex]}
+                  currentGameProps={currentGame}
+                  currentGameNumber={props.currentGameNumber}
+                  playerSignerAddress={props.playerSignerAddress}
+                  actionsContract_write={props.actionsContract_write}
+                  gameContract_write={props.gameContract_write}
+                  lastDieRoll={lastDieRoll}
+                  setLastDieRoll={setLastDieRoll}
+                  numItems={getNumItems()}
+                  allHeldItems={currentPlayerItems}
+                  roomTiles={roomTiles}
+                  players={players}
+                  chars={chars}
+                  currentTile={
+                    gameTiles[
+                      players[currentGame.currentPlayerTurnIndex].position.row
+                    ][players[currentGame.currentPlayerTurnIndex].position.col]
+                  }
+                  setEventFlipper={setEventFlipper}
+                  eventResolved={eventResolved}
+                  setEventResolved={setEventResolved}
+                  roomsWithItems={roomsWithItems}
+                  gameWorldItems={gameWorldItems}
+                />
               </Grid>
               <Grid item xs={12}>
                 {renderMapArea()}
