@@ -1,5 +1,5 @@
 import { Button, Card, CardMedia, TextField, Typography } from "@mui/material";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState, useRef } from "react";
 import GamePanel, { DenizenInterface, GameInterface } from "./GamePanel";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -52,15 +52,18 @@ const BottomOverlay = styled(Box)(({ theme }) => ({
   width: "100%",
 }));
 
-const RoomName = styled(Typography)(({ theme }) => ({
-  position: "absolute",
-  bottom: 0,
-  right: 0,
-  padding: 5,
-  color: "white",
-  background: "transparent",
-  fontSize: "clamp(10px, 1vw, 20px)",
-}));
+const RoomName = styled(Typography)<{ fontSize: string }>(
+  ({ theme, fontSize }) => ({
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    padding: 5,
+    color: "white",
+    background: "transparent",
+    fontSize: fontSize, // Dynamic font size
+    textShadow: "0px 0px 3px black", // Add this line
+  })
+);
 
 export interface RoomTile {
   eventType: EventType;
@@ -120,6 +123,17 @@ export interface TilePropsInterface {
 }
 
 export default function Tile(props: TilePropsInterface) {
+  const tileRef = useRef<HTMLDivElement | null>(null); // Reference for the tile component
+  const [fontSize, setFontSize] = useState("1rem"); // State to hold calculated font size
+
+  // Recalculate font size whenever the tile component is rendered or resized
+  useEffect(() => {
+    if (tileRef.current) {
+      const { width } = tileRef.current.getBoundingClientRect();
+      setFontSize(`${width * 0.1}px`); // This example sets the font size to 2% of the tile width. Adjust as necessary.
+    }
+  }, []);
+
   function renderTopRowIcons() {
     const lootRenders: ReactNode[] = [];
 
@@ -354,7 +368,12 @@ export default function Tile(props: TilePropsInterface) {
             component="img"
           />
           <RoomName
-            sx={{ fontSize: "0.5rem", fontWeight: "bold", textAlign: "right" }}
+            fontSize={fontSize}
+            sx={{
+              fontWeight: "bold",
+              textAlign: "right",
+              textShadow: "0px 0px 3px black",
+            }}
           >
             {roomDisplayDataList[props.tile.roomId].name}
           </RoomName>
@@ -365,6 +384,8 @@ export default function Tile(props: TilePropsInterface) {
   }
 
   return (
-    <Box key={props.row + "," + props.col + "-tile-box"}>{renderTile()}</Box>
+    <Box key={props.row + "," + props.col + "-tile-box"} ref={tileRef}>
+      {renderTile()}
+    </Box>
   );
 }
