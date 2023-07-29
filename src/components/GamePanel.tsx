@@ -129,13 +129,13 @@ export default function GamePanel(props: GameInfoInterface) {
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <GameInfo {...props} />
+          <ActionPicker {...props} />
         </Grid>
         <Grid item xs={12}>
           <EventModal {...props} />
         </Grid>
         <Grid item xs={12}>
-          <ActionPicker {...props} />
+          <GameInfo {...props} />
         </Grid>
         <Grid item xs={12}>
           {Inventory(props)}

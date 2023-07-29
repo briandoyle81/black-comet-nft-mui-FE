@@ -44,6 +44,7 @@ import { ethers } from "ethers";
 import actionsContractDeployData from "../deployments/Actions.json";
 import gamesContractDeployData from "../deployments/BCGames.json";
 import playersContractDeployData from "../deployments/BCPlayers.json";
+import EventTracker from "./EventTracker";
 
 let timesBoardPulled = 0;
 
@@ -1430,7 +1431,14 @@ export default function GameBoard(props: GameBoardProps) {
             </Box>
           </Grid>
           <Grid item xs={9}>
-            {renderMapArea()}
+            <Grid container spacing={0}>
+              <Grid item xs={12}>
+                <EventTracker currentGameProps={currentGame} />
+              </Grid>
+              <Grid item xs={12}>
+                {renderMapArea()}
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </Box>

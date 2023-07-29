@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, Grid, Typography } from "@mui/material";
-import { GameInterface, GameInfoInterface } from "./GamePanel";
-import Player, { PlayerInterface } from "./Player";
+import { GameInfoInterface } from "./GamePanel";
+import Player from "./Player";
+import HeartIcon from "../assets/img/misc/round heart token.png";
 
 export default function GameInfo(props: GameInfoInterface) {
   function getTraitColor(charTrait: number, modifiedTrait: number) {
@@ -12,6 +13,67 @@ export default function GameInfo(props: GameInfoInterface) {
     }
     return "white";
   }
+
+  function renderHealth() {
+    let healthIcons = [];
+    let currentHealth =
+      props.currentPlayer.currentTraits.health -
+      props.currentPlayer.healthDmgTaken;
+
+    let numNormal;
+    if (currentHealth > props.currentPlayer.currentTraits.health) {
+      numNormal = props.currentPlayer.currentTraits.health;
+    } else {
+      numNormal = currentHealth;
+    }
+
+    for (let i = 0; i < numNormal; i++) {
+      healthIcons.push(
+        <img
+          key={i}
+          src={HeartIcon}
+          alt="heart"
+          style={{ height: "30px", width: "30px" }}
+        />
+      );
+    }
+
+    if (currentHealth < props.currentPlayer.currentTraits.health) {
+      const numLost = props.currentPlayer.currentTraits.health - currentHealth;
+
+      for (let i = 0; i < numLost; i++) {
+        healthIcons.push(
+          <img
+            key={i}
+            src={HeartIcon}
+            alt="heart"
+            style={{ height: "30px", width: "30px", filter: "grayscale(100%)" }}
+          />
+        );
+      }
+    } else if (currentHealth > props.currentPlayer.currentTraits.health) {
+      const numGained =
+        currentHealth - props.currentPlayer.currentTraits.health;
+
+      for (let i = 0; i < numGained; i++) {
+        healthIcons.push(
+          <img
+            key={i}
+            src={HeartIcon}
+            alt="heart"
+            style={{
+              height: "30px",
+              width: "30px",
+              boxShadow: "inset 2px 2px 2px 2px gold",
+            }}
+          />
+        );
+      }
+    }
+
+    return healthIcons;
+  }
+
   return (
     <Card>
       <Grid container spacing={1}>
@@ -20,51 +82,6 @@ export default function GameInfo(props: GameInfoInterface) {
             <CardContent>
               <Grid container spacing={1}>
                 <Grid item xs={12}>
-                  <Card>
-                    <CardHeader title="Event Tracker" />
-                    <Grid container spacing={0}>
-                      <Grid item xs={6}>
-                        <Grid container spacing={1}>
-                          <Grid item xs={6}>
-                            <Typography variant="body1" align="left">
-                              Bug:
-                            </Typography>
-                            <Typography variant="body1" align="left">
-                              Mystery:
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={6}>
-                            <Typography variant="body1">
-                              {props.currentGameProps.eventTracker.bugEvents.toString()}
-                            </Typography>
-                            <Typography variant="body1">
-                              {props.currentGameProps.eventTracker.mysteryEvents.toString()}
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Grid container spacing={1}>
-                          <Grid item xs={6}>
-                            <Typography variant="body1" align="left">
-                              Scavenger:
-                            </Typography>
-                            <Typography variant="body1" align="left">
-                              Ship:
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={6}>
-                            <Typography variant="body1">
-                              {props.currentGameProps.eventTracker.scavEvents.toString()}
-                            </Typography>
-                            <Typography variant="body1">
-                              {props.currentGameProps.eventTracker.shipEvents.toString()}
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  </Card>
                   <Card>
                     <CardHeader title="Current Player" />
                     <Grid container spacing={0}>
@@ -139,14 +156,11 @@ export default function GameInfo(props: GameInfoInterface) {
                       props.currentPlayer.currentTraits.health
                     )}
                   >
-                    Dmg. Taken:
+                    Health:
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body1">
-                    {props.currentPlayer.healthDmgTaken.toString()}/
-                    {props.currentPlayer.currentTraits.health}
-                  </Typography>
+                  {renderHealth()}
                 </Grid>
                 <Grid item xs={6}>
                   <Typography
