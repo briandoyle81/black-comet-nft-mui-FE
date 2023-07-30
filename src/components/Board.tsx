@@ -433,8 +433,7 @@ export default function GameBoard(props: GameBoardProps) {
         const parsedEvent = actionsInterface.parseLog(diceRollEvent);
         // console.log("parsedEvent", parsedEvent);
         if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
-          const newLog =
-            "A " + parsedEvent.args.roll.toString() + " was rolled.";
+          const newLog = buildDiceRollEventLog(parsedEvent.args.roll);
 
           historicLogs.push({
             blockNumber,
@@ -520,6 +519,9 @@ export default function GameBoard(props: GameBoardProps) {
     const playerAttackEventFilter =
       await props.gameContract_read.filters.PlayerAttack();
 
+    const playerDiceRollEventFilter =
+      await props.playersContract_read.filters.DiceRollEvent();
+
     const denizenTurnOverFilter =
       await props.gameContract_read.filters.DenizenTurnOver();
 
@@ -534,8 +536,7 @@ export default function GameBoard(props: GameBoardProps) {
         const parsedEvent = gamesInterface.parseLog(diceRollEvent);
         // console.log("parsedEvent", parsedEvent);
         if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
-          const newLog =
-            "A " + parsedEvent.args.roll.toString() + " was rolled.";
+          const newLog = buildDiceRollEventLog(parsedEvent.args.roll);
 
           historicLogs.push({
             blockNumber,
@@ -698,6 +699,26 @@ export default function GameBoard(props: GameBoardProps) {
           });
         }
       }
+
+      const playerDiceRollEvents = await props.playersContract_read.queryFilter(
+        playerDiceRollEventFilter,
+        blockNumber.toNumber(),
+        blockNumber.toNumber()
+      );
+
+      for (const playerDiceRollEvent of playerDiceRollEvents) {
+        const parsedEvent = playersInterface.parseLog(playerDiceRollEvent);
+        // console.log("parsedEvent", parsedEvent);
+        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
+          const newLog = buildDiceRollEventLog(parsedEvent.args.roll);
+
+          historicLogs.push({
+            blockNumber,
+            logType: "EventDiceRollEvent",
+            log: newLog,
+          });
+        }
+      }
     }
 
     // TODO: After events are added to items contract
@@ -793,7 +814,21 @@ export default function GameBoard(props: GameBoardProps) {
           // DO NOT USE ===, will always be false!!
           if (gameId.toNumber() === props.currentGameNumber) {
             setLastDieRoll(roll.toString());
-            const newLog = "A " + roll.toString() + " was rolled.";
+            const newLog = buildDiceRollEventLog(roll);
+            setLogs([...logs, newLog]);
+          }
+        }
+      );
+
+      props.playersContract_read.on(
+        "DiceRollEvent",
+        (gameId: BigNumber, roll: BigNumber) => {
+          console.log("Roll Event roll:", roll);
+          // TODO: Hack using mapID instead of gameId
+          // DO NOT USE ===, will always be false!!
+          if (gameId.toNumber() === props.currentGameNumber) {
+            setLastDieRoll(roll.toString());
+            const newLog = buildDiceRollEventLog(roll);
             setLogs([...logs, newLog]);
           }
         }
@@ -832,7 +867,7 @@ export default function GameBoard(props: GameBoardProps) {
           // DO NOT USE ===, will always be false!!
           if (gameId.toNumber() === props.currentGameNumber) {
             setLastDieRoll(roll.toString());
-            const newLog = "A " + roll.toString() + " was rolled.";
+            const newLog = buildDiceRollEventLog(roll);
             setLogs([...logs, newLog]);
           }
         }
@@ -998,6 +1033,11 @@ export default function GameBoard(props: GameBoardProps) {
     }
   }, [gameLoaded, props.currentGameNumber, eventFlipper, props.walletLoaded]);
 
+  function buildDiceRollEventLog(roll: BigNumber) {
+    const newLog = "A " + roll.toString() + " was rolled.";
+    return newLog;
+  }
+
   function createEffectLog(effects: BCEffect[]) {
     const effectNames = effects.map((effect: BCEffect) => {
       return EffectNames[effect.effect] + ", ";
@@ -1028,6 +1068,7 @@ export default function GameBoard(props: GameBoardProps) {
     const logTypeOrder = [
       "ActionCompleteEvent",
       "EventResolvedEvent1",
+      "EventDiceRollEvent",
       "EventResolvedEvent2",
       "PlayerAttack",
       "DenizenAttack",
