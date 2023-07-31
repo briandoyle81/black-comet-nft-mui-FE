@@ -139,7 +139,7 @@ export default function GameInfo(props: GameInfoInterface) {
               <Player
                 {...{
                   player: props.currentPlayer,
-                  portrait: true,
+                  portrait: false,
                   genHash: props.currentChar.genHash,
                 }}
               />

@@ -136,6 +136,8 @@ export default function Player(props: PlayerProps) {
     }
   }
 
-  // Assign archetypeHeight to all the Archetypes
+  if (!props.portrait) {
+    return <Box>{renderPlayer(props.portrait)}</Box>;
+  }
   return <BoxContainer>{renderPlayer(props.portrait)}</BoxContainer>;
 }
