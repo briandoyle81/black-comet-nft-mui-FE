@@ -13,6 +13,8 @@ interface CharactersDataInterface {
   lobbiesContract_write: any;
   itemsContract_read: any;
   address: string;
+  setCurrentGameNumber: Function;
+  setTabValue: Function;
 }
 
 interface SelectedItemsInterface {
@@ -105,26 +107,15 @@ export default function CharactersList(props: CharactersDataInterface) {
     setClearChoices(true);
   }
 
-  function renderEnlistButton(char: CharInterface) {
-    if (char.inGame) {
-      return (
-        <Button variant="contained" disabled>
-          Away on Mission
-        </Button>
-      );
-    } else {
-      return (
-        <Button
-          variant="contained"
-          onClick={() => {
-            handleEnlistClick(char.id);
-          }}
-        >
-          Enlist for Mission
-        </Button>
-      );
-    }
-  }
+  // TODO:  Chars don't know what game they're in
+  // function handleGameButtonClick(id: number) {
+  //   // TODO: Magic number
+  //   localStorage.setItem("lastGame", id.toString());
+  //   localStorage.setItem("lastTab", "2");
+  //   const intId = ethers.BigNumber.from(id).toNumber();
+  //   props.setCurrentGameNumber(intId);
+  //   props.setTabValue(2);
+  // }
 
   async function handleSoloClick(id: number) {
     console.log(selectedItems);
@@ -145,32 +136,54 @@ export default function CharactersList(props: CharactersDataInterface) {
     setSelectedItems(newSelectedItems);
   }
 
-  function renderSoloButton(char: CharInterface) {
-    if (char.inGame) {
-      return (
-        <Button variant="contained" disabled>
-          Away on Mission
-        </Button>
-      );
-    } else {
-      return (
-        <Button
-          variant="contained"
-          onClick={() => {
-            handleSoloClick(char.id);
-          }}
-        >
-          Start Solo Mission
-        </Button>
-      );
-    }
-  }
-
   function buildPlayerProps(genHash: string) {
     return {
       portrait: true,
       genHash: genHash,
     };
+  }
+
+  function renderEnlistButtons(char: CharInterface) {
+    if (char.inGame) {
+      return (
+        <Grid item xs={12}>
+          <Grid container spacing={1}>
+            <Grid item xs={12}>
+              <Button variant="contained" disabled>
+                In Game
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+      );
+    } else {
+      return (
+        <Grid item xs={12}>
+          <Grid container spacing={1}>
+            <Grid item xs={6}>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  handleEnlistClick(char.id);
+                }}
+              >
+                Enlist for Mission
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  handleSoloClick(char.id);
+                }}
+              >
+                Start Solo Mission
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+      );
+    }
   }
 
   function renderCharData() {
@@ -179,16 +192,20 @@ export default function CharactersList(props: CharactersDataInterface) {
       charList.push(
         <Grid item xs={3} key={index + " Player card"}>
           <Card>
-            <Typography variant="body1" align="left">
-              UiF DNA:
-            </Typography>
-            <Typography variant="body1" align="left">
-              {char.genHash.slice(2, 34)}
-            </Typography>
-            <Typography variant="body1" align="left">
-              {char.genHash.slice(34, 66)}
-            </Typography>
-            <Grid container spacing={1}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Card>
+                  <Typography variant="body1" align="left">
+                    UiF DNA:
+                  </Typography>
+                  <Typography variant="body1" align="left">
+                    {char.genHash.slice(2, 34)}
+                  </Typography>
+                  <Typography variant="body1" align="left">
+                    {char.genHash.slice(34, 66)}
+                  </Typography>
+                </Card>
+              </Grid>
               <Grid item xs={6}>
                 <Player {...buildPlayerProps(char.genHash)} />
               </Grid>
@@ -196,62 +213,106 @@ export default function CharactersList(props: CharactersDataInterface) {
                 <Grid container spacing={1}>
                   <Grid item xs={12}>
                     <Card>
-                      <Typography variant="body1">
-                        Clone: {char.cloneNumber}/{char.maxClones}
-                      </Typography>
-                      <Typography variant="body1">
-                        Id Number: {char.id.toString()}
-                      </Typography>
-                      <Typography variant="body1">Traits</Typography>
-                      <Typography variant="body1">
-                        Health: {char.traits.health}
-                      </Typography>
-                      <Typography variant="body1">
-                        Carry: {char.traits.carry}
-                      </Typography>
-                      <Typography variant="body1">
-                        Defense: {char.traits.defense}
-                      </Typography>
-                      <Typography variant="body1">
-                        Hack: {char.traits.hack}
-                      </Typography>
-                      <Typography variant="body1">
-                        Breach: {char.traits.breach}
-                      </Typography>
-                      <Typography variant="body1">
-                        Shoot: {char.traits.shoot}
-                      </Typography>
-                      <Typography variant="body1">
-                        Melee: {char.traits.melee}
-                      </Typography>
-                    </Card>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Card>
-                      <Typography variant="h6">Items</Typography>
                       <Grid container spacing={1}>
-                        <ItemSelector
-                          charId={parseInt(char.id.toString())}
-                          items={items}
-                          updateItemsForChar={updateItemsForChar}
-                          clearChoices={clearChoices}
-                          resetClear={resetClear}
-                        />
+                        <Grid item xs={6}>
+                          <Typography variant="body1" align="left">
+                            Clone:
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            {char.cloneNumber}/{char.maxClones}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1" align="left">
+                            Id Number:
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            {char.id.toString()}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Typography variant="body1">Traits</Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1" align="left">
+                            Health:
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            {char.traits.health}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1" align="left">
+                            Carry:
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            {char.traits.carry}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1" align="left">
+                            Defense:
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            {char.traits.defense}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1" align="left">
+                            Hack:
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            {char.traits.hack}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1" align="left">
+                            Breach:
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            {char.traits.breach}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1" align="left">
+                            Shoot:
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            {char.traits.shoot}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1" align="left">
+                            Melee:
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography variant="body1">
+                            {char.traits.melee}
+                          </Typography>
+                        </Grid>
                       </Grid>
                     </Card>
                   </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              <Grid container spacing={1}>
-                <Grid item xs={6}>
-                  {renderEnlistButton(char)}
-                </Grid>
-                <Grid item xs={6}>
-                  {renderSoloButton(char)}
-                </Grid>
-              </Grid>
+              {renderEnlistButtons(char)}
             </Grid>
           </Card>
         </Grid>
@@ -262,14 +323,22 @@ export default function CharactersList(props: CharactersDataInterface) {
 
   return (
     <Grid container spacing={1}>
-      <Grid item xs={12}>
+      <Grid item xs={4}>
         <Card>
           <Button variant="contained" onClick={handleDecantClick}>
             Buy New Character NFT
           </Button>
+        </Card>
+      </Grid>
+      <Grid item xs={4}>
+        <Card>
           <Typography variant="body1">
             Owned Characters in Barracks: {chars.length}
           </Typography>
+        </Card>
+      </Grid>
+      <Grid item xs={4}>
+        <Card>
           <Typography variant="body1">
             Please retry if joining/starting a mission fails.
           </Typography>

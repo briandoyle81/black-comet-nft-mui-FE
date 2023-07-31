@@ -268,6 +268,8 @@ function App() {
               lobbiesContract_write={lobbiesContract_write}
               itemsContract_read={itemsContract_read}
               address={playerAddress}
+              setCurrentGameNumber={setCurrentGameNumber}
+              setTabValue={setTabValue}
             />
           </TabPanel>
           <TabPanel value={tabValue} index={1}>

@@ -1,6 +1,8 @@
+import React, { useEffect, useState } from "react";
+
 import { Box, Card, CardMedia } from "@mui/material";
-import { styled } from '@mui/material/styles';
-import { Position } from './Utils';
+import { styled } from "@mui/material/styles";
+import { Position } from "./Utils";
 
 import Archetype0 from "../assets/img/arch_svg/archetype_0";
 import Archetype1 from "../assets/img/arch_svg/archetype_1";
@@ -12,42 +14,35 @@ import Archetype6 from "../assets/img/arch_svg/archetype_6";
 import Archetype7 from "../assets/img/arch_svg/archetype_7";
 import { TraitsInterface } from "./Board";
 
+const ARCHETYPE_HEIGHT = 455;
+
 // Names must be lowercase to keep React from getting upset about custom
 // attributes in the DOM
 export interface ArchetypeProps {
-  clothingcolor: object,
-  clothinglowlight: object,
-  clothinghightlight: object,
-  dirtstyle: object,
-}
-
-// const PlayerOverlay = styled(Card)(({ theme }) => ({
-//   // position: 'absolute',
-//   // left: '-55%',
-//   // bottom: '-55%',
-//   scale: '30%',
-//   background: 'transparent'
-// }));
-
-const PlayerStyle = {
-  zIndex: 1299, // TODO
-  width: '100%'
+  clothingcolor: object;
+  clothinglowlight: object;
+  clothinghightlight: object;
+  dirtstyle: object;
 }
 
 const OnBoardPlayer = styled(Card)(({ theme }) => ({
   zIndex: 1299, // TODO
-  width: '90%',
-  background: 'white',
-  border: 'black'
+  width: "90%",
+  background: "white",
+  border: "black",
 }));
 
 const Portrait = styled(Card)(({ theme }) => ({
-  background: 'white'
+  background: "white",
+  border: "none",
+  boxShadow: "none",
 }));
 
-// const ImageStyle = {
-//   height: 150
-// }
+const BoxContainer = styled(Box)(({ theme }) => ({
+  height: `${ARCHETYPE_HEIGHT}px`,
+  backgroundColor: `white`,
+  borderRadius: "4px",
+}));
 
 export interface PlayerInterface {
   remoteId: number;
@@ -73,101 +68,74 @@ export interface PlayerInterface {
 }
 
 export interface PlayerProps {
-  player?: PlayerInterface,
-  portrait: boolean,
-  genHash: string
+  player?: PlayerInterface;
+  portrait: boolean;
+  genHash: string;
 }
 
 // TODO: Move to utils and refine
 
-function changeColor(color: string, amount: number) { // #FFF not supportet rather use #FFFFFF
-    const clamp = (val: number) => Math.min(Math.max(val, 0), 0xFF)
-    const fill = (str: string) => ('00' + str).slice(-2)
+function changeColor(color: string, amount: number) {
+  // #FFF not supported rather use #FFFFFF
+  const clamp = (val: number) => Math.min(Math.max(val, 0), 0xff);
+  const fill = (str: string) => ("00" + str).slice(-2);
 
-    const num = parseInt(color.substr(1), 16)
-    const red = clamp((num >> 16) + amount)
-    const green = clamp(((num >> 8) & 0x00FF) + amount)
-    const blue = clamp((num & 0x0000FF) + amount)
-    return '#' + fill(red.toString(16)) + fill(green.toString(16)) + fill(blue.toString(16))
+  const num = parseInt(color.substr(1), 16);
+  const red = clamp((num >> 16) + amount);
+  const green = clamp(((num >> 8) & 0x00ff) + amount);
+  const blue = clamp((num & 0x0000ff) + amount);
+  return (
+    "#" +
+    fill(red.toString(16)) +
+    fill(green.toString(16)) +
+    fill(blue.toString(16))
+  );
 }
 
 export default function Player(props: PlayerProps) {
-
   function buildArchetype(genHash: string) {
-    const colorString = "#" + props.genHash.slice(20, 26) // Block 5 - 2 // TODO: Library
+    const colorString = "#" + props.genHash.slice(20, 26); // Block 5 - 2 // TODO: Library
     const builtProps: ArchetypeProps = {
       clothingcolor: { fill: colorString },
       clothinglowlight: { fill: changeColor(colorString, -100) },
       clothinghightlight: { fill: changeColor(colorString, 50) },
       dirtstyle: {},
-    }
+    };
 
     return builtProps;
   }
-
 
   function getArt() {
     const archTypeString = props.genHash[4];
 
     // console.log(props.genHash, props.genHash[4]);
     if (archTypeString === "0" || archTypeString === "1") {
-      return (
-        <Archetype0 {...buildArchetype(props.genHash)} />
-      );
+      return <Archetype0 {...buildArchetype(props.genHash)} />;
     } else if (archTypeString === "2" || archTypeString === "3") {
-      return (
-        <Archetype1 {...buildArchetype(props.genHash)} />
-      );
+      return <Archetype1 {...buildArchetype(props.genHash)} />;
     } else if (archTypeString === "4" || archTypeString === "5") {
-      return (
-        <Archetype2 {...buildArchetype(props.genHash)} />
-      );
+      return <Archetype2 {...buildArchetype(props.genHash)} />;
     } else if (archTypeString === "6" || archTypeString === "7") {
-      return (
-        <Archetype3 {...buildArchetype(props.genHash)} />
-      );
+      return <Archetype3 {...buildArchetype(props.genHash)} />;
     } else if (archTypeString === "8" || archTypeString === "9") {
-      return (
-        <Archetype4 {...buildArchetype(props.genHash)} />
-      );
+      return <Archetype4 {...buildArchetype(props.genHash)} />;
     } else if (archTypeString === "a" || archTypeString === "b") {
-      return (
-        <Archetype5 {...buildArchetype(props.genHash)} />
-      );
+      return <Archetype5 {...buildArchetype(props.genHash)} />;
     } else if (archTypeString === "c" || archTypeString === "d") {
-      return (
-        <Archetype6 {...buildArchetype(props.genHash)} />
-      );
+      return <Archetype6 {...buildArchetype(props.genHash)} />;
     } else if (archTypeString === "e" || archTypeString === "f") {
-      return (
-        <Archetype7 {...buildArchetype(props.genHash)} />
-      );
+      return <Archetype7 {...buildArchetype(props.genHash)} />;
     }
   }
 
   function renderPlayer(portrait: boolean) {
     if (!portrait) {
-      return (
-
-        <OnBoardPlayer>
-          {getArt()}
-       </OnBoardPlayer>
-
-      )
+      return <OnBoardPlayer>{getArt()}</OnBoardPlayer>;
     } else {
-      return (
-        <Portrait>
-          <CardMedia>
-            {getArt()}
-          </CardMedia>
-        </Portrait>
-      )
+      return <Portrait>{getArt()}</Portrait>;
     }
   }
 
-  return (
-    <Box>
-      {renderPlayer(props.portrait)}
-    </Box>
-  )
+  // Assign archetypeHeight to all the Archetypes
+  return <BoxContainer>{renderPlayer(props.portrait)}</BoxContainer>;
 }
