@@ -163,7 +163,7 @@ export default function EventModal(props: GameInfoInterface) {
       return (
         <Box>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            TODO: PUT WHAT HAPPENED HERE!
+            {props.logs[props.logs.length - 1]}
           </Typography>
           <Button variant="contained" onClick={handleConfirm}>
             Ok

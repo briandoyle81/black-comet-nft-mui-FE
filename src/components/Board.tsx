@@ -49,6 +49,7 @@ import EventModal from "./EventModal";
 import GameInfoCard from "./GameInfoCard";
 import { DenizenTypeToString } from "./Denizen";
 import { create } from "domain";
+import { roomDisplayDataList } from "./RoomTiles";
 
 let timesBoardPulled = 0;
 
@@ -432,7 +433,7 @@ export default function GameBoard(props: GameBoardProps) {
       for (const diceRollEvent of diceRollEvents) {
         const parsedEvent = actionsInterface.parseLog(diceRollEvent);
         // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
+        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
           const newLog = buildDiceRollEventLog(parsedEvent.args.roll);
 
           historicLogs.push({
@@ -452,7 +453,7 @@ export default function GameBoard(props: GameBoardProps) {
       for (const challengeEvent of challengeEvents) {
         const parsedEvent = actionsInterface.parseLog(challengeEvent);
         // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
+        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
           const newLog =
             "Challenge roll of: " +
             parsedEvent.args.roll.toString() +
@@ -478,7 +479,7 @@ export default function GameBoard(props: GameBoardProps) {
       for (const actionCompleteEvent of actionCompleteEvents) {
         const parsedEvent = actionsInterface.parseLog(actionCompleteEvent);
         // console.log("parsedActionCompleteEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
+        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
           const { position } = parsedEvent.args.player;
           const newLog =
             "Player " +
@@ -522,6 +523,9 @@ export default function GameBoard(props: GameBoardProps) {
     const playerDiceRollEventFilter =
       await props.playersContract_read.filters.DiceRollEvent();
 
+    const playerDiedEventFilter =
+      await props.playersContract_read.filters.PlayerDiedEvent();
+
     const denizenTurnOverFilter =
       await props.gameContract_read.filters.DenizenTurnOver();
 
@@ -535,7 +539,7 @@ export default function GameBoard(props: GameBoardProps) {
       for (const diceRollEvent of diceRollEvents) {
         const parsedEvent = gamesInterface.parseLog(diceRollEvent);
         // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
+        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
           const newLog = buildDiceRollEventLog(parsedEvent.args.roll);
 
           historicLogs.push({
@@ -555,7 +559,7 @@ export default function GameBoard(props: GameBoardProps) {
       for (const challengeEvent of challengeEvents) {
         const parsedEvent = gamesInterface.parseLog(challengeEvent);
         // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
+        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
           const newLog =
             "Challenge roll of: " +
             parsedEvent.args.roll.toString() +
@@ -581,7 +585,7 @@ export default function GameBoard(props: GameBoardProps) {
       for (const denizenAttackEvent of denizenAttackEvents) {
         const parsedEvent = gamesInterface.parseLog(denizenAttackEvent);
         // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
+        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
           const newLog =
             DenizenTypeToString.get(parsedEvent.args.denizenType) +
             " with ID " +
@@ -610,7 +614,7 @@ export default function GameBoard(props: GameBoardProps) {
       for (const playerAttackEvent of playerAttackEvents) {
         const parsedEvent = gamesInterface.parseLog(playerAttackEvent);
         // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
+        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
           const newLog =
             "Player with ID " +
             parsedEvent.args.playerId.toString() +
@@ -673,16 +677,11 @@ export default function GameBoard(props: GameBoardProps) {
       for (const eventResolvedEvent of eventResolvedEvents) {
         const parsedEvent = playersInterface.parseLog(eventResolvedEvent);
         // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
-          const { id } = parsedEvent.args.bcEvent;
-          const eventData = getEventFromId(id);
-          const name = eventData[0].name;
-
-          const newLog =
-            "Player " +
-            parsedEvent.args.playerId.toString() +
-            " experienced " +
-            name;
+        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
+          const newLog = buildBCEventEventLog(
+            parsedEvent.args.bcEvent,
+            parsedEvent.args.position
+          );
 
           const newLog2 = createEffectLog(parsedEvent.args.appliedBCEffects);
 
@@ -709,12 +708,41 @@ export default function GameBoard(props: GameBoardProps) {
       for (const playerDiceRollEvent of playerDiceRollEvents) {
         const parsedEvent = playersInterface.parseLog(playerDiceRollEvent);
         // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
+        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
           const newLog = buildDiceRollEventLog(parsedEvent.args.roll);
 
           historicLogs.push({
             blockNumber,
             logType: "EventDiceRollEvent",
+            log: newLog,
+          });
+        }
+      }
+
+      const playerDiedEvents = await props.playersContract_read.queryFilter(
+        playerDiedEventFilter,
+        blockNumber.toNumber(),
+        blockNumber.toNumber()
+      );
+
+      for (const playerDiedEvent of playerDiedEvents) {
+        const parsedEvent = playersInterface.parseLog(playerDiedEvent);
+        // console.log("parsedEvent", parsedEvent);
+        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
+          const newLog =
+            "Player " +
+            parsedEvent.args.playerId.toString() +
+            " died at " +
+            parsedEvent.args.position.row.toString() +
+            ", " +
+            parsedEvent.args.position.col.toString() +
+            " from " +
+            parsedEvent.args.damage.toString() +
+            " damage";
+
+          historicLogs.push({
+            blockNumber,
+            logType: "PlayerDiedEvent",
             log: newLog,
           });
         }
@@ -809,7 +837,6 @@ export default function GameBoard(props: GameBoardProps) {
       props.gameContract_read.on(
         "DiceRollEvent",
         (gameId: BigNumber, roll: BigNumber) => {
-          console.log("Roll Event roll:", roll);
           // TODO: Hack using mapID instead of gameId
           // DO NOT USE ===, will always be false!!
           if (gameId.toNumber() === props.currentGameNumber) {
@@ -823,13 +850,37 @@ export default function GameBoard(props: GameBoardProps) {
       props.playersContract_read.on(
         "DiceRollEvent",
         (gameId: BigNumber, roll: BigNumber) => {
-          console.log("Roll Event roll:", roll);
           // TODO: Hack using mapID instead of gameId
           // DO NOT USE ===, will always be false!!
           if (gameId.toNumber() === props.currentGameNumber) {
             setLastDieRoll(roll.toString());
             const newLog = buildDiceRollEventLog(roll);
             setLogs([...logs, newLog]);
+          }
+        }
+      );
+
+      props.playersContract_read.on(
+        "PlayerDiedEvent",
+        (
+          gameId: BigNumber,
+          playerId: BigNumber,
+          damage: BigNumber,
+          position: Position
+        ) => {
+          if (gameId.toNumber() == props.currentGameNumber) {
+            const newLog =
+              "Player " +
+              playerId.toString() +
+              " died at " +
+              position.row.toString() +
+              ", " +
+              position.col.toString() +
+              " from " +
+              damage.toString() +
+              " damage";
+            setLogs([...logs, newLog]);
+            setEventFlipper(true);
           }
         }
       );
@@ -842,13 +893,12 @@ export default function GameBoard(props: GameBoardProps) {
           forValue: BigNumber,
           against: BigNumber
         ) => {
-          console.log("Challenge Event roll:", roll);
           // TODO: Hack using mapID instead of gameId
           // TODO: THe above might not be true an longer
           if (gameId.toNumber() === props.currentGameNumber) {
             setLastDieRoll(roll.toString());
             const newLog =
-              "A challenge roll was" +
+              "A challenge roll was " +
               roll.toString() +
               ". For: " +
               forValue.toString() +
@@ -862,7 +912,6 @@ export default function GameBoard(props: GameBoardProps) {
       props.actionsContract_read.on(
         "DiceRollEvent",
         (gameId: BigNumber, roll: BigNumber) => {
-          console.log("Roll Event roll:", roll);
           // TODO: Hack using mapID instead of gameId
           // DO NOT USE ===, will always be false!!
           if (gameId.toNumber() === props.currentGameNumber) {
@@ -881,13 +930,12 @@ export default function GameBoard(props: GameBoardProps) {
           forValue: BigNumber,
           against: BigNumber
         ) => {
-          console.log("Challenge Event roll:", roll);
           // TODO: Hack using mapID instead of gameId
           // TODO: THe above might not be true an longer
           if (gameId.toNumber() === props.currentGameNumber) {
             setLastDieRoll(roll.toString());
             const newLog =
-              "A challenge roll was" +
+              "A challenge roll was " +
               roll.toString() +
               ". For: " +
               forValue.toString() +
@@ -908,15 +956,6 @@ export default function GameBoard(props: GameBoardProps) {
           damage: BigNumber,
           turnabout: BigNumber
         ) => {
-          console.log(
-            "Denizen Attack",
-            gameId,
-            denizenType,
-            denizenId,
-            playerTarget,
-            damage,
-            turnabout
-          );
           if (gameId.toNumber() === props.currentGameNumber) {
             const newLog =
               denizenType.toString() +
@@ -937,7 +976,7 @@ export default function GameBoard(props: GameBoardProps) {
         "ActionCompleteEvent",
         (
           gameId: BigNumber,
-          game: GameInterface,
+          // game: GameInterface,
           playerId: BigNumber,
           player: PlayerInterface,
           action: Action
@@ -970,15 +1009,6 @@ export default function GameBoard(props: GameBoardProps) {
           damage: BigNumber,
           turnabout: BigNumber
         ) => {
-          console.log(
-            "Player Attack",
-            gameId,
-            playerId,
-            denizenType,
-            denizenId,
-            damage,
-            turnabout
-          );
           const newLog =
             "Player with ID " +
             playerId.toString() +
@@ -988,14 +1018,13 @@ export default function GameBoard(props: GameBoardProps) {
             denizenId.toString() +
             " for " +
             damage.toString() +
-            "and took turnabout of " +
+            " and took turnabout of " +
             turnabout.toString();
           setLogs([...logs, newLog]);
         }
       );
 
       props.gameContract_read.on("DenizenTurnOver", (gameId: BigNumber) => {
-        console.log("Denizen Turn Over", gameId);
         if (gameId.toNumber() === props.currentGameNumber) {
           const newLog = "Denizen Turn Over";
           setLogs([...logs, newLog]);
@@ -1009,24 +1038,20 @@ export default function GameBoard(props: GameBoardProps) {
           gameId: BigNumber,
           playerId: BigNumber,
           bcEvent: BCEvent,
-          bcEffects: BCEffect[] // The effect that actually happened
+          bcEffects: BCEffect[], // The effect that actually happened
+          position: Position
         ) => {
           // DO NOT USE ===, will always be false!!
-          // console.log("Triggered Event Resolved Event");
-          if (gameId.toNumber() === props.currentGameNumber) {
+          if (gameId.toNumber() == props.currentGameNumber) {
             setEventResolved(true);
 
-            const { id } = bcEvent;
-            const eventData = getEventFromId(id);
-            const name = eventData[0].name;
-
-            const newLog =
-              "Player " + playerId.toString() + " experienced " + name;
+            const newLog = buildBCEventEventLog(bcEvent, position);
             const newLog2 = createEffectLog(bcEffects);
 
             setLogs([...logs, newLog, newLog2]);
 
             setEventsLoaded(true);
+            setEventFlipper(true);
           }
         }
       );
@@ -1035,6 +1060,24 @@ export default function GameBoard(props: GameBoardProps) {
 
   function buildDiceRollEventLog(roll: BigNumber) {
     const newLog = "A " + roll.toString() + " was rolled.";
+    return newLog;
+  }
+
+  function buildBCEventEventLog(bcEvent: BCEvent, position: Position) {
+    const { id } = bcEvent;
+    const eventData = getEventFromId(id);
+    const name = eventData[0].name;
+    const newLog =
+      "Player experienced " +
+      name +
+      " in " +
+      roomDisplayDataList[gameTiles[position.row][position.col].roomId].name +
+      " at " +
+      position.row +
+      ", " +
+      position.col +
+      ".";
+
     return newLog;
   }
 
@@ -1074,6 +1117,7 @@ export default function GameBoard(props: GameBoardProps) {
       "DenizenAttack",
       "DiceRollEvent",
       "ChallengeEvent",
+      "PlayerDiedEvent",
       "DenizenTurnOver",
     ];
 
@@ -1461,6 +1505,7 @@ export default function GameBoard(props: GameBoardProps) {
                 setEventResolved={setEventResolved}
                 roomsWithItems={roomsWithItems}
                 gameWorldItems={gameWorldItems}
+                logs={logs}
               />
             </Card>
           </Grid>
@@ -1503,6 +1548,7 @@ export default function GameBoard(props: GameBoardProps) {
                       setEventResolved={setEventResolved}
                       roomsWithItems={roomsWithItems}
                       gameWorldItems={gameWorldItems}
+                      logs={logs}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -1550,6 +1596,7 @@ export default function GameBoard(props: GameBoardProps) {
                   setEventResolved={setEventResolved}
                   roomsWithItems={roomsWithItems}
                   gameWorldItems={gameWorldItems}
+                  logs={logs}
                 />
               </Grid>
               <Grid item xs={12}>

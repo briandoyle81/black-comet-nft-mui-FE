@@ -1,23 +1,29 @@
-import { Button, Card, CardContent, CardHeader, CardMedia, Grid, List, ListItem, Typography } from "@mui/material";
-import { Box } from "@mui/system"
-
-
-
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardMedia,
+  Grid,
+  List,
+  ListItem,
+  Typography,
+} from "@mui/material";
+import { Box } from "@mui/system";
 
 export default function Info() {
   return (
     <Card>
       <CardHeader>
-        <Typography variant="h2">
-          Info
-        </Typography>
+        <Typography variant="h2">Info</Typography>
       </CardHeader>
       <CardContent>
         <Typography variant="h3" align="left">
           General
         </Typography>
         <Typography variant="body1" align="left" color="red">
-          USE A DEV WALLET.  WE ARE NOT RESPONSIBLE FOR ANY LOSSES!!!  EXPECT BUGS AND REGULAR RESETS!
+          USE A DEV WALLET. WE ARE NOT RESPONSIBLE FOR ANY LOSSES!!! EXPECT BUGS
+          AND REGULAR RESETS!
         </Typography>
         <Card>
           <CardContent>
@@ -56,38 +62,50 @@ export default function Info() {
           </ListItem>
           <ListItem>
             <Typography variant="body1" align="left" color="yellow">
-              You should see the game board, and the "Actions" section with drop down menus on the right side.
+              You should see the game board, and the "Actions" section with drop
+              down menus on the right side.
             </Typography>
           </ListItem>
           <ListItem>
             <Typography variant="body1" align="left" color="yellow">
-              Alternately, find your game number from the Games List, and use the control on the bottom right of the Game tab to select that game.
+              Alternately, find your game number from the Games List, and use
+              the control on the bottom right of the Game tab to select that
+              game.
             </Typography>
           </ListItem>
         </List>
         <Typography variant="body1" align="left">
-          Explore the Black Comet and loot rooms to collect valuable data and NFT items.
+          Explore the Black Comet and loot rooms to collect valuable data and
+          NFT items.
         </Typography>
         <Typography variant="body1" align="left">
-          Buy a character from the characters tab and click the "Start Solo Mission" button.  Multiplayer is not recommended at this time.
+          Buy a character from the characters tab and click the "Start Solo
+          Mission" button. Multiplayer is not recommended at this time.
         </Typography>
         <Typography variant="body1" align="left">
-          Use the (temporary) actions picker on the right side to move and explore.
+          Use the (temporary) actions picker on the right side to move and
+          explore.
         </Typography>
         <Typography variant="body1" align="left">
-          Doors can be open, breached, or closed.  The left number is the strength vs. hack.  The right number is strength vs. breach.  Hacking opens the door temporarily, it will close at the end of the round.  Breaching opens it permanently, but allows fire to spread.
+          Doors can be open, breached, or closed. The left number is the
+          strength vs. hack. The right number is strength vs. breach. Hacking
+          opens the door temporarily, it will close at the end of the round.
+          Breaching opens it permanently, but allows fire to spread.
         </Typography>
         <Typography variant="body1" align="left">
-          Use the "Move" followup to enter a room after breaching or hacking, or to move through two open/breached doors through two discovered rooms.
+          Use the "Move" followup to enter a room after breaching or hacking, or
+          to move through two open/breached doors through two discovered rooms.
         </Typography>
         <Typography variant="body1" align="left">
-          Use "Loot" if there are icons in the upper left corner of your current room.
+          Use "Loot" if there are icons in the upper left corner of your current
+          room.
         </Typography>
         <Typography variant="h4" align="left">
           What (Probably) Works
         </Typography>
         <Typography variant="body1" align="left">
-          Moving, looting, some events.  Dying if you go into space, or stand in fire (icon in lower left next to vents)
+          Moving, looting, some events. Dying if you go into space, or stand in
+          fire (icon in lower left next to vents)
         </Typography>
         <Typography variant="body1" align="left">
           Rooms events will trigger, but many events are not implemented fully.
@@ -99,9 +117,27 @@ export default function Info() {
           What Doesn't Work
         </Typography>
         <Typography variant="body1" align="left">
-          Most consequences for dying, enemy spawns, endgame, nft player and item transfer, combat, many random events, some room events, rendering doors/windows on the right edge.
+          Most consequences for dying, enemy spawns, endgame, nft player and
+          item transfer, combat, many random events, some room events, rendering
+          doors/windows on the right edge.
         </Typography>
+
+        <Typography variant="h3" align="left">
+          Attributions for Temporary Assets
+        </Typography>
+        <a
+          href="https://www.flaticon.com/free-icons/breach"
+          title="breach icons"
+        >
+          Breach icons created by Leremy - Flaticon
+        </a>
+        <a
+          href="https://www.flaticon.com/free-icons/hacking"
+          title="hacking icons"
+        >
+          Hacking icons created by Good Ware - Flaticon
+        </a>
       </CardContent>
     </Card>
-  )
+  );
 }

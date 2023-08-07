@@ -64,6 +64,7 @@ export interface GameInfoInterface {
   setEventResolved: Function;
   roomsWithItems: Position[];
   gameWorldItems: ItemDataInterface[];
+  logs: string[];
 }
 
 export interface DenizenInterface {
