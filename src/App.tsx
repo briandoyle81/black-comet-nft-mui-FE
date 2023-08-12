@@ -25,6 +25,8 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 import Info from "./components/Info";
 import ItemVault from "./components/ItemVault";
+import { Button } from "@mui/material";
+import OnboardingModal from "./components/OnboardingModal";
 
 const theme = createTheme({
   palette: {
@@ -77,7 +79,21 @@ function App() {
   }
   const [tabValue, setTabValue] = useState(lastTab);
 
+  const [modalOpen, setModalOpen] = useState<boolean>(true);
+
+  const handleModalClose = (): void => {
+    setModalOpen(false);
+  };
+
+  const handleModalOpen = (): void => {
+    localStorage.setItem("onboarded", "false");
+    setModalOpen(true);
+  };
+
   const loadWallet = async () => {
+    if (!window.ethereum) {
+      return;
+    }
     // TODO: Cleanup
     const walletProvider = new ethers.providers.Web3Provider(
       window.ethereum,
@@ -238,14 +254,19 @@ function App() {
 
   return appLoading ? (
     <ThemeProvider theme={theme}>
+      <OnboardingModal open={modalOpen} onClose={handleModalClose} />
       <Typography variant="body1" align="left" color="white">
         Please connect or unlock your wallet. Or wait for it to load. You may
         need to refresh the page. A better connection experience is pending.
       </Typography>
+      <Button variant="outlined" color="primary" onClick={handleModalOpen}>
+        Re-Open Onboarding
+      </Button>
     </ThemeProvider>
   ) : (
     <ThemeProvider theme={theme}>
       <div className="App">
+        <OnboardingModal open={modalOpen} onClose={handleModalClose} />
         <Card>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <Tabs
@@ -319,11 +340,9 @@ function App() {
             Pre-Alpha Test. Bugs abound! Play at your own risk! In-game NFTs
             will be reset regularly. Use a dev wallet!
           </Typography>
-          <Typography>
-            A transaction that is expected to fail means bad input. If
-            transactions are failing after submission, try again with double the
-            gas limit.
-          </Typography>
+          <Button variant="outlined" color="primary" onClick={handleModalOpen}>
+            Re-Open Onboarding
+          </Button>
         </Card>
       </div>
     </ThemeProvider>
