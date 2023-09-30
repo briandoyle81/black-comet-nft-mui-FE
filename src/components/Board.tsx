@@ -486,9 +486,9 @@ export default function GameBoard(props: GameBoardProps) {
             parsedEvent.args.playerId.toString() +
             " selected " +
             ActionString[parsedEvent.args.action as Action] +
-            " at " +
+            " at row " +
             position.row.toString() +
-            ", " +
+            ", col " +
             position.col.toString();
 
           historicLogs.push({
@@ -825,6 +825,7 @@ export default function GameBoard(props: GameBoardProps) {
       const denizens = await props.gameContract_read.getDenizensInGame(
         props.currentGameNumber
       );
+      // console.log("denizens", denizens);
       let newGame = { ...currentGame };
       newGame.denizens = denizens;
       setCurrentGame(newGame);
@@ -1072,9 +1073,9 @@ export default function GameBoard(props: GameBoardProps) {
       name +
       " in " +
       roomDisplayDataList[gameTiles[position.row][position.col].roomId].name +
-      " at " +
+      " at row " +
       position.row +
-      ", " +
+      ", col " +
       position.col +
       ".";
 
@@ -1259,7 +1260,7 @@ export default function GameBoard(props: GameBoardProps) {
       if (currentPlayerPos.col <= 3) {
         return 5;
       } else if (currentPlayerPos.col >= 8) {
-        return 11;
+        return 10;
       } else {
         return currentPlayerPos.col + 3;
       }
@@ -1423,7 +1424,7 @@ export default function GameBoard(props: GameBoardProps) {
 
   function handleDenizenTurnClick() {
     props.gameContract_write.processDenizenMoves(props.currentGameNumber, {
-      gasLimit: 10_000_000,
+      // gasLimit: 10_000_000,
     });
     setEventFlipper(true);
   }

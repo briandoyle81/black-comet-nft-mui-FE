@@ -1,17 +1,18 @@
-import { Button, Card, CardMedia, Chip, Grid, Typography } from "@mui/material";
-import { Box } from "@mui/system";
-import { ethers } from "ethers";
+import { Button, Card, Grid, Typography } from "@mui/material";
 import { ReactNode, useEffect, useState } from "react";
 import { CharInterface } from "./Board";
 import { ItemDataInterface } from "./ItemCard";
 import ItemSelector from "./ItemSelector";
 import Player, { ArchetypeProps, PlayerInterface } from "./Player";
 
+import { useContractRead, useContractReads, useContractWrite } from "wagmi";
+import { charContract, itemsContract } from "../contracts";
+
+import charContractDeployData from "../deployments/BCChars.json";
+import { parseEther } from "viem";
+import { DECANT_COST_IN_ETH } from "../constants";
+
 interface CharactersDataInterface {
-  charContract_read: any; // todo any
-  charContract_write: any;
-  lobbiesContract_write: any;
-  itemsContract_read: any;
   address: string;
   setCurrentGameNumber: Function;
   setTabValue: Function;
@@ -34,75 +35,59 @@ export default function CharactersList(props: CharactersDataInterface) {
   );
   const [clearChoices, setClearChoices] = useState(false);
 
-  useEffect(() => {
-    console.log("Start of useEffect in characters");
+  const { data, isError, isLoading } = useContractReads({
+    contracts: [
+      {
+        address: charContract.address,
+        abi: charContract.abi,
+        functionName: "getAllCharsByOwner",
+        args: [props.address],
+      },
+      {
+        address: itemsContract.address,
+        abi: itemsContract.abi,
+        functionName: "getOwnedItems",
+        args: [props.address],
+      },
+    ],
+    watch: true,
+    onSettled: (data) => {
+      console.log("onSettled", data);
+      if (data) {
+        setChars(data[0].result as CharInterface[]);
+        setItems(data[1].result as ItemDataInterface[]);
+        setCharsLoaded(true);
+        setItemsLoaded(true);
+      }
+    },
+  });
 
-    async function updateCharsFromChain() {
-      const remoteChars = await props.charContract_read.getAllCharsByOwner(
-        props.address
-      );
-
-      const newChars: CharInterface[] = [];
-
-      let newSelectedItems: SelectedItemsInterface = {};
-
-      remoteChars.forEach((char: any) => {
-        newChars.push(char);
-        newSelectedItems[char.id] = [];
-      });
-      setChars(newChars);
-      setSelectedItems(newSelectedItems);
-      setCharsLoaded(true);
-    }
-
-    async function updateVaultFromChain() {
-      const remoteChars = await props.itemsContract_read.getOwnedItems(
-        props.address
-      );
-
-      const newItems: ItemDataInterface[] = [];
-
-      remoteChars.forEach((item: any) => {
-        newItems.push(item);
-      });
-      setItems(newItems);
-      setItemsLoaded(true);
-    }
-
-    if (!itemsLoaded) {
-      updateVaultFromChain();
-    }
-
-    if (!charsLoaded) {
-      updateCharsFromChain();
-    }
-  }, [
-    props.address,
-    charsLoaded,
-    props.charContract_read,
-    itemsLoaded,
-    props.itemsContract_read,
-  ]);
+  const {
+    isLoading: isDecantLoading,
+    isSuccess: isDecantSuccess,
+    write: decantNewClone,
+  } = useContractWrite({
+    address: charContract.address,
+    abi: charContract.abi,
+    functionName: "decantNewClone",
+  });
 
   function resetClear() {
     setClearChoices(false);
   }
 
   async function handleDecantClick() {
-    const tx = await props.charContract_write.decantNewClone({
-      value: ethers.utils.parseEther(".01"),
-    });
-    await tx.wait();
+    decantNewClone({ value: parseEther(DECANT_COST_IN_ETH.toString()) });
     setCharsLoaded(false);
   }
 
   async function handleEnlistClick(id: number) {
-    const tx = await props.charContract_write.enlistChar(
-      id,
-      selectedItems[id],
-      { value: ethers.utils.parseEther(".0001"), gasLimit: 12000000 }
-    );
-    await tx.wait();
+    // const tx = await props.charContract_write.enlistChar(
+    //   id,
+    //   selectedItems[id],
+    //   { value: ethers.utils.parseEther(".0001"), gasLimit: 12000000 }
+    // );
+    // await tx.wait();
     setCharsLoaded(false);
     setClearChoices(true);
   }
@@ -118,14 +103,14 @@ export default function CharactersList(props: CharactersDataInterface) {
   // }
 
   async function handleSoloClick(id: number) {
-    console.log(selectedItems);
-    console.log("Items sent to game", Array.from(selectedItems[id].values()));
-    const tx = await props.charContract_write.enlistSolo(
-      id,
-      selectedItems[id],
-      { value: ethers.utils.parseEther(".0005"), gasLimit: 12000000 }
-    );
-    await tx.wait();
+    // console.log(selectedItems);
+    // console.log("Items sent to game", Array.from(selectedItems[id].values()));
+    // const tx = await props.charContract_write.enlistSolo(
+    //   id,
+    //   selectedItems[id],
+    //   { value: ethers.utils.parseEther(".0005"), gasLimit: 12000000 }
+    // );
+    // await tx.wait();
     setCharsLoaded(false);
     setClearChoices(true);
   }
@@ -321,14 +306,22 @@ export default function CharactersList(props: CharactersDataInterface) {
     return charList;
   }
 
+  function renderDecantButton() {
+    return (
+      <Button
+        disabled={isDecantLoading}
+        variant="contained"
+        onClick={handleDecantClick}
+      >
+        {isDecantLoading ? "Sign in Wallet" : "Buy New Character NFT"}
+      </Button>
+    );
+  }
+
   return (
     <Grid container spacing={1}>
       <Grid item xs={4}>
-        <Card>
-          <Button variant="contained" onClick={handleDecantClick}>
-            Buy New Character NFT
-          </Button>
-        </Card>
+        <Card>{renderDecantButton()}</Card>
       </Grid>
       <Grid item xs={4}>
         <Card>
