@@ -10,7 +10,11 @@ import { charContract, itemsContract } from "../contracts";
 
 import charContractDeployData from "../deployments/BCChars.json";
 import { parseEther } from "viem";
-import { DECANT_COST_IN_ETH } from "../constants";
+import {
+  DECANT_COST_IN_ETH,
+  MULTI_GAME_COST_IN_ETH,
+  SOLO_GAME_COST_IN_ETH,
+} from "../constants";
 
 interface CharactersDataInterface {
   address: string;
@@ -24,7 +28,6 @@ interface SelectedItemsInterface {
 
 // TODO: Rename to CharactersList
 export default function CharactersList(props: CharactersDataInterface) {
-  const [charsLoaded, setCharsLoaded] = useState(false);
   const [chars, setChars] = useState<CharInterface[]>([]);
 
   const [itemsLoaded, setItemsLoaded] = useState(false);
@@ -35,7 +38,7 @@ export default function CharactersList(props: CharactersDataInterface) {
   );
   const [clearChoices, setClearChoices] = useState(false);
 
-  const { data, isError, isLoading } = useContractReads({
+  useContractReads({
     contracts: [
       {
         address: charContract.address,
@@ -52,11 +55,9 @@ export default function CharactersList(props: CharactersDataInterface) {
     ],
     watch: true,
     onSettled: (data) => {
-      console.log("onSettled", data);
       if (data) {
         setChars(data[0].result as CharInterface[]);
         setItems(data[1].result as ItemDataInterface[]);
-        setCharsLoaded(true);
         setItemsLoaded(true);
       }
     },
@@ -72,23 +73,40 @@ export default function CharactersList(props: CharactersDataInterface) {
     functionName: "decantNewClone",
   });
 
+  const {
+    isLoading: isEnlistLoading,
+    isSuccess: isEnlistSuccess,
+    write: enlistChar,
+  } = useContractWrite({
+    address: charContract.address,
+    abi: charContract.abi,
+    functionName: "enlistChar",
+  });
+
+  const {
+    isLoading: isSoloLoading,
+    isSuccess: isSoloSuccess,
+    write: enlistSolo,
+  } = useContractWrite({
+    address: charContract.address,
+    abi: charContract.abi,
+    functionName: "enlistSolo",
+  });
+
   function resetClear() {
     setClearChoices(false);
   }
 
   async function handleDecantClick() {
     decantNewClone({ value: parseEther(DECANT_COST_IN_ETH.toString()) });
-    setCharsLoaded(false);
   }
 
   async function handleEnlistClick(id: number) {
-    // const tx = await props.charContract_write.enlistChar(
-    //   id,
-    //   selectedItems[id],
-    //   { value: ethers.utils.parseEther(".0001"), gasLimit: 12000000 }
-    // );
-    // await tx.wait();
-    setCharsLoaded(false);
+    enlistChar({
+      value: parseEther(MULTI_GAME_COST_IN_ETH.toString()),
+      args: [id, selectedItems[id]],
+    });
+
     setClearChoices(true);
   }
 
@@ -103,15 +121,11 @@ export default function CharactersList(props: CharactersDataInterface) {
   // }
 
   async function handleSoloClick(id: number) {
-    // console.log(selectedItems);
-    // console.log("Items sent to game", Array.from(selectedItems[id].values()));
-    // const tx = await props.charContract_write.enlistSolo(
-    //   id,
-    //   selectedItems[id],
-    //   { value: ethers.utils.parseEther(".0005"), gasLimit: 12000000 }
-    // );
-    // await tx.wait();
-    setCharsLoaded(false);
+    enlistSolo({
+      value: parseEther(SOLO_GAME_COST_IN_ETH.toString()),
+      args: [id, selectedItems[id]],
+    });
+
     setClearChoices(true);
   }
 
@@ -292,6 +306,20 @@ export default function CharactersList(props: CharactersDataInterface) {
                             {char.traits.melee}
                           </Typography>
                         </Grid>
+                      </Grid>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Card>
+                      <Typography variant="h6">Items</Typography>
+                      <Grid container spacing={1}>
+                        <ItemSelector
+                          charId={parseInt(char.id.toString())}
+                          items={items}
+                          updateItemsForChar={updateItemsForChar}
+                          clearChoices={clearChoices}
+                          resetClear={resetClear}
+                        />
                       </Grid>
                     </Card>
                   </Grid>
