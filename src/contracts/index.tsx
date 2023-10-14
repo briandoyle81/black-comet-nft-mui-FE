@@ -18,7 +18,7 @@ export const itemsContract = {
   abi: itemsContractDeployData.abi as Abi,
 };
 
-export const gameContract = {
+export const gamesContract = {
   address: gameContractDeployData.address as `0x${string}`,
   abi: gameContractDeployData.abi as Abi,
 };

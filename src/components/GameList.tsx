@@ -8,53 +8,37 @@ import {
   ListItem,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import { ethers } from "ethers";
-import { ReactNode, useEffect, useState } from "react";
-import { CharInterface } from "./Board";
+import { useState } from "react";
 import { GameInterface } from "./GamePanel";
+import { useContractRead } from "wagmi";
+import { gamesContract } from "../contracts";
 
 interface GameListDataInterface {
-  gameContract_read: any; // todo any
   setCurrentGameNumber: Function;
   setTabValue: Function;
   address: string;
 }
 
 export default function GameList(props: GameListDataInterface) {
-  const [gamesLoaded, setGamesLoaded] = useState(false);
   const [games, setGames] = useState<GameInterface[]>([]);
 
-  useEffect(() => {
-    async function updateGamesFromChain() {
-      const gameIds = await props.gameContract_read.extGetGamesOfPlayer(
-        props.address
-      );
-      const newGames: GameInterface[] = [];
-
-      for (let i = 0; i < gameIds.length; i++) {
-        const newGame = await props.gameContract_read.games(gameIds[i]);
-        newGames.push({
-          ...newGame,
-          playerIndexes: await props.gameContract_read.extGetGamePlayerIndexes(
-            gameIds[i]
-          ),
-          gameNumber: gameIds[i],
-        });
+  useContractRead({
+    address: gamesContract.address,
+    abi: gamesContract.abi,
+    functionName: "extGetGamesOfPlayer",
+    args: [props.address],
+    watch: true,
+    onSettled: (data) => {
+      if (data) {
+        setGames(data as GameInterface[]);
       }
-
-      setGames(newGames);
-      setGamesLoaded(true);
-    }
-
-    if (!gamesLoaded) {
-      updateGamesFromChain();
-    }
-  }, [gamesLoaded, props.address, props.gameContract_read]);
+    },
+  });
 
   const handleGameButtonClick = (id: number) => {
     localStorage.setItem("lastGame", id.toString());
     localStorage.setItem("lastTab", "2");
-    const intId = ethers.BigNumber.from(id).toNumber();
+    const intId = id as number;
     props.setCurrentGameNumber(intId);
     props.setTabValue(2);
   };
@@ -65,7 +49,7 @@ export default function GameList(props: GameListDataInterface) {
         <Card sx={{ mb: 2 }}>
           <CardContent>
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Game Number: {game.gameNumber.toString()}
+              Game Number: {game.gameId.toString()}
             </Typography>
             <List>
               <ListItem>
@@ -98,7 +82,7 @@ export default function GameList(props: GameListDataInterface) {
           </CardContent>
           <Button
             variant="contained"
-            onClick={() => handleGameButtonClick(game.gameNumber)}
+            onClick={() => handleGameButtonClick(game.gameId)}
             sx={{ m: 2 }}
           >
             Load Game

@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
@@ -7,12 +6,9 @@ import GameInfo from "./GameInfo";
 import { PlayerInterface } from "./Player";
 import ActionPicker from "./ActionPicker";
 import { CharInterface } from "./Board";
-import { Card, CardContent, CardHeader, Typography } from "@mui/material";
-import { isPropertySignature } from "typescript";
-import ItemCard, { ItemDataInterface } from "./ItemCard";
-import EventModal from "./EventModal";
+import { ItemDataInterface } from "./ItemCard";
 import { Position } from "./Utils";
-import { GameTileInterface, RoomTile, TilePropsInterface } from "./Tile";
+import { GameTileInterface, RoomTile } from "./Tile";
 import Inventory from "./Inventory";
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -47,10 +43,9 @@ export interface GameInfoInterface {
   currentPlayer: PlayerInterface;
   currentChar: CharInterface;
   currentGameProps: GameInterface;
+  denizens: DenizenInterface[];
   currentGameNumber: number;
   playerSignerAddress: string;
-  actionsContract_write: any; // TODO: Any
-  gameContract_write: any;
   lastDieRoll: string;
   setLastDieRoll: Function;
   numItems: number; // number of items in the current room
@@ -59,9 +54,8 @@ export interface GameInfoInterface {
   players: PlayerInterface[];
   chars: CharInterface[];
   currentTile: GameTileInterface;
-  setEventFlipper: Function;
-  eventResolved: boolean;
-  setEventResolved: Function;
+  eventIsLive: boolean;
+  setEventIsLive: Function;
   roomsWithItems: Position[];
   gameWorldItems: ItemDataInterface[];
   logs: string[];
@@ -88,16 +82,18 @@ export interface GameInterface {
   active: boolean;
   denizenTurn: boolean;
 
+  gameId: number;
+
   playerIndexes: number[];
+  charIds: number[];
+
   currentPlayerTurnIndex: number;
   numPlayers: number;
-  // uint256[] itemIDs; // Items in (owned by) the game
 
   turnsTaken: number;
 
   eventTracker: EventTrackerInterface;
 
-  // mapContract: string; // TODO: Handle if game contract changes!!!!
   mapId: number;
 
   eventPlayerId: number;
@@ -105,12 +101,18 @@ export interface GameInterface {
   eventType: BCEventType;
   eventPosition: Position;
 
+  unusedBugEvents: number[];
+  unusedMysteryEvents: number[];
+  unusedScavEvents: number[];
+  unusedShipEvents: number[];
+
   turnTimeLimit: number;
   lastTurnTimestamp: number;
 
-  denizens: DenizenInterface[];
+  denizenIds: number[];
+  // Extras not in smart contract type
 
-  gameNumber: number;
+  // denizens?: DenizenInterface[];
 }
 
 export default function GamePanel(props: GameInfoInterface) {

@@ -45,10 +45,10 @@ const BoxContainer = styled(Box)(({ theme }) => ({
 }));
 
 export interface PlayerInterface {
-  remoteId: number;
-
   owner: string;
   characterId: number;
+
+  id: number;
 
   currentTraits: TraitsInterface;
 

@@ -4,10 +4,29 @@ import { ReactNode, useState } from "react";
 import { Action, Followthrough } from "./ActionPicker";
 import { GameInfoInterface } from "./GamePanel";
 import ItemCard from "./ItemCard";
+import { useContractWrite } from "wagmi";
+import { actionsContract } from "../contracts";
 
 export default function Inventory(props: GameInfoInterface) {
   const [selectedCard, setSelectedCard] = useState<any>({});
   const [selectedId, setSelectedId] = useState<number[]>([]);
+
+  const {
+    data: dropItemData,
+    isSuccess: dropItemIsSuccess,
+    write: doAction,
+  } = useContractWrite({
+    address: actionsContract.address,
+    abi: actionsContract.abi,
+    functionName: "doAction",
+    onSuccess(data) {
+      if (data) {
+        // props.setEventFlipper();
+        setSelectedId([]);
+        setSelectedCard({});
+      }
+    },
+  });
 
   const handleCardClick = (event: any, cardNumber: number, id: number) => {
     if (selectedCard[cardNumber] === true) {
@@ -27,23 +46,16 @@ export default function Inventory(props: GameInfoInterface) {
   };
 
   const submitDrop = async () => {
-    const dropTx = await props.actionsContract_write.doAction(
-      props.currentGameNumber,
-      props.currentPlayer.remoteId,
-      Action.DROP_ITEMS,
-      Followthrough.NONE,
-      0,
-      0,
-      selectedId
-    );
-
-    // Below works for the acting client, but not a hook, so others
-    // won't get the update (they do through the events though)
-    await dropTx.wait().then(() => {
-      // TODO: Set waiting state to prevent action submission
-      props.setEventFlipper();
-      setSelectedId([]);
-      setSelectedCard({});
+    doAction({
+      args: [
+        props.currentGameNumber,
+        props.currentPlayer.id,
+        Action.DROP_ITEMS,
+        Followthrough.NONE,
+        0,
+        0,
+        selectedId,
+      ],
     });
   };
 

@@ -7,12 +7,12 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  TextField,
   Typography,
 } from "@mui/material";
 import { ReactNode, useEffect, useState } from "react";
 import GamePanel, {
   BCEventType,
+  DenizenInterface,
   DenizenType,
   EventTrackerInterface,
   GameInterface,
@@ -28,28 +28,34 @@ import Door from "./Doors";
 
 import { PlayerInterface } from "./Player";
 
-import Tile, {
-  EmptyRoomTile,
-  EmptyTile,
-  GameTileInterface,
-  RoomTile,
-} from "./Tile";
+import Tile, { EmptyTile, GameTileInterface, RoomTile } from "./Tile";
 import { BigNumber } from "ethers";
 import { getEventFromId } from "./EventData";
 import { Action, ActionString } from "./ActionPicker";
 import ChatWindow from "./ChatWindow";
 
-import { ethers } from "ethers";
-
-import actionsContractDeployData from "../deployments/Actions.json";
-import gamesContractDeployData from "../deployments/BCGames.json";
-import playersContractDeployData from "../deployments/BCPlayers.json";
+// import actionsContractDeployData from "../deployments/Actions.json";
+// import gamesContractDeployData from "../deployments/BCGames.json";
+// import playersContractDeployData from "../deployments/BCPlayers.json";
 import EventTracker from "./EventTracker";
 import EventModal from "./EventModal";
 import GameInfoCard from "./GameInfoCard";
 import { DenizenTypeToString } from "./Denizen";
-import { create } from "domain";
 import { roomDisplayDataList } from "./RoomTiles";
+import {
+  useContractRead,
+  useContractReads,
+  useContractWrite,
+  usePublicClient,
+} from "wagmi";
+import {
+  actionsContract,
+  gamesContract,
+  itemsContract,
+  mapsContract,
+} from "../contracts";
+
+import { parseAbiItem } from "viem";
 
 let timesBoardPulled = 0;
 
@@ -74,7 +80,11 @@ export const EmptyGame: GameInterface = {
   active: false,
   denizenTurn: false,
 
+  gameId: -1,
+
   playerIndexes: [0, 0, 0, 0],
+  charIds: [],
+
   currentPlayerTurnIndex: 0,
   numPlayers: 0,
 
@@ -89,30 +99,22 @@ export const EmptyGame: GameInterface = {
   eventType: BCEventType.NONE,
   eventPosition: { row: 0, col: 0 },
 
+  unusedBugEvents: [],
+  unusedMysteryEvents: [],
+  unusedScavEvents: [],
+  unusedShipEvents: [],
+
   turnTimeLimit: 0,
   lastTurnTimestamp: 0,
 
-  denizens: [],
-
-  gameNumber: -1,
+  denizenIds: [],
 };
 
 export interface GameBoardProps {
   currentGameNumber: number;
-  mapContract_read: any; // TODO anys
-  gameContract_read: any;
-  gameContract_write: any;
-  charContract_read: any;
-  itemContract_read: any;
   playerSignerAddress: string;
-  actionsContract_write: any; // TODO: Any
-  actionsContract_read: any;
-  playersContract_read: any;
-  playersContract_write: any;
-  utilsContract_read: any;
   setCurrentGameNumber: Function;
-  walletLoaded: boolean;
-  provider: any; // TODO: any
+  isConnected: boolean;
 }
 
 export interface TraitsInterface {
@@ -127,14 +129,15 @@ export interface TraitsInterface {
 
 export interface CharInterface {
   genHash: string; // TODO: Tie to universal inventory
+  id: number;
+  uifID: number;
   traits: TraitsInterface;
   cloneNumber: number; // High but possibly reachable limit
   maxClones: number; // Eventually exit them from the economy??
   ability: number;
   flaw: number;
   inGame: boolean;
-  dead: boolean;
-  id: number;
+  gameId: number;
 }
 
 export enum EffectTypes {
@@ -213,9 +216,8 @@ interface HistoricLog {
 export default function GameBoard(props: GameBoardProps) {
   const n = 11; // TODO: Hardcoded board size, can't use await here
 
-  // const [loading, setLoading] = useState(false);
   const [numGames, setNumGames] = useState(0);
-  const [currentGame, setCurrentGame] = useState<GameInterface>(EmptyGame);
+  const [currentGame, setCurrentGame] = useState<GameInterface>(EmptyGame); // TODO: I don't think i need EmptyGame.  Except I do because I get endless null ref errors even on components that can't render unless game exists
   const [roomTiles, setRoomTiles] = useState<RoomTile[]>([]);
   const [gameTiles, setGameTiles] = useState(
     Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile))
@@ -223,19 +225,23 @@ export default function GameBoard(props: GameBoardProps) {
   const [doors, setDoors] = useState<DoorInterface[]>([]);
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
   const [chars, setChars] = useState<CharInterface[]>([]);
-  const [gameLoaded, setGameLoaded] = useState(false);
-  const [formGameNumber, setFormGameNumber] = useState(props.currentGameNumber);
+  const [denizens, setDenizens] = useState<DenizenInterface[]>([]);
+
   const [currentPlayerItems, setCurrentPlayerItems] = useState<any[]>(); // TODO: Any
   const [gameWorldItems, setGameWorldItems] = useState<ItemDataInterface[]>([]);
   const [roomsWithItems, setRoomsWithItem] = useState<Position[]>([]); // TODO: This should be a set
 
   const [lastDieRoll, setLastDieRoll] = useState("None");
-  const [eventFlipper, setEventFlipper] = useState(true); // TODO: Confusing name, think this should be actionFlipper
-  const [eventsLoaded, setEventsLoaded] = useState(false);
-  const [eventResolved, setEventResolved] = useState(false);
+  // const [eventFlipper, setEventFlipper] = useState(true); // TODO: Confusing name, think this should be actionFlipper
+
+  const [eventIsLive, setEventIsLive] = useState(false);
 
   const [logs, setLogs] = useState(["Welcome to the Black Comet!"]);
-  const [logBlocks, setLogBlocks] = useState<Set<BigNumber>>(new Set());
+
+  const [obtainedLogBlocks, setObtainedLogBlocks] = useState<Set<BigNumber>>(
+    new Set()
+  );
+  const [newLogBlocks, setNewLogBlocks] = useState<Set<BigNumber>>(new Set());
 
   const [dateInSeconds, setDateInSeconds] = useState(
     Math.floor(Date.now() / 1000)
@@ -249,891 +255,217 @@ export default function GameBoard(props: GameBoardProps) {
 
   const [debugGameOver, setDebugGameOver] = useState(false);
 
-  const updateWorldItemsFromChain = async () => {
-    const remoteWorldItems = await props.itemContract_read.getWorldItems(
-      props.currentGameNumber
-    );
-    // const remoteWorldItems: IWorldItem[] = [];
-    const newRemoteItems: ItemDataInterface[] = [];
-
-    const newPosWithItem: Position[] = [];
-
-    remoteWorldItems.forEach((worldItem: ItemDataInterface) => {
-      newRemoteItems.push(worldItem);
-      newPosWithItem.push(worldItem.position);
-    });
-
-    setGameWorldItems([...newRemoteItems]);
-    setRoomsWithItem([...newPosWithItem]);
-  };
-
-  const updateCurrentPlayerItemsFromChain = async () => {
-    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(
-      props.currentGameNumber
-    );
-
-    let playerItems: any[][] = [];
-    for (let i = 0; i < playerIndexes.length; i++) {
-      const currentPlayerId = playerIndexes[i];
-      // TODO: Debug this.  Works fine in unit test trying to get items from null set, crashes here
-      const remoteItems = await props.itemContract_read.getItemsByPlayer(
-        currentPlayerId
-      );
-
-      playerItems.push(remoteItems);
-    }
-    setCurrentPlayerItems(playerItems);
-  };
-
-  const updateBoardFromChain = async () => {
-    timesBoardPulled++;
-    console.log("timesBoardPulled", timesBoardPulled);
-    const remoteBoard = await props.mapContract_read.extGetBoard(
-      props.currentGameNumber
-    ); // TODO: Confirm that game and map numbers will always match
-    const localBoard = Array.from({ length: n }, () =>
-      Array.from({ length: n }, () => EmptyTile)
-    );
-
-    remoteBoard.forEach((rowData: GameTileInterface[], row: number) => {
-      rowData.forEach((gameTile: GameTileInterface, col) => {
-        localBoard[row][col] = gameTile;
-      });
-    });
-
-    const remoteRoomTiles = await props.mapContract_read.extGetRoomList(
-      props.currentGameNumber
-    ); // TODO: Confirm that game and map numbers will always match
-    const localRoomTiles: RoomTile[] = [];
-
-    remoteRoomTiles.forEach((roomTile: RoomTile) => {
-      localRoomTiles.push(roomTile);
-    });
-
-    // TODO: Hack for broken reactor.  Remove next time you see this!
-    // I saw it 4-23 and I don't remember what it does and am not sure if I should remove
-    // removed 7-15
-    // localRoomTiles[100] = EmptyRoomTile;
-
-    setGameTiles(localBoard);
-    setRoomTiles(localRoomTiles);
-  };
-
-  const updateCharsFromChain = async () => {
-    const updatedChars: CharInterface[] = [];
-    // TODO: Get the cached char id list instead of loading it
-    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(
-      props.currentGameNumber
-    );
-
-    for (let i = 0; i < playerIndexes.length; i++) {
-      const remotePlayer = await props.playersContract_read.players(
-        playerIndexes[i]
-      );
-      const remoteChar = await props.charContract_read.characters(
-        remotePlayer.characterId
-      );
-      updatedChars.push(remoteChar);
-    }
-
-    setChars(updatedChars);
-  };
-
-  const updateDoorsFromChain = async () => {
-    const remoteDoors = await props.mapContract_read.extGetDoors(
-      props.currentGameNumber
-    ); // TODO: Get game first and get board number from it
-
-    const newDoors: DoorInterface[] = [];
-
-    remoteDoors.forEach((door: DoorInterface, index: number) => {
-      const newDoor: DoorInterface = {
-        vsBreach: door.vsBreach,
-        vsHack: door.vsHack,
-        status: door.status,
-        rotate: false,
-      };
-      // newDoors[index] = newDoor;
-      newDoors.push(newDoor);
-    });
-
-    setDoors(newDoors);
-  };
-
-  const updateRemotePlayers = async () => {
-    const newPlayers: PlayerInterface[] = [];
-
-    const playerIndexes = await props.gameContract_read.extGetGamePlayerIndexes(
-      props.currentGameNumber
-    );
-
-    for (let i = 0; i < playerIndexes.length; i++) {
-      const remotePlayer = await props.playersContract_read.players(
-        playerIndexes[i]
-      );
-      const { position } = remotePlayer;
-      const newPlayer: PlayerInterface = {
-        remoteId: playerIndexes[i],
-
-        owner: remotePlayer.owner,
-        characterId: remotePlayer.characterId,
-
-        currentTraits: remotePlayer.currentTraits,
-
-        position: position,
-
-        healthDmgTaken: remotePlayer.healthDmgTaken,
-        armorDmgTaken: remotePlayer.armorDmgTaken,
-        actionsTaken: remotePlayer.actionsTaken,
-
-        dataTokens: remotePlayer.dataTokens,
-        currentEffects: remotePlayer.currentEffects,
-        inventoryIDs: remotePlayer.inventoryIDs,
-
-        canHarmOthers: remotePlayer.canHarmOthers,
-        dead: remotePlayer.dead,
-      };
-      newPlayers.push(newPlayer);
-    }
-    setPlayers(newPlayers);
-  };
-
-  // TODO: Decompose this to a component
-  const getLogBlocks = async () => {
-    const historicLogs: HistoricLog[] = [];
-
-    const actionsBlocks = await props.actionsContract_read.getEventBlocks(
-      props.currentGameNumber
-    );
-
-    // DON'T SORT NOW, WILL SORT AFTER WE HAVE THEM ALL
-    // Then create filters for the DiceRollEvent, ChallengeEvent, and ActionCompleteEvent in the actions contract
-    // console.log("actionsBlocks", actionsBlocks);
-    const actionsInterface = new ethers.utils.Interface(
-      actionsContractDeployData.abi
-    );
-
-    // TODO: It's probably not efficient to make all these filters more than once
-    const actionsDiceRollEventFilter =
-      await props.actionsContract_read.filters.DiceRollEvent();
-
-    const actionsChallengeEventFilter =
-      await props.actionsContract_read.filters.ChallengeEvent();
-
-    const actionCompleteEventFilter =
-      await props.actionsContract_read.filters.ActionCompleteEvent();
-
-    for (const blockNumber of actionsBlocks) {
-      const diceRollEvents = await props.actionsContract_read.queryFilter(
-        actionsDiceRollEventFilter,
-        blockNumber.toNumber(),
-        blockNumber.toNumber()
-      );
-
-      for (const diceRollEvent of diceRollEvents) {
-        const parsedEvent = actionsInterface.parseLog(diceRollEvent);
-        // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
-          const newLog = buildDiceRollEventLog(parsedEvent.args.roll);
-
-          historicLogs.push({
-            blockNumber,
-            logType: "DiceRollEvent",
-            log: newLog,
-          });
-        }
-      }
-
-      const challengeEvents = await props.actionsContract_read.queryFilter(
-        actionsChallengeEventFilter,
-        blockNumber.toNumber(),
-        blockNumber.toNumber()
-      );
-
-      for (const challengeEvent of challengeEvents) {
-        const parsedEvent = actionsInterface.parseLog(challengeEvent);
-        // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
-          const newLog =
-            "Challenge roll of: " +
-            parsedEvent.args.roll.toString() +
-            ". For: " +
-            parsedEvent.args.forValue.toString() +
-            " Against: " +
-            parsedEvent.args.against.toString();
-
-          historicLogs.push({
-            blockNumber,
-            logType: "ChallengeEvent",
-            log: newLog,
-          });
-        }
-      }
-
-      const actionCompleteEvents = await props.actionsContract_read.queryFilter(
-        actionCompleteEventFilter,
-        blockNumber.toNumber(),
-        blockNumber.toNumber()
-      );
-
-      for (const actionCompleteEvent of actionCompleteEvents) {
-        const parsedEvent = actionsInterface.parseLog(actionCompleteEvent);
-        // console.log("parsedActionCompleteEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
-          const { position } = parsedEvent.args.player;
-          const newLog =
-            "Player " +
-            parsedEvent.args.playerId.toString() +
-            " selected " +
-            ActionString[parsedEvent.args.action as Action] +
-            " at row " +
-            position.row.toString() +
-            ", col " +
-            position.col.toString();
-
-          historicLogs.push({
-            blockNumber,
-            logType: "ActionCompleteEvent",
-            log: newLog,
-          });
-        }
-      }
-    }
-
-    const gamesBlocks = await props.gameContract_read.getEventBlocks(
-      props.currentGameNumber
-    );
-
-    const gamesInterface = new ethers.utils.Interface(
-      gamesContractDeployData.abi
-    );
-
-    const gamesDiceRollEventFilter =
-      await props.gameContract_read.filters.DiceRollEvent();
-
-    const gamesChallengeEventFilter =
-      await props.gameContract_read.filters.ChallengeEvent();
-
-    const denizenAttackEventFilter =
-      await props.gameContract_read.filters.DenizenAttack();
-
-    const playerAttackEventFilter =
-      await props.gameContract_read.filters.PlayerAttack();
-
-    const playerDiceRollEventFilter =
-      await props.playersContract_read.filters.DiceRollEvent();
-
-    const playerDiedEventFilter =
-      await props.playersContract_read.filters.PlayerDiedEvent();
-
-    const denizenTurnOverFilter =
-      await props.gameContract_read.filters.DenizenTurnOver();
-
-    for (const blockNumber of gamesBlocks) {
-      const diceRollEvents = await props.gameContract_read.queryFilter(
-        gamesDiceRollEventFilter,
-        blockNumber.toNumber(),
-        blockNumber.toNumber()
-      );
-
-      for (const diceRollEvent of diceRollEvents) {
-        const parsedEvent = gamesInterface.parseLog(diceRollEvent);
-        // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
-          const newLog = buildDiceRollEventLog(parsedEvent.args.roll);
-
-          historicLogs.push({
-            blockNumber,
-            logType: "DiceRollEvent",
-            log: newLog,
-          });
-        }
-      }
-
-      const challengeEvents = await props.gameContract_read.queryFilter(
-        gamesChallengeEventFilter,
-        blockNumber.toNumber(),
-        blockNumber.toNumber()
-      );
-
-      for (const challengeEvent of challengeEvents) {
-        const parsedEvent = gamesInterface.parseLog(challengeEvent);
-        // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
-          const newLog =
-            "Challenge roll of: " +
-            parsedEvent.args.roll.toString() +
-            ". For: " +
-            parsedEvent.args.forValue.toString() +
-            " Against: " +
-            parsedEvent.args.against.toString();
-
-          historicLogs.push({
-            blockNumber,
-            logType: "ChallengeEvent",
-            log: newLog,
-          });
-        }
-      }
-
-      const denizenAttackEvents = await props.gameContract_read.queryFilter(
-        denizenAttackEventFilter,
-        blockNumber.toNumber(),
-        blockNumber.toNumber()
-      );
-
-      for (const denizenAttackEvent of denizenAttackEvents) {
-        const parsedEvent = gamesInterface.parseLog(denizenAttackEvent);
-        // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
-          const newLog =
-            DenizenTypeToString.get(parsedEvent.args.denizenType) +
-            " with ID " +
-            parsedEvent.args.denizenId.toString() +
-            " attacked player " +
-            parsedEvent.args.playerTarget.toString() +
-            " for " +
-            parsedEvent.args.damage.toString() +
-            " and took turnabout of " +
-            parsedEvent.args.turnabout.toString();
-
-          historicLogs.push({
-            blockNumber,
-            logType: "DenizenAttack",
-            log: newLog,
-          });
-        }
-      }
-
-      const playerAttackEvents = await props.gameContract_read.queryFilter(
-        playerAttackEventFilter,
-        blockNumber.toNumber(),
-        blockNumber.toNumber()
-      );
-
-      for (const playerAttackEvent of playerAttackEvents) {
-        const parsedEvent = gamesInterface.parseLog(playerAttackEvent);
-        // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
-          const newLog =
-            "Player with ID " +
-            parsedEvent.args.playerId.toString() +
-            " attacked " +
-            DenizenTypeToString.get(parsedEvent.args.denizenType) +
-            " #" +
-            parsedEvent.args.denizenId.toString() +
-            " for " +
-            parsedEvent.args.damage.toString() +
-            " and took turnabout of " +
-            parsedEvent.args.turnabout.toString();
-
-          historicLogs.push({
-            blockNumber,
-            logType: "PlayerAttack",
-            log: newLog,
-          });
-        }
-      }
-
-      const denizenTurnOverEvents = await props.gameContract_read.queryFilter(
-        denizenTurnOverFilter,
-        blockNumber.toNumber(),
-        blockNumber.toNumber()
-      );
-
-      for (const denizenTurnOverEvent of denizenTurnOverEvents) {
-        const parsedEvent = gamesInterface.parseLog(denizenTurnOverEvent);
-        // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
-          const newLog = "Denizen Turn Over";
-
-          historicLogs.push({
-            blockNumber,
-            logType: "DenizenTurnOver",
-            log: newLog,
-          });
-        }
-      }
-    }
-
-    const playersBlocks = await props.playersContract_read.getEventBlocks(
-      props.currentGameNumber
-    );
-
-    const playersInterface = new ethers.utils.Interface(
-      playersContractDeployData.abi
-    );
-
-    const eventResolvedEventFilter =
-      await props.playersContract_read.filters.EventResolvedEvent();
-
-    for (const blockNumber of playersBlocks) {
-      const eventResolvedEvents = await props.playersContract_read.queryFilter(
-        eventResolvedEventFilter,
-        blockNumber.toNumber(),
-        blockNumber.toNumber()
-      );
-
-      for (const eventResolvedEvent of eventResolvedEvents) {
-        const parsedEvent = playersInterface.parseLog(eventResolvedEvent);
-        // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
-          const newLog = buildBCEventEventLog(
-            parsedEvent.args.bcEvent,
-            parsedEvent.args.position
-          );
-
-          const newLog2 = createEffectLog(parsedEvent.args.appliedBCEffects);
-
-          historicLogs.push({
-            blockNumber,
-            logType: "EventResolvedEvent1",
-            log: newLog,
-          });
-
-          historicLogs.push({
-            blockNumber,
-            logType: "EventResolvedEvent2",
-            log: newLog2,
-          });
-        }
-      }
-
-      const playerDiceRollEvents = await props.playersContract_read.queryFilter(
-        playerDiceRollEventFilter,
-        blockNumber.toNumber(),
-        blockNumber.toNumber()
-      );
-
-      for (const playerDiceRollEvent of playerDiceRollEvents) {
-        const parsedEvent = playersInterface.parseLog(playerDiceRollEvent);
-        // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() == props.currentGameNumber) {
-          const newLog = buildDiceRollEventLog(parsedEvent.args.roll);
-
-          historicLogs.push({
-            blockNumber,
-            logType: "EventDiceRollEvent",
-            log: newLog,
-          });
-        }
-      }
-
-      const playerDiedEvents = await props.playersContract_read.queryFilter(
-        playerDiedEventFilter,
-        blockNumber.toNumber(),
-        blockNumber.toNumber()
-      );
-
-      for (const playerDiedEvent of playerDiedEvents) {
-        const parsedEvent = playersInterface.parseLog(playerDiedEvent);
-        // console.log("parsedEvent", parsedEvent);
-        if (parsedEvent.args.gameId.toNumber() === props.currentGameNumber) {
-          const newLog =
-            "Player " +
-            parsedEvent.args.playerId.toString() +
-            " died at " +
-            parsedEvent.args.position.row.toString() +
-            ", " +
-            parsedEvent.args.position.col.toString() +
-            " from " +
-            parsedEvent.args.damage.toString() +
-            " damage";
-
-          historicLogs.push({
-            blockNumber,
-            logType: "PlayerDiedEvent",
-            log: newLog,
-          });
-        }
-      }
-    }
-
-    // TODO: After events are added to items contract
-    // const itemsBlocks = await props.itemContract_read.getEventBlocks(
-    //   props.currentGameNumber
-    // );
-    const sortedHistoricLogs = sortHistoricLogs(historicLogs);
-    const newLogs = mapHistoricLogsToLogs(sortedHistoricLogs);
-    setLogs([...newLogs]);
-  };
-
-  const loadGameBoard = async () => {
-    if (eventFlipper === true) {
-      setNumGames(await props.gameContract_read.extGetNumGames());
-      console.log("Loading game number from event:", props.currentGameNumber);
-      const remoteGame = await props.gameContract_read.games(
-        props.currentGameNumber
-      );
-      setCurrentGame(remoteGame);
-
-      console.log("updating doors, board, players from chain");
-
-      await updateDoorsFromChain();
-      await updateBoardFromChain();
-      await updateRemotePlayers();
-      await updateCurrentPlayerItemsFromChain();
-
-      await updateCharsFromChain();
-      await updateWorldItemsFromChain();
-
-      setEventFlipper(false);
-    }
-
-    if (gameLoaded === false) {
-      setNumGames(await props.gameContract_read.extGetNumGames());
-      console.log("Loading game number from start:", props.currentGameNumber);
-      const remoteGame = await props.gameContract_read.games(
-        props.currentGameNumber
-      );
-      setCurrentGame(remoteGame);
-      if (remoteGame.active) {
-        await updateDoorsFromChain();
-        await updateBoardFromChain();
-        await updateRemotePlayers();
-        await updateCurrentPlayerItemsFromChain();
-        await updateCharsFromChain();
-        await getLogBlocks();
-        setGameLoaded(true);
-      } else {
-        setDebugGameOver(true);
-      }
-    }
-  };
-
-  // function refreshClock() {
-  //   setDateInSeconds(Math.floor(Date.now() / 1000));
-  // }
-
-  // useEffect(() => {
-  //   const timerId = setInterval(refreshClock, 1000);
-  //   return function cleanup() {
-  //     clearInterval(timerId);
-  //   };
-  // }, [dateInSeconds]);
-
-  useEffect(() => {
-    console.log("Start of useEffect in Board");
-
-    loadGameBoard().then(async () => {
-      if (currentGame.numPlayers > 0) {
-        setCurrentPlayerPos({
-          row: players[currentGame.currentPlayerTurnIndex].position.row,
-          col: players[currentGame.currentPlayerTurnIndex].position.col,
+  // TODO: These should probably use useContractReads
+  useContractRead({
+    address: itemsContract.address,
+    abi: itemsContract.abi,
+    functionName: "getWorldItems",
+    args: [props.currentGameNumber],
+    watch: true,
+    onSettled(data, error) {
+      if (data) {
+        const newWorldItems = data as ItemDataInterface[];
+        setGameWorldItems(newWorldItems);
+
+        // TODO: roomsWithItem should be a set
+        const newRoomsWithItem: Position[] = [];
+        newWorldItems.forEach((item: ItemDataInterface) => {
+          newRoomsWithItem.push(item.position);
         });
+        setRoomsWithItem(newRoomsWithItem);
       }
-      const denizens = await props.gameContract_read.getDenizensInGame(
-        props.currentGameNumber
-      );
-      // console.log("denizens", denizens);
-      let newGame = { ...currentGame };
-      newGame.denizens = denizens;
-      setCurrentGame(newGame);
-    });
-    if (props.walletLoaded && !eventsLoaded) {
-      // TODO: Find appropriate home
-      // WARNING:  This is creating a stale closure, but it's not impacted because the listener is destroyed and recreated when the game changes
-      // TODO: This is here because if it's in App, for some reason, events cause the tab content to unmount and remount, completely reloading Board
+      if (error) {
+        console.log("error in getWorldItems", error);
+      }
+    },
+  });
 
-      props.gameContract_read.on(
-        "DiceRollEvent",
-        (gameId: BigNumber, roll: BigNumber) => {
-          // TODO: Hack using mapID instead of gameId
-          // DO NOT USE ===, will always be false!!
-          if (gameId.toNumber() === props.currentGameNumber) {
-            setLastDieRoll(roll.toString());
-            const newLog = buildDiceRollEventLog(roll);
-            setLogs([...logs, newLog]);
-          }
+  useContractRead({
+    address: itemsContract.address,
+    abi: itemsContract.abi,
+    functionName: "getAllPlayersItems",
+    args: [props.currentGameNumber],
+    watch: true,
+    onSettled(data, error) {
+      if (data) {
+        setCurrentPlayerItems(data as ItemDataInterface[][]);
+      }
+      if (error) {
+        console.log("error in getAllPlayersItems", error);
+      }
+    },
+  });
+
+  useContractRead({
+    address: mapsContract.address,
+    abi: mapsContract.abi,
+    functionName: "extGetBoard",
+    args: [props.currentGameNumber],
+    watch: true,
+    onSettled(data, error) {
+      if (data) {
+        setGameTiles(data as GameTileInterface[][]);
+      }
+      if (error) {
+        console.log("error in extGetBoard", error);
+      }
+    },
+  });
+
+  useContractRead({
+    address: mapsContract.address,
+    abi: mapsContract.abi,
+    functionName: "extGetRoomList", //TODO: Investigate if this is still useful
+    args: [props.currentGameNumber],
+    watch: true, // TODO: Might not need to watch this
+    onSettled(data, error) {
+      if (data) {
+        setRoomTiles(data as RoomTile[]);
+      }
+      if (error) {
+        console.log("error in extGetRoomList", error);
+      }
+    },
+  });
+
+  useContractRead({
+    address: gamesContract.address,
+    abi: gamesContract.abi,
+    functionName: "extGetCharsInGame",
+    args: [props.currentGameNumber],
+    watch: true, // TODO: Might not need to watch this
+    onSettled(data, error) {
+      if (data) {
+        setChars(data as CharInterface[]);
+      }
+      if (error) {
+        console.log("error in extGetCharsInGame", error);
+      }
+    },
+  });
+
+  useContractRead({
+    address: mapsContract.address,
+    abi: mapsContract.abi,
+    functionName: "extGetDoors",
+    args: [props.currentGameNumber],
+    watch: true,
+    onSettled(data, error) {
+      if (data) {
+        setDoors(data as DoorInterface[]);
+      }
+      if (error) {
+        console.log("error in extGetDoors", error);
+      }
+    },
+  });
+
+  useContractRead({
+    address: gamesContract.address,
+    abi: gamesContract.abi,
+    functionName: "extGetPlayersInGame",
+    args: [props.currentGameNumber],
+    watch: true,
+    onSettled(data, error) {
+      if (data) {
+        setPlayers(data as PlayerInterface[]);
+        // console.log("players", data);
+      }
+      if (error) {
+        console.log("error in extGetPlayersInGame", error);
+      }
+    },
+  });
+
+  useContractRead({
+    address: gamesContract.address,
+    abi: gamesContract.abi,
+    functionName: "extGetNumGames",
+    args: [],
+    watch: true,
+    onSettled(data, error) {
+      if (data) {
+        setNumGames(data as number);
+      }
+      if (error) {
+        console.log("error in extGetNumGames", error);
+      }
+    },
+  });
+
+  useContractRead({
+    address: gamesContract.address,
+    abi: gamesContract.abi,
+    functionName: "extGetGame",
+    args: [props.currentGameNumber],
+    watch: true,
+    onSettled(data, error) {
+      if (data) {
+        const remoteGame = data as GameInterface;
+        // console.log("remoteGame", remoteGame.eventNumber);
+        // console.log("CurrentGame", currentGame.eventNumber);
+
+        if (remoteGame.currentPlayerTurnIndex) {
+          setCurrentPlayerPos({
+            row: players[remoteGame.currentPlayerTurnIndex].position.row,
+            col: players[remoteGame.currentPlayerTurnIndex].position.col,
+          });
         }
-      );
 
-      props.playersContract_read.on(
-        "DiceRollEvent",
-        (gameId: BigNumber, roll: BigNumber) => {
-          // TODO: Hack using mapID instead of gameId
-          // DO NOT USE ===, will always be false!!
-          if (gameId.toNumber() === props.currentGameNumber) {
-            setLastDieRoll(roll.toString());
-            const newLog = buildDiceRollEventLog(roll);
-            setLogs([...logs, newLog]);
-          }
+        if (remoteGame.eventNumber > 0) {
+          setEventIsLive(true);
+        } else {
+          setEventIsLive(false);
         }
-      );
 
-      props.playersContract_read.on(
-        "PlayerDiedEvent",
-        (
-          gameId: BigNumber,
-          playerId: BigNumber,
-          damage: BigNumber,
-          position: Position
-        ) => {
-          if (gameId.toNumber() == props.currentGameNumber) {
-            const newLog =
-              "Player " +
-              playerId.toString() +
-              " died at " +
-              position.row.toString() +
-              ", " +
-              position.col.toString() +
-              " from " +
-              damage.toString() +
-              " damage";
-            setLogs([...logs, newLog]);
-            setEventFlipper(true);
-          }
+        setCurrentGame({ ...remoteGame });
+        if (remoteGame.active === false) {
+          setDebugGameOver(true);
         }
-      );
+      }
+      if (error) {
+        console.log("error in games", error);
+      }
+    },
+  });
 
-      props.gameContract_read.on(
-        "ChallengeEvent",
-        (
-          gameId: BigNumber,
-          roll: BigNumber,
-          forValue: BigNumber,
-          against: BigNumber
-        ) => {
-          // TODO: Hack using mapID instead of gameId
-          // TODO: THe above might not be true an longer
-          if (gameId.toNumber() === props.currentGameNumber) {
-            setLastDieRoll(roll.toString());
-            const newLog =
-              "A challenge roll was " +
-              roll.toString() +
-              ". For: " +
-              forValue.toString() +
-              " Against: " +
-              against.toString();
-            setLogs([...logs, newLog]);
-          }
-        }
-      );
+  useContractRead({
+    address: gamesContract.address,
+    abi: gamesContract.abi,
+    functionName: "getDenizensInGame",
+    args: [props.currentGameNumber],
+    watch: true,
+    onSettled(data, error) {
+      if (data && currentGame.gameId !== -1) {
+        setDenizens(data as DenizenInterface[]);
+      }
+      if (error) {
+        console.log("error in getDenizensInGame", error);
+      }
+    },
+  });
 
-      props.actionsContract_read.on(
-        "DiceRollEvent",
-        (gameId: BigNumber, roll: BigNumber) => {
-          // TODO: Hack using mapID instead of gameId
-          // DO NOT USE ===, will always be false!!
-          if (gameId.toNumber() === props.currentGameNumber) {
-            setLastDieRoll(roll.toString());
-            const newLog = buildDiceRollEventLog(roll);
-            setLogs([...logs, newLog]);
-          }
-        }
-      );
+  const {
+    data: forceNextTurnData,
+    isLoading: forceNextTurnIsLoading,
+    error: forceNextTurnError,
+    write: forceNextTurn,
+  } = useContractWrite({
+    address: gamesContract.address,
+    abi: gamesContract.abi,
+    functionName: "forceNextTurn",
+  });
 
-      props.actionsContract_read.on(
-        "ChallengeEvent",
-        (
-          gameId: BigNumber,
-          roll: BigNumber,
-          forValue: BigNumber,
-          against: BigNumber
-        ) => {
-          // TODO: Hack using mapID instead of gameId
-          // TODO: THe above might not be true an longer
-          if (gameId.toNumber() === props.currentGameNumber) {
-            setLastDieRoll(roll.toString());
-            const newLog =
-              "A challenge roll was " +
-              roll.toString() +
-              ". For: " +
-              forValue.toString() +
-              " Against: " +
-              against.toString();
-            setLogs([...logs, newLog]);
-          }
-        }
-      );
-
-      props.gameContract_read.on(
-        "DenizenAttack",
-        (
-          gameId: BigNumber,
-          denizenType: DenizenType,
-          denizenId: BigNumber,
-          playerTarget: BigNumber,
-          damage: BigNumber,
-          turnabout: BigNumber
-        ) => {
-          if (gameId.toNumber() === props.currentGameNumber) {
-            const newLog =
-              denizenType.toString() +
-              " with ID " +
-              denizenId.toString() +
-              " attacked player " +
-              playerTarget.toString() +
-              " for " +
-              damage.toString() +
-              " and took turnabout of " +
-              turnabout.toString();
-            setLogs([...logs, newLog]);
-          }
-        }
-      );
-
-      props.actionsContract_read.on(
-        "ActionCompleteEvent",
-        (
-          gameId: BigNumber,
-          // game: GameInterface,
-          playerId: BigNumber,
-          player: PlayerInterface,
-          action: Action
-        ) => {
-          if (gameId.toNumber() === props.currentGameNumber) {
-            const { position } = player;
-            const newLog =
-              "Player " +
-              playerId.toString() +
-              " selected " +
-              ActionString[action] +
-              " at " +
-              position.row.toString() +
-              ", " +
-              position.col.toString();
-            setLogs([...logs, newLog]);
-
-            setEventFlipper(true);
-          }
-        }
-      );
-
-      props.gameContract_read.on(
-        "PlayerAttack",
-        (
-          gameId: BigNumber,
-          playerId: BigNumber,
-          denizenType: DenizenType,
-          denizenId: BigNumber,
-          damage: BigNumber,
-          turnabout: BigNumber
-        ) => {
-          const newLog =
-            "Player with ID " +
-            playerId.toString() +
-            " attacked " +
-            denizenType.toString() +
-            " #" +
-            denizenId.toString() +
-            " for " +
-            damage.toString() +
-            " and took turnabout of " +
-            turnabout.toString();
-          setLogs([...logs, newLog]);
-        }
-      );
-
-      props.gameContract_read.on("DenizenTurnOver", (gameId: BigNumber) => {
-        if (gameId.toNumber() === props.currentGameNumber) {
-          const newLog = "Denizen Turn Over";
-          setLogs([...logs, newLog]);
-          setEventFlipper(true);
-        }
-      });
-
-      props.playersContract_read.on(
-        "EventResolvedEvent",
-        (
-          gameId: BigNumber,
-          playerId: BigNumber,
-          bcEvent: BCEvent,
-          bcEffects: BCEffect[], // The effect that actually happened
-          position: Position
-        ) => {
-          // DO NOT USE ===, will always be false!!
-          if (gameId.toNumber() == props.currentGameNumber) {
-            setEventResolved(true);
-
-            const newLog = buildBCEventEventLog(bcEvent, position);
-            const newLog2 = createEffectLog(bcEffects);
-
-            setLogs([...logs, newLog, newLog2]);
-
-            setEventsLoaded(true);
-            setEventFlipper(true);
-          }
-        }
-      );
-    }
-  }, [gameLoaded, props.currentGameNumber, eventFlipper, props.walletLoaded]);
-
-  function buildDiceRollEventLog(roll: BigNumber) {
-    const newLog = "A " + roll.toString() + " was rolled.";
-    return newLog;
-  }
-
-  function buildBCEventEventLog(bcEvent: BCEvent, position: Position) {
-    const { id } = bcEvent;
-    const eventData = getEventFromId(id);
-    const name = eventData[0].name;
-    const newLog =
-      "Player experienced " +
-      name +
-      " in " +
-      roomDisplayDataList[gameTiles[position.row][position.col].roomId].name +
-      " at row " +
-      position.row +
-      ", col " +
-      position.col +
-      ".";
-
-    return newLog;
-  }
-
-  function createEffectLog(effects: BCEffect[]) {
-    const effectNames = effects.map((effect: BCEffect) => {
-      return EffectNames[effect.effect] + ", ";
-    });
-
-    let newLog;
-
-    if (effectNames.length === 0) {
-      return "This event is not yet implemented";
-    }
-
-    if (effectNames[0] === "numEnemyToPlace, ") {
-      newLog =
-        effects[0].value +
-        " " +
-        DenizenTypeToString.get(
-          ethers.BigNumber.from(effects[1].value).toNumber()
-        ) +
-        " were placed"; // TODO: Add where
-    } else {
-      newLog = "The effects were " + effectNames.join("").slice(0, -2);
-    }
-
-    return newLog;
-  }
-
-  function sortHistoricLogs(historicLogs: HistoricLog[]) {
-    const logTypeOrder = [
-      "ActionCompleteEvent",
-      "EventResolvedEvent1",
-      "EventDiceRollEvent",
-      "EventResolvedEvent2",
-      "PlayerAttack",
-      "DenizenAttack",
-      "DiceRollEvent",
-      "ChallengeEvent",
-      "PlayerDiedEvent",
-      "DenizenTurnOver",
-    ];
-
-    return historicLogs.sort((a, b) => {
-      if (a.blockNumber.lt(b.blockNumber)) return -1; // assuming BigNumber has lt method for less than comparison
-      if (a.blockNumber.gt(b.blockNumber)) return 1; // assuming BigNumber has gt method for greater than comparison
-
-      // blockNumbers are equal, sort by logType
-      return logTypeOrder.indexOf(a.logType) - logTypeOrder.indexOf(b.logType);
-    });
-  }
-
-  function mapHistoricLogsToLogs(historicLogs: HistoricLog[]): string[] {
-    return historicLogs.map((log) => log.log);
-  }
+  const {
+    data: processDenizenMovesData,
+    isLoading: processDenizenMovesIsLoading,
+    error: processDenizenMovesError,
+    write: processDenizenMoves,
+  } = useContractWrite({
+    address: gamesContract.address,
+    abi: gamesContract.abi,
+    functionName: "processDenizenMoves",
+  });
 
   function renderRowWithDoors(row: number) {
     const rowWithDoors: ReactNode[] = [];
@@ -1153,6 +485,7 @@ export default function GameBoard(props: GameBoardProps) {
             row={row}
             col={col}
             currentGame={currentGame}
+            denizens={denizens}
             roomTiles={roomTiles}
             roomsWithItems={roomsWithItems}
           />
@@ -1325,9 +658,16 @@ export default function GameBoard(props: GameBoardProps) {
       return <Box>Selected game does not exist!</Box>;
     }
 
-    return !gameLoaded ? (
-      "Loading..."
-    ) : (
+    // return !gameLoaded ? (
+    //   "Loading..."
+    // ) : (
+    //   <Card>
+    //     <CardContent>
+    //       <Box sx={{ flexGrow: 1 }}>{renderMapWithDoors()}</Box>
+    //     </CardContent>
+    //   </Card>
+    // );
+    return (
       <Card>
         <CardContent>
           <Box sx={{ flexGrow: 1 }}>{renderMapWithDoors()}</Box>
@@ -1337,6 +677,9 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   function getNumItems() {
+    if (currentGame.gameId === -1) {
+      return 0;
+    }
     const currentPlayer = players[currentGame.currentPlayerTurnIndex];
     const currentRoomId =
       gameTiles[currentPlayer.position.row][currentPlayer.position.col].roomId;
@@ -1347,7 +690,6 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   useEffect(() => {
-    setGameLoaded(false);
     localStorage.setItem("lastGame", props.currentGameNumber.toString());
   }, [props.currentGameNumber]);
 
@@ -1373,17 +715,18 @@ export default function GameBoard(props: GameBoardProps) {
   // TODO: Rewrite all of this
   function getSecondsRemaining() {
     // TODO: Figure out this insanity.  Why are they behaving as strings when added, type of object, but think they're numbers, when they're bigNumbers?
-    const endOfTurnSeconds: number =
-      parseInt(currentGame.lastTurnTimestamp.toString()) +
-      parseInt(currentGame.turnTimeLimit.toString());
-    return dateInSeconds - endOfTurnSeconds;
+    // const endOfTurnSeconds: number =
+    //   parseInt(currentGame.lastTurnTimestamp.toString()) +
+    //   parseInt(currentGame.turnTimeLimit.toString());
+    // return dateInSeconds - endOfTurnSeconds;
   }
 
   function getTurnTimeRemaining() {
-    const remaining = getSecondsRemaining();
+    // const remaining = getSecondsRemaining();
 
-    const negative = remaining <= 0 ? "" : "-";
-    return negative + fancyTimeFormat(Math.abs(remaining)); // TODO: Minutes and seconds
+    // const negative = remaining <= 0 ? "" : "-";
+    // return negative + fancyTimeFormat(Math.abs(remaining)); // TODO: Minutes and seconds
+    return "???";
   }
 
   function fancyTimeFormat(duration: number) {
@@ -1418,22 +761,25 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   function handleEndTurnClick() {
-    props.gameContract_write.forceNextTurn(props.currentGameNumber);
-    setEventFlipper(true);
+    forceNextTurn({ args: [props.currentGameNumber] });
   }
 
   function handleDenizenTurnClick() {
-    props.gameContract_write.processDenizenMoves(props.currentGameNumber, {
-      // gasLimit: 10_000_000,
+    processDenizenMoves({
+      args: [props.currentGameNumber],
+      // gas: BigInt(10_000_000),
     });
-    setEventFlipper(true);
   }
 
   function renderGameArea() {
     if (debugGameOver) {
       return "Game is over.  Will add seeing old games later";
     }
-    return !gameLoaded ? (
+    return !(
+      currentGame.gameId !== -1 &&
+      roomTiles.length > 0 &&
+      doors.length > 0
+    ) ? (
       "Loading Game Area..."
     ) : (
       <Box>
@@ -1485,10 +831,9 @@ export default function GameBoard(props: GameBoardProps) {
                 currentPlayer={players[currentGame.currentPlayerTurnIndex]}
                 currentChar={chars[currentGame.currentPlayerTurnIndex]}
                 currentGameProps={currentGame}
+                denizens={denizens}
                 currentGameNumber={props.currentGameNumber}
                 playerSignerAddress={props.playerSignerAddress}
-                actionsContract_write={props.actionsContract_write}
-                gameContract_write={props.gameContract_write}
                 lastDieRoll={lastDieRoll}
                 setLastDieRoll={setLastDieRoll}
                 numItems={getNumItems()}
@@ -1501,9 +846,8 @@ export default function GameBoard(props: GameBoardProps) {
                     players[currentGame.currentPlayerTurnIndex].position.row
                   ][players[currentGame.currentPlayerTurnIndex].position.col]
                 }
-                setEventFlipper={setEventFlipper}
-                eventResolved={eventResolved}
-                setEventResolved={setEventResolved}
+                eventIsLive={eventIsLive}
+                setEventIsLive={setEventIsLive}
                 roomsWithItems={roomsWithItems}
                 gameWorldItems={gameWorldItems}
                 logs={logs}
@@ -1524,10 +868,9 @@ export default function GameBoard(props: GameBoardProps) {
                       }
                       currentChar={chars[currentGame.currentPlayerTurnIndex]}
                       currentGameProps={currentGame}
+                      denizens={denizens}
                       currentGameNumber={props.currentGameNumber}
                       playerSignerAddress={props.playerSignerAddress}
-                      actionsContract_write={props.actionsContract_write}
-                      gameContract_write={props.gameContract_write}
                       lastDieRoll={lastDieRoll}
                       setLastDieRoll={setLastDieRoll}
                       numItems={getNumItems()}
@@ -1544,9 +887,8 @@ export default function GameBoard(props: GameBoardProps) {
                             .col
                         ]
                       }
-                      setEventFlipper={setEventFlipper}
-                      eventResolved={eventResolved}
-                      setEventResolved={setEventResolved}
+                      eventIsLive={eventIsLive}
+                      setEventIsLive={setEventIsLive}
                       roomsWithItems={roomsWithItems}
                       gameWorldItems={gameWorldItems}
                       logs={logs}
@@ -1576,10 +918,9 @@ export default function GameBoard(props: GameBoardProps) {
                   currentPlayer={players[currentGame.currentPlayerTurnIndex]}
                   currentChar={chars[currentGame.currentPlayerTurnIndex]}
                   currentGameProps={currentGame}
+                  denizens={denizens}
                   currentGameNumber={props.currentGameNumber}
                   playerSignerAddress={props.playerSignerAddress}
-                  actionsContract_write={props.actionsContract_write}
-                  gameContract_write={props.gameContract_write}
                   lastDieRoll={lastDieRoll}
                   setLastDieRoll={setLastDieRoll}
                   numItems={getNumItems()}
@@ -1592,9 +933,8 @@ export default function GameBoard(props: GameBoardProps) {
                       players[currentGame.currentPlayerTurnIndex].position.row
                     ][players[currentGame.currentPlayerTurnIndex].position.col]
                   }
-                  setEventFlipper={setEventFlipper}
-                  eventResolved={eventResolved}
-                  setEventResolved={setEventResolved}
+                  eventIsLive={eventIsLive}
+                  setEventIsLive={setEventIsLive}
                   roomsWithItems={roomsWithItems}
                   gameWorldItems={gameWorldItems}
                   logs={logs}

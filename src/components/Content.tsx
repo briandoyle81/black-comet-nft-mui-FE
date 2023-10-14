@@ -17,7 +17,6 @@ import Header from "./Header";
 
 function Content() {
   const { address, isConnected } = useAccount();
-  const [walletLoaded, setWalletLoaded] = useState(false);
 
   const lastGameString = localStorage.getItem("lastGame");
   let lastGame: number;
@@ -128,31 +127,19 @@ function Content() {
             />
           </TabPanel>
           <TabPanel value={tabValue} index={1}>
-            {/* <GameList
-              gameContract_read={gameContract_read}
+            <GameList
               setCurrentGameNumber={setCurrentGameNumber}
               setTabValue={setTabValue}
-              address={playerAddress}
-            /> */}
+              address={address as string}
+            />
           </TabPanel>
           <TabPanel value={tabValue} index={2}>
-            {/* <GameBoard
+            <GameBoard
               currentGameNumber={currentGameNumber}
-              mapContract_read={mapContract_read}
-              gameContract_read={gameContract_read}
-              gameContract_write={gameContract_write}
-              charContract_read={charContract_read}
-              itemContract_read={itemsContract_read}
-              playerSignerAddress={playerAddress}
-              actionsContract_write={actionsContract_write}
-              actionsContract_read={actionsContract_read}
-              playersContract_read={playersContract_read}
-              playersContract_write={playersContract_write}
-              utilsContract_read={utilsContract_read}
+              playerSignerAddress={address as string}
               setCurrentGameNumber={setCurrentGameNumber}
-              walletLoaded={walletLoaded}
-              provider={provider}
-            /> */}
+              isConnected={isConnected}
+            />
           </TabPanel>
           <TabPanel value={tabValue} index={3}>
             <Box>Lobbies (Not implemented)</Box>

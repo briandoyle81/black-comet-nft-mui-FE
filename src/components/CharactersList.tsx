@@ -26,7 +26,6 @@ interface SelectedItemsInterface {
   [charId: number]: number[];
 }
 
-// TODO: Rename to CharactersList
 export default function CharactersList(props: CharactersDataInterface) {
   const [chars, setChars] = useState<CharInterface[]>([]);
 
@@ -38,27 +37,39 @@ export default function CharactersList(props: CharactersDataInterface) {
   );
   const [clearChoices, setClearChoices] = useState(false);
 
-  useContractReads({
-    contracts: [
-      {
-        address: charContract.address,
-        abi: charContract.abi,
-        functionName: "getAllCharsByOwner",
-        args: [props.address],
-      },
-      {
-        address: itemsContract.address,
-        abi: itemsContract.abi,
-        functionName: "getOwnedItems",
-        args: [props.address],
-      },
-    ],
+  // TODO: I think this should be useContractReads, but I get both websockets errors and
+  // errs from char being null if I do that.  I think it might be returning results with only one
+  // or the other, and then setting the one without a result to null.
+  // Might be able to handle with if (data) then if (data[0]) then setChars(data[0])
+  useContractRead({
+    address: charContract.address,
+    abi: charContract.abi,
+    functionName: "getAllCharsByOwner",
+    args: [props.address],
     watch: true,
-    onSettled: (data) => {
+    onSettled: (data, error) => {
       if (data) {
-        setChars(data[0].result as CharInterface[]);
-        setItems(data[1].result as ItemDataInterface[]);
+        setChars(data as CharInterface[]);
+      }
+      if (error) {
+        console.log("Error getting chars", error);
+      }
+    },
+  });
+
+  useContractRead({
+    address: itemsContract.address,
+    abi: itemsContract.abi,
+    functionName: "getOwnedItems",
+    args: [props.address],
+    watch: true,
+    onSettled: (data, error) => {
+      if (data) {
+        setItems(data as ItemDataInterface[]);
         setItemsLoaded(true);
+      }
+      if (error) {
+        console.log("Error getting items", error);
       }
     },
   });
@@ -97,6 +108,14 @@ export default function CharactersList(props: CharactersDataInterface) {
     setClearChoices(false);
   }
 
+  const handleGameButtonClick = (id: number) => {
+    localStorage.setItem("lastGame", id.toString());
+    localStorage.setItem("lastTab", "2");
+    const intId = id as number;
+    props.setCurrentGameNumber(intId);
+    props.setTabValue(2);
+  };
+
   async function handleDecantClick() {
     decantNewClone({ value: parseEther(DECANT_COST_IN_ETH.toString()) });
   }
@@ -104,7 +123,7 @@ export default function CharactersList(props: CharactersDataInterface) {
   async function handleEnlistClick(id: number) {
     enlistChar({
       value: parseEther(MULTI_GAME_COST_IN_ETH.toString()),
-      args: [id, selectedItems[id]],
+      args: [id, selectedItems[id] || []],
     });
 
     setClearChoices(true);
@@ -123,7 +142,7 @@ export default function CharactersList(props: CharactersDataInterface) {
   async function handleSoloClick(id: number) {
     enlistSolo({
       value: parseEther(SOLO_GAME_COST_IN_ETH.toString()),
-      args: [id, selectedItems[id]],
+      args: [id, selectedItems[id] || []],
     });
 
     setClearChoices(true);
@@ -148,8 +167,11 @@ export default function CharactersList(props: CharactersDataInterface) {
         <Grid item xs={12}>
           <Grid container spacing={1}>
             <Grid item xs={12}>
-              <Button variant="contained" disabled>
-                In Game
+              <Button
+                variant="contained"
+                onClick={() => handleGameButtonClick(char.gameId)}
+              >
+                Load Game
               </Button>
             </Grid>
           </Grid>
