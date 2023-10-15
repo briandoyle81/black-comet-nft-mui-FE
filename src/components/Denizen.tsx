@@ -1,6 +1,6 @@
 import { Box, Card, CardMedia, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Position } from "./Utils";
+import { Position } from "../utils/Utils";
 
 import BugAlien from "../assets/img/chars/Bug_Alien.png";
 import Scav from "../assets/img/chars/Scavenger.png";

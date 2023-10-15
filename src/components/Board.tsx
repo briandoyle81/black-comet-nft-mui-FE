@@ -19,7 +19,7 @@ import GamePanel, {
 } from "./GamePanel";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import { Position } from "./Utils";
+import { Position } from "../utils/Utils";
 
 import { DoorInterface } from "./Doors";
 import { ItemDataInterface } from "./ItemCard";
@@ -56,6 +56,7 @@ import {
 } from "../contracts";
 
 import { parseAbiItem } from "viem";
+import GameLogs from "./GameLogs";
 
 let timesBoardPulled = 0;
 
@@ -207,7 +208,7 @@ export interface BCEvent {
   highEffect: BCEffect[];
 }
 
-interface HistoricLog {
+export interface HistoricLog {
   blockNumber: BigNumber;
   logType: string;
   log: string;
@@ -237,15 +238,6 @@ export default function GameBoard(props: GameBoardProps) {
   const [eventIsLive, setEventIsLive] = useState(false);
 
   const [logs, setLogs] = useState(["Welcome to the Black Comet!"]);
-
-  const [obtainedLogBlocks, setObtainedLogBlocks] = useState<Set<BigNumber>>(
-    new Set()
-  );
-  const [newLogBlocks, setNewLogBlocks] = useState<Set<BigNumber>>(new Set());
-
-  const [dateInSeconds, setDateInSeconds] = useState(
-    Math.floor(Date.now() / 1000)
-  );
 
   const [zoomed, setZoomed] = useState(false);
   const [currentPlayerPos, setCurrentPlayerPos] = useState<Position>({
@@ -953,6 +945,7 @@ export default function GameBoard(props: GameBoardProps) {
   return (
     <Box>
       {renderGameArea()}
+      <GameLogs currentGameNumber={props.currentGameNumber} setLogs={setLogs} />
       <ChatWindow content={[...logs]} />
     </Box>
   );

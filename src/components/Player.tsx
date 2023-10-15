@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { Box, Card, CardMedia } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Position } from "./Utils";
+import { Position } from "../utils/Utils";
 
 import Archetype0 from "../assets/img/arch_svg/archetype_0";
 import Archetype1 from "../assets/img/arch_svg/archetype_1";

@@ -1,23 +1,80 @@
-export default function GameLogs() {
-  // useContractRead({
-  //   address: actionsContract.address,
-  //   abi: actionsContract.abi,
-  //   functionName: "getEventBlocks",
-  //   args: [props.currentGameNumber],
-  //   watch: true,
-  //   onSettled(data, error) {
-  //     if (data) {
-  //       const blocks = data as BigNumber[];
-  //       // Filter blocks to include only ones not already in obtainedLogBlocks
-  //       const newBlocks = blocks.filter((block) => !obtainedLogBlocks.has(block));
+import { useContractRead, usePublicClient, useWalletClient } from "wagmi";
+import { actionsContract } from "../contracts";
+import { useState } from "react";
+import { HistoricLog } from "./Board";
+import { parseAbi } from "viem";
+import { type } from "os";
+import { polygonMumbai } from "viem/chains";
 
-  //       for (const block in newBlocks) {
-  //         const logs = await publicClient.getLogs({
+export interface GameLogProps {
+  currentGameNumber: number;
+  setLogs: Function;
+}
 
-  //       }
-  //     }
-  //   }
-  // });
+export default function GameLogs(props: GameLogProps) {
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient({
+    chainId: polygonMumbai.id,
+  });
+  // console.log("publicClient", publicClient);
+
+  const [actionsLogBlocks, setActionsLogBlocks] = useState<Set<BigInt>>(
+    new Set()
+  );
+  const [gamesLogBlocks, setGamesLogBlocks] = useState<Set<BigInt>>(new Set());
+  const [playersLogBlocks, setPlayersLogBlocks] = useState<Set<BigInt>>(
+    new Set()
+  );
+  const [itemsLogBlocks, setItemsLogBlocks] = useState<Set<BigInt>>(new Set());
+
+  useContractRead({
+    address: actionsContract.address,
+    abi: actionsContract.abi,
+    functionName: "getEventBlocks",
+    args: [props.currentGameNumber],
+    watch: true,
+    onSettled(data, error) {
+      if (data && publicClient.hasOwnProperty("getLogs")) {
+        // console.log("in onsettled", publicClient);
+        const blocks = data as BigInt[];
+        // Filter blocks to include only ones not already in obtainedLogBlocks
+        const newBlocks = blocks.filter(
+          (block) => !actionsLogBlocks.has(block)
+        );
+
+        if (newBlocks.length === 0) {
+          return;
+        }
+        console.log("newBlocks", newBlocks); // newBlocks Array(13) [ 41210470n, 41210527n, 41210541n...
+
+        const historicLogs: HistoricLog[] = [];
+
+        // TODO: Get logs for new blocks
+        newBlocks.forEach(async (block) => {
+          if (!publicClient.hasOwnProperty("getLogs")) {
+            alert("This will never alert");
+            return;
+          }
+          // Yet at runtime I get an error in the browser: ERROR in src/components/GameLogs.tsx:57:50
+          // TS2339: Property 'getLogs' does not exist on type 'PublicClient<Transport<string, Record<string, any>, EIP1193RequestFn<undefined>>, Chain<ChainFormatters | undefined>>'.
+          const actionsLogs = await publicClient.getLogs({
+            address: actionsContract.address,
+            events: parseAbi([
+              "event DiceRollEvent(uint256 indexed gameId, uint256 indexed playerId, uint256 roll)",
+              "event ChallengeEvent(uint256 indexed gameId, uint256 indexed playerId, uint256 roll, uint256 forValue, uint256 against)",
+              "event ActionCompleteEvent(uint256 indexed gameId, uint256 indexed playerId, uint256 action, uint256 row, uint256 col)",
+            ]),
+            fromBlock: block as bigint,
+            toBlock: block as bigint,
+          });
+
+          console.log("Logs", actionsLogs); // Always empty
+        });
+        // Add new blocks to obtainedLogBlocks
+        setActionsLogBlocks(new Set([...actionsLogBlocks, ...newBlocks]));
+      }
+    },
+  });
 
   // // TODO: Decompose this to a component
   // const getLogBlocks = async () => {

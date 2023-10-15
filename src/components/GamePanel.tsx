@@ -7,7 +7,7 @@ import { PlayerInterface } from "./Player";
 import ActionPicker from "./ActionPicker";
 import { CharInterface } from "./Board";
 import { ItemDataInterface } from "./ItemCard";
-import { Position } from "./Utils";
+import { Position } from "../utils/Utils";
 import { GameTileInterface, RoomTile } from "./Tile";
 import Inventory from "./Inventory";
 

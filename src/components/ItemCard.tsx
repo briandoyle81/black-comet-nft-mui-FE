@@ -1,55 +1,82 @@
-import { Box, Card, CardContent, CardMedia, Grid, Typography } from "@mui/material"
-import { styled } from '@mui/material/styles';
+import {
+  Box,
+  Card,
+  CardContent,
+  CardMedia,
+  Grid,
+  Typography,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 import CompanyItemBG from "../assets/img/misc/companyitem_bg.jpg";
 import ScavengerBG from "../assets/img/misc/scavenger_bg.jpg";
 import ArtifactBG from "../assets/img/misc/artifact_bg.png";
-import { Position } from "./Utils";
+import { Position } from "../utils/Utils";
 
-
-enum ItemCategory { COMPANY = 0, ARTIFACT, SCAVENGER }
-enum ItemType { CONSUMABLE = 0, HEALTH, CARRY, DEFENSE, HACK, BREACH, HAZARD, ARMOR, RANGED, MELEE, SPECIAL }
+enum ItemCategory {
+  COMPANY = 0,
+  ARTIFACT,
+  SCAVENGER,
+}
+enum ItemType {
+  CONSUMABLE = 0,
+  HEALTH,
+  CARRY,
+  DEFENSE,
+  HACK,
+  BREACH,
+  HAZARD,
+  ARMOR,
+  RANGED,
+  MELEE,
+  SPECIAL,
+}
 
 const ItemOverlay = styled(Box)(({ theme }) => ({
-  position: 'absolute',
-  left: '0',
-  top: '0',
+  position: "absolute",
+  left: "0",
+  top: "0",
   zIndex: 1299,
-  background: 'transparent',
+  background: "transparent",
 }));
 
-export enum WorldItemStatus { DESTROYED = 0, HELD, ON_GROUND, DISCARDED }
+export enum WorldItemStatus {
+  DESTROYED = 0,
+  HELD,
+  ON_GROUND,
+  DISCARDED,
+}
 
 export interface ItemDataInterface {
-  genHash: string,
-  id: number,
-  uifID: number,
-  holdingPlayerId: number,
+  genHash: string;
+  id: number;
+  uifID: number;
+  holdingPlayerId: number;
 
-  weight: number,
+  weight: number;
 
-  traitModID: number,
+  traitModID: number;
 
-  itemCategory: ItemCategory,
+  itemCategory: ItemCategory;
 
-  grantsAbility: number,
-  grantsFlaw: number,
+  grantsAbility: number;
+  grantsFlaw: number;
 
-  itemType: ItemType,
+  itemType: ItemType;
 
-  power: number,
+  power: number;
 
-  currentGame: number,
+  currentGame: number;
 
-  status: WorldItemStatus,
+  status: WorldItemStatus;
 
-  position: Position
+  position: Position;
 }
 
 const ItemCategoryToString = new Map([
   [ItemCategory.COMPANY, "Company"],
   [ItemCategory.ARTIFACT, "Artifact"],
-  [ItemCategory.SCAVENGER, "Scavenger"]
+  [ItemCategory.SCAVENGER, "Scavenger"],
 ]);
 
 const ItemTypeToString = new Map([
@@ -67,7 +94,6 @@ const ItemTypeToString = new Map([
 ]);
 
 export default function ItemCard(props: ItemDataInterface) {
-
   function getItemBg() {
     switch (props.itemCategory) {
       case 0:
@@ -80,11 +106,8 @@ export default function ItemCard(props: ItemDataInterface) {
   }
 
   return (
-    <Card sx={{ position: 'relative' }}>
-      <CardMedia
-        image={getItemBg()}
-        component="img"
-      />
+    <Card sx={{ position: "relative" }}>
+      <CardMedia image={getItemBg()} component="img" />
       <ItemOverlay>
         <Grid container spacing={0}>
           <Grid item xs={12}>
@@ -103,9 +126,9 @@ export default function ItemCard(props: ItemDataInterface) {
             </Typography>
           </Grid>
           <Grid item xs={12}>
-              <Typography variant="body1" color="black">
-                  {"Pwr " + props.power.toString()}
-              </Typography>
+            <Typography variant="body1" color="black">
+              {"Pwr " + props.power.toString()}
+            </Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography variant="body1" color="black">
@@ -115,5 +138,5 @@ export default function ItemCard(props: ItemDataInterface) {
         </Grid>
       </ItemOverlay>
     </Card>
-  )
+  );
 }
