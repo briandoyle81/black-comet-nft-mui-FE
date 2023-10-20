@@ -1,17 +1,22 @@
-import { Button, Card, CardMedia, Chip, Grid, Typography } from "@mui/material";
-import { Box } from "@mui/system";
-import { ethers } from "ethers";
+import { Button, Card, Grid, Typography } from "@mui/material";
 import { ReactNode, useEffect, useState } from "react";
 import { CharInterface } from "./Board";
 import { ItemDataInterface } from "./ItemCard";
 import ItemSelector from "./ItemSelector";
 import Player, { ArchetypeProps, PlayerInterface } from "./Player";
 
+import { useContractRead, useContractReads, useContractWrite } from "wagmi";
+import { charContract, itemsContract } from "../contracts";
+
+import charContractDeployData from "../deployments/BCChars.json";
+import { parseEther } from "viem";
+import {
+  DECANT_COST_IN_ETH,
+  MULTI_GAME_COST_IN_ETH,
+  SOLO_GAME_COST_IN_ETH,
+} from "../constants";
+
 interface CharactersDataInterface {
-  charContract_read: any; // todo any
-  charContract_write: any;
-  lobbiesContract_write: any;
-  itemsContract_read: any;
   address: string;
   setCurrentGameNumber: Function;
   setTabValue: Function;
@@ -21,9 +26,7 @@ interface SelectedItemsInterface {
   [charId: number]: number[];
 }
 
-// TODO: Rename to CharactersList
 export default function CharactersList(props: CharactersDataInterface) {
-  const [charsLoaded, setCharsLoaded] = useState(false);
   const [chars, setChars] = useState<CharInterface[]>([]);
 
   const [itemsLoaded, setItemsLoaded] = useState(false);
@@ -34,76 +37,95 @@ export default function CharactersList(props: CharactersDataInterface) {
   );
   const [clearChoices, setClearChoices] = useState(false);
 
-  useEffect(() => {
-    console.log("Start of useEffect in characters");
+  // TODO: I think this should be useContractReads, but I get both websockets errors and
+  // errs from char being null if I do that.  I think it might be returning results with only one
+  // or the other, and then setting the one without a result to null.
+  // Might be able to handle with if (data) then if (data[0]) then setChars(data[0])
+  useContractRead({
+    address: charContract.address,
+    abi: charContract.abi,
+    functionName: "getAllCharsByOwner",
+    args: [props.address],
+    watch: true,
+    onSettled: (data, error) => {
+      if (data) {
+        setChars(data as CharInterface[]);
+      }
+      if (error) {
+        console.log("Error getting chars", error);
+      }
+    },
+  });
 
-    async function updateCharsFromChain() {
-      const remoteChars = await props.charContract_read.getAllCharsByOwner(
-        props.address
-      );
+  useContractRead({
+    address: itemsContract.address,
+    abi: itemsContract.abi,
+    functionName: "getOwnedItems",
+    args: [props.address],
+    watch: true,
+    onSettled: (data, error) => {
+      if (data) {
+        setItems(data as ItemDataInterface[]);
+        setItemsLoaded(true);
+      }
+      if (error) {
+        console.log("Error getting items", error);
+      }
+    },
+  });
 
-      const newChars: CharInterface[] = [];
+  const {
+    isLoading: isDecantLoading,
+    isSuccess: isDecantSuccess,
+    write: decantNewClone,
+  } = useContractWrite({
+    address: charContract.address,
+    abi: charContract.abi,
+    functionName: "decantNewClone",
+  });
 
-      let newSelectedItems: SelectedItemsInterface = {};
+  const {
+    isLoading: isEnlistLoading,
+    isSuccess: isEnlistSuccess,
+    write: enlistChar,
+  } = useContractWrite({
+    address: charContract.address,
+    abi: charContract.abi,
+    functionName: "enlistChar",
+  });
 
-      remoteChars.forEach((char: any) => {
-        newChars.push(char);
-        newSelectedItems[char.id] = [];
-      });
-      setChars(newChars);
-      setSelectedItems(newSelectedItems);
-      setCharsLoaded(true);
-    }
-
-    async function updateVaultFromChain() {
-      const remoteChars = await props.itemsContract_read.getOwnedItems(
-        props.address
-      );
-
-      const newItems: ItemDataInterface[] = [];
-
-      remoteChars.forEach((item: any) => {
-        newItems.push(item);
-      });
-      setItems(newItems);
-      setItemsLoaded(true);
-    }
-
-    if (!itemsLoaded) {
-      updateVaultFromChain();
-    }
-
-    if (!charsLoaded) {
-      updateCharsFromChain();
-    }
-  }, [
-    props.address,
-    charsLoaded,
-    props.charContract_read,
-    itemsLoaded,
-    props.itemsContract_read,
-  ]);
+  const {
+    isLoading: isSoloLoading,
+    isSuccess: isSoloSuccess,
+    write: enlistSolo,
+  } = useContractWrite({
+    address: charContract.address,
+    abi: charContract.abi,
+    functionName: "enlistSolo",
+  });
 
   function resetClear() {
     setClearChoices(false);
   }
 
+  const handleGameButtonClick = (id: number) => {
+    localStorage.setItem("lastGame", id.toString());
+    localStorage.setItem("lastTab", "2");
+    const intId = id as number;
+    props.setCurrentGameNumber(intId);
+    props.setTabValue(2);
+  };
+
   async function handleDecantClick() {
-    const tx = await props.charContract_write.decantNewClone({
-      value: ethers.utils.parseEther(".01"),
-    });
-    await tx.wait();
-    setCharsLoaded(false);
+    decantNewClone({ value: parseEther(DECANT_COST_IN_ETH.toString()) });
   }
 
   async function handleEnlistClick(id: number) {
-    const tx = await props.charContract_write.enlistChar(
-      id,
-      selectedItems[id],
-      { value: ethers.utils.parseEther(".0001"), gasLimit: 12000000 }
-    );
-    await tx.wait();
-    setCharsLoaded(false);
+    enlistChar({
+      value: parseEther(MULTI_GAME_COST_IN_ETH.toString()),
+      args: [id, selectedItems[id] || []],
+    });
+
     setClearChoices(true);
   }
 
@@ -118,15 +140,11 @@ export default function CharactersList(props: CharactersDataInterface) {
   // }
 
   async function handleSoloClick(id: number) {
-    console.log(selectedItems);
-    console.log("Items sent to game", Array.from(selectedItems[id].values()));
-    const tx = await props.charContract_write.enlistSolo(
-      id,
-      selectedItems[id],
-      { value: ethers.utils.parseEther(".0005"), gasLimit: 12000000 }
-    );
-    await tx.wait();
-    setCharsLoaded(false);
+    enlistSolo({
+      value: parseEther(SOLO_GAME_COST_IN_ETH.toString()),
+      args: [id, selectedItems[id] || []],
+    });
+
     setClearChoices(true);
   }
 
@@ -149,8 +167,11 @@ export default function CharactersList(props: CharactersDataInterface) {
         <Grid item xs={12}>
           <Grid container spacing={1}>
             <Grid item xs={12}>
-              <Button variant="contained" disabled>
-                In Game
+              <Button
+                variant="contained"
+                onClick={() => handleGameButtonClick(char.gameId)}
+              >
+                Load Game
               </Button>
             </Grid>
           </Grid>
@@ -310,6 +331,20 @@ export default function CharactersList(props: CharactersDataInterface) {
                       </Grid>
                     </Card>
                   </Grid>
+                  <Grid item xs={12}>
+                    <Card>
+                      <Typography variant="h6">Items</Typography>
+                      <Grid container spacing={1}>
+                        <ItemSelector
+                          charId={parseInt(char.id.toString())}
+                          items={items}
+                          updateItemsForChar={updateItemsForChar}
+                          clearChoices={clearChoices}
+                          resetClear={resetClear}
+                        />
+                      </Grid>
+                    </Card>
+                  </Grid>
                 </Grid>
               </Grid>
               {renderEnlistButtons(char)}
@@ -321,14 +356,22 @@ export default function CharactersList(props: CharactersDataInterface) {
     return charList;
   }
 
+  function renderDecantButton() {
+    return (
+      <Button
+        disabled={isDecantLoading}
+        variant="contained"
+        onClick={handleDecantClick}
+      >
+        {isDecantLoading ? "Sign in Wallet" : "Buy New Character NFT"}
+      </Button>
+    );
+  }
+
   return (
     <Grid container spacing={1}>
       <Grid item xs={4}>
-        <Card>
-          <Button variant="contained" onClick={handleDecantClick}>
-            Buy New Character NFT
-          </Button>
-        </Card>
+        <Card>{renderDecantButton()}</Card>
       </Grid>
       <Grid item xs={4}>
         <Card>

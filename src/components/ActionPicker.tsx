@@ -6,13 +6,15 @@ import {
   Grid,
   InputLabel,
   MenuItem,
-  TextField,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
 import { DenizenInterface, GameInfoInterface } from "./GamePanel";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { ethers } from "ethers";
+
+import { useContractWrite } from "wagmi";
+import { actionsContract } from "../contracts";
+import { parseUnits } from "viem";
 
 export enum Action {
   HACK = 0,
@@ -66,7 +68,23 @@ export default function ActionPicker(props: GameInfoInterface) {
   const [secondDir, setSecondDir] = useState(Direction.NORTH);
   const [panelState, setPanelState] = useState(PanelState.LIVE);
   const [denizenTarget, setDenizenTarget] = useState(0);
-  // const [actionIds, setActionIds] = useState<number[]>([]);
+
+  const {
+    data: actionData,
+    isLoading: actionIsLoading,
+    isSuccess: actionIsSuccess,
+    write: doAction,
+  } = useContractWrite({
+    address: actionsContract.address,
+    abi: actionsContract.abi,
+    functionName: "doAction",
+    onSuccess(data) {
+      // I'm doing this because onSettled says it's triggered on send, not on success
+      if (data) {
+        setPanelState(PanelState.LIVE);
+      }
+    },
+  });
 
   const handleTarget = (event: SelectChangeEvent) => {
     const targetString = event.target.value as string;
@@ -95,15 +113,14 @@ export default function ActionPicker(props: GameInfoInterface) {
   };
 
   const submitAction = async () => {
-    let cost = ethers.utils.parseUnits("0", "gwei"); // TODO: Hardcoding
+    let cost = parseUnits("0", 9); // TODO: Hardcoding, price in gwei
     let actionIds: number[] = [];
     setPanelState(PanelState.WAITING);
     if (action === Action.LOOT) {
-      cost = ethers.utils.parseUnits((100 * props.numItems).toString(), "gwei");
+      cost = parseUnits((100 * props.numItems).toString(), 9); // TODO: Hardcoding, price in gwei
     }
     if (action === Action.PICK_ITEMS) {
       for (let worldItem of props.gameWorldItems) {
-        console.log("In actions, world item", worldItem);
         if (
           worldItem.position.row === props.currentPlayer.position.row &&
           worldItem.position.col === props.currentPlayer.position.col
@@ -116,23 +133,23 @@ export default function ActionPicker(props: GameInfoInterface) {
       actionIds.push(denizenTarget);
       console.log(actionIds);
     }
-    console.log("In actions, world item ids", actionIds);
-    const actionTx = await props.actionsContract_write.doAction(
-      props.currentGameNumber,
-      props.currentPlayer.remoteId,
-      action,
-      followthrough,
-      firstDir,
-      secondDir,
-      actionIds,
-      {
-        value: cost,
-        gasLimit: 4000000, // TODO: Find a more elegant solution here
-        // What is likely happening is that for random numbers
-        // the client side simulation picks a cheaper outcome
-        // than what actually happens onchain
-      }
-    );
+
+    doAction({
+      args: [
+        props.currentGameNumber,
+        props.currentPlayer.id,
+        action,
+        followthrough,
+        firstDir,
+        secondDir,
+        actionIds,
+      ],
+      value: cost,
+      gas: BigInt(4000000), // TODO: Find a more elegant solution here
+      // What is likely happening is that for random numbers
+      // the client side simulation picks a cheaper outcome
+      // than what actually happens onchain
+    });
 
     if (action === Action.BREACH || Action.HACK) {
       // TODO: Shoot
@@ -141,13 +158,6 @@ export default function ActionPicker(props: GameInfoInterface) {
     } else {
       props.setLastDieRoll("None");
     }
-
-    // Below works for the acting client, but not a hook, so others
-    // won't get the update (they do through the events though)
-    await actionTx.wait().then(() => {
-      // TODO: Set waiting state to prevent action submission
-      setPanelState(PanelState.LIVE);
-    });
   };
 
   function isPlayerTurn(walletAddress: string, charOwner: string) {
@@ -190,10 +200,10 @@ export default function ActionPicker(props: GameInfoInterface) {
     }
 
     function getDenizenTargets() {
-      if (!props.currentGameProps.denizens) {
+      if (!props.denizens) {
         return [];
       }
-      return props.currentGameProps.denizens
+      return props.denizens
         .filter((denizen: DenizenInterface) => {
           if (denizen.healthRemaining.toString() === "0") {
             return false;
@@ -329,7 +339,13 @@ export default function ActionPicker(props: GameInfoInterface) {
           <Button
             variant="contained"
             onClick={submitAction}
-            disabled={panelState == PanelState.LIVE ? false : true}
+            disabled={
+              panelState == PanelState.LIVE &&
+              !actionIsLoading &&
+              !props.eventIsLive
+                ? false
+                : true
+            }
           >
             Submit
           </Button>

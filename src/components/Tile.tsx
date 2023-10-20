@@ -11,7 +11,7 @@ import { roomDisplayDataList } from "./RoomTiles";
 import Vent from "../assets/img/overlays/vent.png";
 import Player, { PlayerInterface } from "./Player";
 import { CharInterface } from "./Board";
-import { Position } from "./Utils";
+import { Position } from "../utils/Utils";
 import GameInfo from "./GameInfo";
 
 import Looted from "../assets/img/overlays/looted.png";
@@ -118,6 +118,7 @@ export interface TilePropsInterface {
   row: number;
   col: number;
   currentGame: GameInterface;
+  denizens: DenizenInterface[];
   roomTiles: RoomTile[];
   roomsWithItems: Position[];
 }
@@ -270,12 +271,9 @@ export default function Tile(props: TilePropsInterface) {
     }
     // TODO: Hack
     // console.log("Game in tile", props.currentGame);
-    if (
-      props.currentGame.denizens !== undefined &&
-      props.currentGame.denizens.length > 0
-    ) {
+    if (props.denizens !== undefined && props.denizens.length > 0) {
       // console.log("DRAWING DENIZENS");
-      props.currentGame.denizens.forEach((denizen: DenizenInterface, index) => {
+      props.denizens.forEach((denizen: DenizenInterface, index) => {
         if (
           position.row === denizen.position.row &&
           position.col === denizen.position.col

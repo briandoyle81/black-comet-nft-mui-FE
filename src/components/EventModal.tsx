@@ -1,17 +1,17 @@
 import { Box, Button, Modal, Typography } from "@mui/material";
-import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import {
-  EventDataDisplay,
   BugEventDisplayData,
   TileEventDisplayData,
   MysteryEventDisplayData,
   ScavEventDisplayData,
   ShipEventDisplayData,
 } from "./EventData";
-import { BCEventType, GameInfoInterface, GameInterface } from "./GamePanel";
+import { BCEventType, GameInfoInterface } from "./GamePanel";
 import { roomDisplayDataList } from "./RoomTiles";
-import Tile, { EmptyTile } from "./Tile";
+import Tile from "./Tile";
+import { useContractWrite } from "wagmi";
+import { gamesContract } from "../contracts";
 
 const style = {
   position: "absolute" as "absolute",
@@ -39,27 +39,37 @@ export default function EventModal(props: GameInfoInterface) {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  useEffect(() => {
-    if (props.currentGameProps.eventNumber > 0) {
-      setModalState(eventModalState.LIVE);
-      handleOpen();
-    }
-  }, [props.currentGameProps.eventNumber]);
+  const {
+    data: resolveEventData,
+    isLoading: resolveEventIsLoading,
+    isSuccess: resolveEventIsSuccess,
+    write: resolveEvent,
+  } = useContractWrite({
+    address: gamesContract.address,
+    abi: gamesContract.abi,
+    functionName: "resolveEvent",
+  });
 
   useEffect(() => {
-    if (props.eventResolved) {
+    if (props.eventIsLive && modalState === eventModalState.NONE) {
+      setOpen(true);
+      setModalState(eventModalState.LIVE);
+    }
+  }, [props.eventIsLive, modalState]);
+
+  useEffect(() => {
+    if (modalState === eventModalState.WAITING && props.eventIsLive === false) {
       setModalState(eventModalState.RESOLVED);
     }
-  }, [props.eventResolved]);
+  }, [props.eventIsLive, modalState]);
 
   const handleEvent = () => {
-    props.gameContract_write.resolveEvent(props.currentGameNumber, 0);
+    resolveEvent({ args: [props.currentGameNumber, 0] });
     setModalState(eventModalState.WAITING);
   };
 
   const handleConfirm = () => {
     setModalState(eventModalState.NONE);
-    props.setEventResolved(false);
     handleClose();
   };
 
@@ -200,6 +210,7 @@ export default function EventModal(props: GameInfoInterface) {
             row={props.currentGameProps.eventPosition.row}
             col={props.currentGameProps.eventPosition.col}
             currentGame={props.currentGameProps}
+            denizens={props.denizens}
             roomTiles={props.roomTiles}
             roomsWithItems={props.roomsWithItems}
           />

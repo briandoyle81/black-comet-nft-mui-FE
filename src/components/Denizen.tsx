@@ -1,6 +1,6 @@
 import { Box, Card, CardMedia, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Position } from "./Utils";
+import { Position } from "../utils/Utils";
 
 import BugAlien from "../assets/img/chars/Bug_Alien.png";
 import Scav from "../assets/img/chars/Scavenger.png";
@@ -24,7 +24,7 @@ const OnBoardDenizen = styled(Card)(({ theme }) => ({
   width: "90%",
   height: "90%",
   // background: 'grey',
-  border: "black",
+  // border: "black",
 }));
 
 const Portrait = styled(Card)(({ theme }) => ({
@@ -147,7 +147,9 @@ export default function Denizen(props: DenizenProps) {
   }
 
   return props.denizen.healthRemaining.toString() === "0" ? (
-    <></>
+    <Box sx={{ transform: "rotate(180deg)", border: "3px solid red" }}>
+      {renderDenizen(props.portrait)}
+    </Box>
   ) : (
     <Box>{renderDenizen(props.portrait)}</Box>
   );
