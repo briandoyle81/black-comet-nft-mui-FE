@@ -6,6 +6,7 @@ import utilsContractDeployData from "../deployments/BCUtils.json";
 import playersContractDeployData from "../deployments/BCPlayers.json";
 import mapsContractDeployData from "../deployments/Maps.json";
 import lobbiesContractDeployData from "../deployments/Lobby.json";
+import denizensContractDeployData from "../deployments/BCDenizens.json";
 import { Abi } from "viem";
 
 export const charContract = {
@@ -46,4 +47,9 @@ export const mapsContract = {
 export const lobbiesContract = {
   address: lobbiesContractDeployData.address as `0x${string}`,
   abi: lobbiesContractDeployData.abi as Abi,
+};
+
+export const denizensContract = {
+  address: denizensContractDeployData.address as `0x${string}`,
+  abi: denizensContractDeployData.abi as Abi,
 };

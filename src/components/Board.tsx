@@ -13,7 +13,6 @@ import { ReactNode, useEffect, useState } from "react";
 import GamePanel, {
   BCEventType,
   DenizenInterface,
-  DenizenType,
   EventTrackerInterface,
   GameInterface,
 } from "./GamePanel";
@@ -29,36 +28,17 @@ import Door from "./Doors";
 import { PlayerInterface } from "./Player";
 
 import Tile, { EmptyTile, GameTileInterface, RoomTile } from "./Tile";
-import { BigNumber } from "ethers";
-import { getEventFromId } from "./EventData";
-import { Action, ActionString } from "./ActionPicker";
+
 import ChatWindow from "./ChatWindow";
 
-// import actionsContractDeployData from "../deployments/Actions.json";
-// import gamesContractDeployData from "../deployments/BCGames.json";
-// import playersContractDeployData from "../deployments/BCPlayers.json";
 import EventTracker from "./EventTracker";
 import EventModal from "./EventModal";
 import GameInfoCard from "./GameInfoCard";
-import { DenizenTypeToString } from "./Denizen";
-import { roomDisplayDataList } from "./RoomTiles";
-import {
-  useContractRead,
-  useContractReads,
-  useContractWrite,
-  usePublicClient,
-} from "wagmi";
-import {
-  actionsContract,
-  gamesContract,
-  itemsContract,
-  mapsContract,
-} from "../contracts";
 
-import { parseAbiItem } from "viem";
+import { useContractRead, useContractWrite } from "wagmi";
+import { gamesContract, itemsContract, mapsContract } from "../contracts";
+
 import GameLogs from "./GameLogs";
-
-let timesBoardPulled = 0;
 
 const DISPLAY_COLUMNS = 13; // TODO: I really need to refigure out and document the reasoning here
 const ZOOMED_COLUMNS = 8;
@@ -167,7 +147,7 @@ export enum EffectTypes {
   traitModifiersID,
 }
 
-const EffectNames = {
+export const EffectNames = {
   0: "empty,",
   1: "permanant",
   2: "fullHealth",
@@ -195,21 +175,21 @@ const EffectNames = {
 
 export interface BCEffect {
   effect: EffectTypes;
-  value: BigNumber;
+  value: BigInt;
 }
 
 export interface BCEvent {
-  id: BigNumber;
+  id: BigInt;
   permanent: boolean;
-  rollForLow: BigNumber; // Unused if zero
-  rollForHigh: BigNumber; // Unused if zero
+  rollForLow: BigInt; // Unused if zero
+  rollForHigh: BigInt; // Unused if zero
   defaultEffect: BCEffect[];
   lowEffect: BCEffect[];
   highEffect: BCEffect[];
 }
 
 export interface HistoricLog {
-  blockNumber: BigNumber;
+  blockNumber: BigInt;
   logType: string;
   log: string;
 }
@@ -233,11 +213,11 @@ export default function GameBoard(props: GameBoardProps) {
   const [roomsWithItems, setRoomsWithItem] = useState<Position[]>([]); // TODO: This should be a set
 
   const [lastDieRoll, setLastDieRoll] = useState("None");
-  // const [eventFlipper, setEventFlipper] = useState(true); // TODO: Confusing name, think this should be actionFlipper
-
   const [eventIsLive, setEventIsLive] = useState(false);
 
-  const [logs, setLogs] = useState(["Welcome to the Black Comet!"]);
+  const [renderedTextLogs, setRenderedTextLogs] = useState([
+    "Welcome to the Black Comet!",
+  ]);
 
   const [zoomed, setZoomed] = useState(false);
   const [currentPlayerPos, setCurrentPlayerPos] = useState<Position>({
@@ -842,7 +822,7 @@ export default function GameBoard(props: GameBoardProps) {
                 setEventIsLive={setEventIsLive}
                 roomsWithItems={roomsWithItems}
                 gameWorldItems={gameWorldItems}
-                logs={logs}
+                logs={renderedTextLogs}
               />
             </Card>
           </Grid>
@@ -883,7 +863,7 @@ export default function GameBoard(props: GameBoardProps) {
                       setEventIsLive={setEventIsLive}
                       roomsWithItems={roomsWithItems}
                       gameWorldItems={gameWorldItems}
-                      logs={logs}
+                      logs={renderedTextLogs}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -929,7 +909,7 @@ export default function GameBoard(props: GameBoardProps) {
                   setEventIsLive={setEventIsLive}
                   roomsWithItems={roomsWithItems}
                   gameWorldItems={gameWorldItems}
-                  logs={logs}
+                  logs={renderedTextLogs}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -945,8 +925,12 @@ export default function GameBoard(props: GameBoardProps) {
   return (
     <Box>
       {renderGameArea()}
-      <GameLogs currentGameNumber={props.currentGameNumber} setLogs={setLogs} />
-      <ChatWindow content={[...logs]} />
+      <GameLogs
+        currentGameNumber={props.currentGameNumber}
+        setLogs={setRenderedTextLogs}
+        gameTiles={gameTiles}
+      />
+      <ChatWindow content={[...renderedTextLogs]} />
     </Box>
   );
 }
