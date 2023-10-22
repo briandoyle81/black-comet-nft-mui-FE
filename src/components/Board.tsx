@@ -2,22 +2,22 @@ import {
   Button,
   Card,
   CardContent,
+  Box,
+  Grid,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Typography,
+  SelectChangeEvent,
 } from "@mui/material";
-import { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import GamePanel, {
   BCEventType,
   DenizenInterface,
   EventTrackerInterface,
   GameInterface,
 } from "./GamePanel";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
 import { Position } from "../utils/Utils";
 
 import { DoorInterface } from "./Doors";
@@ -341,7 +341,6 @@ export default function GameBoard(props: GameBoardProps) {
     onSettled(data, error) {
       if (data) {
         setPlayers(data as PlayerInterface[]);
-        // console.log("players", data);
       }
       if (error) {
         console.log("error in extGetPlayersInGame", error);
@@ -374,9 +373,6 @@ export default function GameBoard(props: GameBoardProps) {
     onSettled(data, error) {
       if (data) {
         const remoteGame = data as GameInterface;
-        // console.log("remoteGame", remoteGame.eventNumber);
-        // console.log("CurrentGame", currentGame.eventNumber);
-
         if (remoteGame.currentPlayerTurnIndex) {
           setCurrentPlayerPos({
             row: players[remoteGame.currentPlayerTurnIndex].position.row,
@@ -417,23 +413,13 @@ export default function GameBoard(props: GameBoardProps) {
     },
   });
 
-  const {
-    data: forceNextTurnData,
-    isLoading: forceNextTurnIsLoading,
-    error: forceNextTurnError,
-    write: forceNextTurn,
-  } = useContractWrite({
+  const { write: forceNextTurn } = useContractWrite({
     address: gamesContract.address,
     abi: gamesContract.abi,
     functionName: "forceNextTurn",
   });
 
-  const {
-    data: processDenizenMovesData,
-    isLoading: processDenizenMovesIsLoading,
-    error: processDenizenMovesError,
-    write: processDenizenMoves,
-  } = useContractWrite({
+  const { write: processDenizenMoves } = useContractWrite({
     address: gamesContract.address,
     abi: gamesContract.abi,
     functionName: "processDenizenMoves",
@@ -576,9 +562,7 @@ export default function GameBoard(props: GameBoardProps) {
 
   function renderMapWithDoors() {
     const rows: ReactNode[] = [];
-    // gameTiles.forEach((rowData: GameTileInterface[], row) => {
     for (let row = getZoomedRowStart(); row < getZoomedRowEnd(); row++) {
-      const rowData = gameTiles[row];
       if (row === 0) {
         return;
       }
@@ -620,25 +604,14 @@ export default function GameBoard(props: GameBoardProps) {
   }
 
   function renderMapArea() {
-    // if (numGames === 0) {
-    //   return (
-    //     <Box>No games yet!</Box>
-    //   )
-    // }
+    if (numGames === 0) {
+      return <Box>No games yet!</Box>;
+    }
 
     if (props.currentGameNumber > numGames) {
       return <Box>Selected game does not exist!</Box>;
     }
 
-    // return !gameLoaded ? (
-    //   "Loading..."
-    // ) : (
-    //   <Card>
-    //     <CardContent>
-    //       <Box sx={{ flexGrow: 1 }}>{renderMapWithDoors()}</Box>
-    //     </CardContent>
-    //   </Card>
-    // );
     return (
       <Card>
         <CardContent>
@@ -655,9 +628,6 @@ export default function GameBoard(props: GameBoardProps) {
     const currentPlayer = players[currentGame.currentPlayerTurnIndex];
     const currentRoomId =
       gameTiles[currentPlayer.position.row][currentPlayer.position.col].roomId;
-    // console.log("there are this many items:", roomTiles[currentRoomId].numItems)
-    // console.log(typeof(roomTiles[currentRoomId].numItems))
-
     return roomTiles[currentRoomId].numItems;
   }
 
@@ -667,8 +637,6 @@ export default function GameBoard(props: GameBoardProps) {
 
   function handleGameSelectorChange(event: SelectChangeEvent) {
     const gameNum = event.target.value;
-    // setGameLoaded(false); Happens above now
-    // localStorage.setItem("lastGame", gameNum.toString());
     props.setCurrentGameNumber(gameNum);
   }
 
@@ -682,54 +650,6 @@ export default function GameBoard(props: GameBoardProps) {
       );
     }
     return menuItems;
-  }
-
-  // TODO: Rewrite all of this
-  function getSecondsRemaining() {
-    // TODO: Figure out this insanity.  Why are they behaving as strings when added, type of object, but think they're numbers, when they're bigNumbers?
-    // const endOfTurnSeconds: number =
-    //   parseInt(currentGame.lastTurnTimestamp.toString()) +
-    //   parseInt(currentGame.turnTimeLimit.toString());
-    // return dateInSeconds - endOfTurnSeconds;
-  }
-
-  function getTurnTimeRemaining() {
-    // const remaining = getSecondsRemaining();
-
-    // const negative = remaining <= 0 ? "" : "-";
-    // return negative + fancyTimeFormat(Math.abs(remaining)); // TODO: Minutes and seconds
-    return "???";
-  }
-
-  function fancyTimeFormat(duration: number) {
-    // Hours, minutes and seconds
-    const hrs = ~~(duration / 3600);
-    const mins = ~~((duration % 3600) / 60);
-    const secs = ~~duration % 60;
-
-    // Output like "1:01" or "4:03:59" or "123:03:59"
-    let ret = "";
-
-    if (hrs > 0) {
-      ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
-    }
-
-    ret += "" + mins + ":" + (secs < 10 ? "0" : "");
-    ret += "" + secs;
-
-    return ret;
-  }
-
-  function getTimeColor() {
-    const secondsRemaining = -getSecondsRemaining();
-
-    if (secondsRemaining < 0) {
-      return "red";
-    } else if (secondsRemaining < 60) {
-      return "yellow";
-    } else {
-      return "white";
-    }
   }
 
   function handleEndTurnClick() {
@@ -760,8 +680,7 @@ export default function GameBoard(props: GameBoardProps) {
             <Card>
               <Grid container>
                 <Grid item xs={3}>
-                  <Typography variant="body1" align="left" color={getTimeColor}>
-                    {/* {"Time Left: " + getTurnTimeRemaining()} */}
+                  <Typography variant="body1" align="left">
                     {"Time Left: ???"}
                   </Typography>
                 </Grid>
@@ -769,7 +688,8 @@ export default function GameBoard(props: GameBoardProps) {
                   <Box alignContent="right">
                     <Button
                       disabled={
-                        getTurnTimeRemaining()[0] === "-" ? false : true
+                        true
+                        // getTurnTimeRemaining()[0] === "-" ? false : true
                       }
                       onClick={handleEndTurnClick}
                     >
@@ -921,7 +841,7 @@ export default function GameBoard(props: GameBoardProps) {
       </Box>
     );
   }
-  // ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] used to debug ChatWindow below
+
   return (
     <Box>
       {renderGameArea()}

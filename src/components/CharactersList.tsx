@@ -1,14 +1,13 @@
 import { Button, Card, Grid, Typography } from "@mui/material";
-import { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { CharInterface } from "./Board";
 import { ItemDataInterface } from "./ItemCard";
 import ItemSelector from "./ItemSelector";
-import Player, { ArchetypeProps, PlayerInterface } from "./Player";
+import Player from "./Player";
 
-import { useContractRead, useContractReads, useContractWrite } from "wagmi";
+import { useContractRead, useContractWrite } from "wagmi";
 import { charContract, itemsContract } from "../contracts";
 
-import charContractDeployData from "../deployments/BCChars.json";
 import { parseEther } from "viem";
 import {
   DECANT_COST_IN_ETH,
@@ -170,8 +169,9 @@ export default function CharactersList(props: CharactersDataInterface) {
               <Button
                 variant="contained"
                 onClick={() => handleGameButtonClick(char.gameId)}
+                disabled={char.gameId == 0 ? true : false}
               >
-                Load Game
+                {char.gameId == 0 ? "Waiting for game" : "Load Game"}
               </Button>
             </Grid>
           </Grid>
@@ -185,20 +185,20 @@ export default function CharactersList(props: CharactersDataInterface) {
               <Button
                 variant="contained"
                 onClick={() => {
-                  handleEnlistClick(char.id);
+                  handleSoloClick(char.id);
                 }}
               >
-                Enlist for Mission
+                Start Solo Mission
               </Button>
             </Grid>
             <Grid item xs={6}>
               <Button
                 variant="contained"
                 onClick={() => {
-                  handleSoloClick(char.id);
+                  handleEnlistClick(char.id);
                 }}
               >
-                Start Solo Mission
+                {"Random MP Game"}
               </Button>
             </Grid>
           </Grid>
