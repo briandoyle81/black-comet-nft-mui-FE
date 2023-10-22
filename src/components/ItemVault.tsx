@@ -1,5 +1,5 @@
 import { Card, Grid, Typography } from "@mui/material";
-import { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import ItemCard, { ItemDataInterface } from "./ItemCard";
 import { useContractRead } from "wagmi";
 import { itemsContract } from "../contracts";

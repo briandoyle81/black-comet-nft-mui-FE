@@ -38,163 +38,164 @@ interface roomDisplayData {
   art: string;
 }
 
-let roomDisplayDataList: roomDisplayData[] = []
+let roomDisplayDataList: roomDisplayData[] = [];
 // TODO: Critical -> Don't rely on order assumption here, add room id number
 roomDisplayDataList.push({
   name: "Empty Space",
   desc: "There is nothing here.",
-  art: Space
+  art: Space,
 });
 roomDisplayDataList.push({
   name: "Unexplored Room",
   desc: "This room has not been explored.",
-  art: Unexplored
+  art: Unexplored,
 });
 roomDisplayDataList.push({
   name: "Donghaijiu",
   desc: "Your home away from home.  It even has roaches!",
-  art: Donghaijiu
+  art: Donghaijiu,
 });
 // Normal Rooms
 roomDisplayDataList.push({
   name: "Armory",
   desc: "There are lots of guns here.  Most are locked away.",
-  art: Armory
+  art: Armory,
 });
 roomDisplayDataList.push({
   name: "Auxiliary Reactor",
   desc: "It seems to be running normally.",
-  art: AuxiliaryReactor
+  art: AuxiliaryReactor,
 });
 roomDisplayDataList.push({
   name: "Breached Reactor",
   desc: "It's on fire!",
-  art: BreachedReactor
+  art: BreachedReactor,
 });
 roomDisplayDataList.push({
   name: "Bridge",
   desc: "The display panels occasionally flicker, showing brief glimpses of arcane symbols.",
-  art: Bridge
+  art: Bridge,
 });
 roomDisplayDataList.push({
   name: "Bug Nest",
   desc: "The eggs glow gently.  Every once in awhile, one shivers.",
-  art: BugNest
+  art: BugNest,
 });
 roomDisplayDataList.push({
   name: "Captain's Quarters",
   desc: "These are the biggest personal rooms you've ever seen.",
-  art: CaptainsQuarters
+  art: CaptainsQuarters,
 });
 roomDisplayDataList.push({
   name: "Cargo Hold",
   desc: "Sadly, most of the cargo is in impenetrable crates molecularly adhered to the deck.",
-  art: CargoHold
+  art: CargoHold,
 });
 roomDisplayDataList.push({
   name: "Clone Room",
   desc: "You can't quite see what is being cloned.  This is probably for the best.",
-  art: CloneRoom
+  art: CloneRoom,
 });
 roomDisplayDataList.push({
   name: "Computer Mainframe",
   desc: "The vast computer blinks and beeps softly.",
-  art: ComputerMainframe
+  art: ComputerMainframe,
 });
 roomDisplayDataList.push({
   name: "Crossroads",
   desc: "The piles of trash tell you that Scavengers often pass through.",
-  art: Crossroads
+  art: Crossroads,
 });
 roomDisplayDataList.push({
   name: "Engineering Catwalk",
-  desc: "You can see the main reactor below.",
-  art: EngCatwalk
+  desc: "You can see the main reactor below.  You could jump down, but you don't see a way back up./n/nUse:  Move to the Main Reactor.",
+  art: EngCatwalk,
 });
 roomDisplayDataList.push({
   name: "Escape Pods",
   desc: "Most of the pods are missing, the rest are sealed behind reinforced doors.",
-  art: EscapePods
+  art: EscapePods,
 });
 roomDisplayDataList.push({
   name: "Galley",
   desc: "Rotten food coats every surface.",
-  art: Galley
+  art: Galley,
 });
 roomDisplayDataList.push({
   name: "Hull Breach",
   desc: "You can barely walk through the twisted mess of panels and beams.",
-  art: HullBreach
+  art: HullBreach,
 });
 roomDisplayDataList.push({
   name: "Lonely Corridor",
   desc: "It's quiet, but not too quiet.",
-  art: LHallway
+  art: LHallway,
 });
 roomDisplayDataList.push({
   name: "Main Reactor",
   desc: "The giant reactor hums with a strange energy.",
-  art: MainReactor
+  art: MainReactor,
 });
 roomDisplayDataList.push({
   name: "Medbay",
-  desc: "Most of the machines are inactive.",
-  art: Medbay
+  desc: "Most of the machines are inactive, but one with a medical symbol appears to be working.\n\nUse: Return to full health +1 bonus health.",
+  art: Medbay,
 });
 roomDisplayDataList.push({
   name: "Observation Room",
   desc: "The windows flicker between clear and opaque.",
-  art: Observation
+  art: Observation,
 });
 roomDisplayDataList.push({
   name: "Officer's Bunk",
   desc: "This officer's quarters are bigger than your apartment.",
-  art: OfficersBunk
+  art: OfficersBunk,
 });
 roomDisplayDataList.push({
   name: "Pantry",
   desc: "You're not sure if the ancient can of cream of mushroom soup is comforting, or frightening.",
-  art: Pantry
+  art: Pantry,
 });
 roomDisplayDataList.push({
   name: "Pump Room",
   desc: "The pumps whirr and hum.",
-  art: PumpRoom
+  art: PumpRoom,
 });
 roomDisplayDataList.push({
   name: "Reactor Control",
   desc: "The controls shock you when you touch them.  You're not sure if that is a security feature.",
-  art: ReactorControl
+  art: ReactorControl,
 });
 roomDisplayDataList.push({
   name: "Scavenger's Den",
   desc: "This once nice bunk room is now full of garbage and human waste.",
-  art: ScavengersDen
+  art: ScavengersDen,
 });
 roomDisplayDataList.push({
   name: "Scullery",
   desc: "An endless cycle of clean dishes are being cleaned by automated machinery.",
-  art: Scullery
+  art: Scullery,
 });
 roomDisplayDataList.push({
   name: "Showers",
   desc: "It sounds like something is moving around in the drain.",
-  art: Showers
+  art: Showers,
 });
 roomDisplayDataList.push({
   name: "Torpedo Tube",
   desc: "You're afraid to think of what would happen if one of these went off.",
-  art: TorpedoTube
+  art: TorpedoTube,
 });
 roomDisplayDataList.push({
   name: "Trash Compactor",
   desc: "You think something just touched your leg!",
-  art: TrashCompactor
+  art: TrashCompactor,
 });
-roomDisplayDataList[100] = { // LOL thanks javascript!
+roomDisplayDataList[100] = {
+  // LOL thanks javascript!
   name: "Main Reactor",
   desc: "Scans detect the Black Comet's main reactor at this location.",
-  art: MainReactorBack
-}
+  art: MainReactorBack,
+};
 
-export { roomDisplayDataList }
+export { roomDisplayDataList };

@@ -148,10 +148,7 @@ function Content() {
             <Info />
           </TabPanel>
           <TabPanel value={tabValue} index={5}>
-            {/* <ItemVault
-              itemsContract_read={itemsContract_read}
-              address={playerAddress}
-            /> */}
+            <ItemVault address={address as string} />
           </TabPanel>
           <Typography>Dev Notes</Typography>
           <Typography>

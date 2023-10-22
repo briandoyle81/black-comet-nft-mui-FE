@@ -4,24 +4,25 @@ import "./App.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { polygonMumbai } from "wagmi/chains";
-// import { publicProvider } from "wagmi/providers/public";
+import { publicProvider } from "wagmi/providers/public";
 // import { alchemyProvider } from "wagmi/providers/alchemy";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 import Content from "./components/Content";
+import React from "react";
 
 const { chains, publicClient } = configureChains(
   [polygonMumbai],
   [
     // alchemyProvider({ apiKey: process.env.REACT_APP_ALCHEMY_KEY as string }),
-    // publicProvider(),
-    jsonRpcProvider({
-      rpc: (chain) => ({
-        http: "https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP",
-      }),
-    }),
+    publicProvider(),
+    // jsonRpcProvider({
+    //   rpc: (chain) => ({
+    //     http: "https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP",
+    //   }),
+    // }),
   ]
 );
 

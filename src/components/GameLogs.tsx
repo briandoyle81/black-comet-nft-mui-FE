@@ -4,7 +4,7 @@ import {
   denizensContract,
   gamesContract,
   playersContract,
-} from "../contracts";
+} from "../contracts/index"; // TODO: Why does this complian if I don't have index in the path?
 import { useState } from "react";
 import { BCEffect, BCEvent, EffectNames, HistoricLog } from "./Board";
 import { getAbiItem } from "viem";

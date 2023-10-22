@@ -1,5 +1,5 @@
 import { Box, Button, Modal, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BugEventDisplayData,
   TileEventDisplayData,
@@ -137,9 +137,13 @@ export default function EventModal(props: GameInfoInterface) {
       return (
         <Box>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            {getEventData(0, props.currentTile.roomId).desc}
+            {convertNewlinesToBreaks(
+              getEventData(0, props.currentTile.roomId).desc
+            )}
           </Typography>
-          <Button onClick={handleClose}>Ok</Button>
+          <Button variant="contained" onClick={handleClose}>
+            Ok
+          </Button>
         </Box>
       );
     } else if (modalState === eventModalState.WAITING) {
