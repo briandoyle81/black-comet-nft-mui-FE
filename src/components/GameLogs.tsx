@@ -15,6 +15,7 @@ import { GameTileInterface } from "./Tile";
 import { getEventFromId } from "./EventData";
 import { DenizenTypeToString } from "./Denizen";
 import { Action, ActionString } from "./ActionPicker";
+import { get } from "http";
 
 export interface GameLogProps {
   currentGameNumber: number;
@@ -377,6 +378,14 @@ export default function GameLogs(props: GameLogProps) {
                 abi: denizensContract.abi,
                 name: "PlayerAttack",
               }),
+              getAbiItem({
+                abi: denizensContract.abi,
+                name: "DiceRollEvent",
+              }),
+              getAbiItem({
+                abi: denizensContract.abi,
+                name: "ChallengeEvent",
+              }),
             ],
             fromBlock: block as bigint,
             toBlock: block as bigint,
@@ -417,6 +426,28 @@ export default function GameLogs(props: GameLogProps) {
                   blockNumber: block,
                   logType: "PlayerAttack",
                   log: newLog4,
+                });
+                break;
+              case "DiceRollEvent":
+                const newLog = buildDiceRollEventLog(log.args.roll);
+                newHistoricLogs.push({
+                  blockNumber: block,
+                  logType: "DiceRollEvent",
+                  log: newLog,
+                });
+                break;
+              case "ChallengeEvent":
+                const newLog2 =
+                  "Challenge roll of: " +
+                  log.args.roll.toString() +
+                  ". For: " +
+                  log.args.forValue.toString() +
+                  " Against: " +
+                  log.args.against.toString();
+                newHistoricLogs.push({
+                  blockNumber: block,
+                  logType: "ChallengeEvent",
+                  log: newLog2,
                 });
                 break;
               default:

@@ -195,13 +195,15 @@ export interface HistoricLog {
 }
 
 export default function GameBoard(props: GameBoardProps) {
-  const n = 11; // TODO: Hardcoded board size, can't use await here
+  const ACTUAL_BOARD_SIZE = 11; // TODO: Hardcoded board size, can't use await here
 
   const [numGames, setNumGames] = useState(0);
   const [currentGame, setCurrentGame] = useState<GameInterface>(EmptyGame); // TODO: I don't think i need EmptyGame.  Except I do because I get endless null ref errors even on components that can't render unless game exists
   const [roomTiles, setRoomTiles] = useState<RoomTile[]>([]);
   const [gameTiles, setGameTiles] = useState(
-    Array.from({ length: n }, () => Array.from({ length: n }, () => EmptyTile))
+    Array.from({ length: ACTUAL_BOARD_SIZE }, () =>
+      Array.from({ length: ACTUAL_BOARD_SIZE }, () => EmptyTile)
+    )
   );
   const [doors, setDoors] = useState<DoorInterface[]>([]);
   const [players, setPlayers] = useState<PlayerInterface[]>([]);
@@ -430,7 +432,7 @@ export default function GameBoard(props: GameBoardProps) {
     // gameTiles[row].forEach((tile: GameTileInterface, col) => {
     for (let col = getZoomedColStart(); col < getZoomedColEnd(); col++) {
       const tile = gameTiles[row][col];
-      if (col === 0 || col === n - 1) {
+      if (col === 0 || col === ACTUAL_BOARD_SIZE - 1) {
         return;
       }
       const itemKey = row + "," + col;
@@ -450,7 +452,7 @@ export default function GameBoard(props: GameBoardProps) {
         </Grid>
       );
       // Don't render the last door.  -2 because other process skips outer ring
-      if (col < n - 2) {
+      if (col < ACTUAL_BOARD_SIZE - 2) {
         rowWithDoors.push(
           <Door
             vsBreach={doors[tile.doors[2]].vsBreach}
@@ -492,7 +494,7 @@ export default function GameBoard(props: GameBoardProps) {
       );
 
       // Push an "empty" card to maintain grid, except the last
-      if (col < n - 1) {
+      if (col < ACTUAL_BOARD_SIZE - 1) {
         rowOfDoors.push(
           <Grid item xs={1} key={row + "," + col + "-empty"}>
             <Card></Card>
@@ -528,7 +530,7 @@ export default function GameBoard(props: GameBoardProps) {
         return currentPlayerPos.row + 3; // + 2 for desired rows and 1 for < in other loop
       }
     } else {
-      return n; // Not n-1 to render Donghaijiu
+      return ACTUAL_BOARD_SIZE; // Not n-1 to render Donghaijiu
     }
   }
 
@@ -556,7 +558,7 @@ export default function GameBoard(props: GameBoardProps) {
         return currentPlayerPos.col + 3;
       }
     } else {
-      return n - 1;
+      return ACTUAL_BOARD_SIZE - 1;
     }
   }
 
@@ -566,7 +568,7 @@ export default function GameBoard(props: GameBoardProps) {
       if (row === 0) {
         return;
       }
-      if (row < n - 1) {
+      if (row < ACTUAL_BOARD_SIZE - 1) {
         rows.push(
           <Box key={row + "-withDoors"}>
             <Grid
@@ -675,6 +677,7 @@ export default function GameBoard(props: GameBoardProps) {
       "Loading Game Area..."
     ) : (
       <Box>
+        {/* Don't use Zoomed columns below, this reduced the game area*/}
         <Grid container spacing={0} columns={DISPLAY_COLUMNS}>
           <Grid item xs={3}>
             <Card>

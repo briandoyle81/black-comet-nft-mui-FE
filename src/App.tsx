@@ -5,7 +5,7 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { polygonMumbai } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
-import { alchemyProvider } from "wagmi/providers/alchemy";
+// import { alchemyProvider } from "wagmi/providers/alchemy";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 // import { InjectedConnector } from "@wagmi/core";
 
@@ -17,10 +17,15 @@ import React from "react";
 const { chains, publicClient } = configureChains(
   [polygonMumbai],
   [
-    alchemyProvider({ apiKey: process.env.REACT_APP_ALCHEMY_KEY as string }),
+    // alchemyProvider({ apiKey: process.env.REACT_APP_ALCHEMY_KEY as string }),
+    // jsonRpcProvider({
+    //   rpc: (chain) => ({
+    //     http: "https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP",
+    //   }),
+    // }),
     jsonRpcProvider({
       rpc: (chain) => ({
-        http: "https://polygon-mumbai.g.alchemy.com/v2/zp-Tq0B2ca_enpFDdUqiGjJnPD11sxQP",
+        http: "https://solemn-yolo-water.matic-testnet.quiknode.pro/e74b10809de481ddb0e3233a0a46000876acb0b7/",
       }),
     }),
     publicProvider(),
