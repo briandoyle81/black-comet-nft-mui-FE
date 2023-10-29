@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 
-import { roomDisplayDataList } from "./RoomTiles";
+import { USABLE_ROOMS, roomDisplayDataList } from "./RoomTiles";
 
 import Vent from "../assets/img/overlays/vent.png";
 import Player, { PlayerInterface } from "./Player";
@@ -25,6 +25,8 @@ import ItemIcon from "../assets/img/overlays/item.png";
 
 import Hazard from "../assets/img/overlays/hazard.png";
 import Denizen from "./Denizen";
+
+import Usable from "../assets/img/overlays/temp-usable-room.png";
 
 export enum EventType {
   NONE = 0,
@@ -313,6 +315,18 @@ export default function Tile(props: TilePropsInterface) {
 
   function renderBottomRowIcons() {
     const iconRenders: ReactNode[] = [];
+    if (USABLE_ROOMS.includes(props.tile.roomId)) {
+      iconRenders.push(
+        <Grid item xs={3} key={iconRenders.length - 1 + "bottom_icon"}>
+          <img
+            src={Usable}
+            alt="Usable"
+            style={{ width: "100%", zIndex: 1299 }}
+          />
+        </Grid>
+      );
+    }
+
     if (props.tile.hasVent) {
       iconRenders.push(
         <Grid item xs={3} key={iconRenders.length - 1 + "bottom_icon"}>

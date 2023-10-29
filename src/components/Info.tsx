@@ -137,6 +137,9 @@ export default function Info() {
         >
           Hacking icons created by Good Ware - Flaticon
         </a>
+        <a href="https://www.flaticon.com/free-icons/hand" title="hand icons">
+          Hand icons created by Pixel perfect - Flaticon
+        </a>
       </CardContent>
     </Card>
   );
