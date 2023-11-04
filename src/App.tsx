@@ -28,7 +28,7 @@ const { chains, publicClient } = configureChains(
         http: "https://solemn-yolo-water.matic-testnet.quiknode.pro/e74b10809de481ddb0e3233a0a46000876acb0b7/",
       }),
     }),
-    publicProvider(),
+    // publicProvider(),
   ]
 );
 

@@ -62,13 +62,13 @@ export interface GameInfoInterface {
 }
 
 export interface DenizenInterface {
-  id: BigInt;
-  gameId: BigInt;
+  id: bigint;
+  gameId: bigint;
   denizenType: DenizenType; // Traits are derived from type
 
   position: Position;
 
-  healthRemaining: BigInt;
+  healthRemaining: bigint;
 }
 
 export interface EventTrackerInterface {

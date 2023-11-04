@@ -36,7 +36,7 @@ import EventModal from "./EventModal";
 import GameInfoCard from "./GameInfoCard";
 
 import { useContractRead, useContractWrite } from "wagmi";
-import { gamesContract, itemsContract, mapsContract } from "../contracts";
+import { gamesContract } from "../contracts";
 
 import GameLogs from "./GameLogs";
 
@@ -175,29 +175,65 @@ export const EffectNames = {
 
 export interface BCEffect {
   effect: EffectTypes;
-  value: BigInt;
+  value: bigint;
 }
 
 export interface BCEvent {
-  id: BigInt;
+  id: bigint;
   permanent: boolean;
-  rollForLow: BigInt; // Unused if zero
-  rollForHigh: BigInt; // Unused if zero
+  rollForLow: bigint; // Unused if zero
+  rollForHigh: bigint; // Unused if zero
   defaultEffect: BCEffect[];
   lowEffect: BCEffect[];
   highEffect: BCEffect[];
 }
 
 export interface HistoricLog {
-  blockNumber: BigInt;
+  blockNumber: bigint;
   logType: string;
   log: string;
+}
+
+export interface CompleteGame {
+  game: GameInterface;
+  board: GameTileInterface[][];
+  doors: DoorInterface[];
+  roomTiles: RoomTile[];
+  characters: CharInterface[];
+  players: PlayerInterface[];
+  denizens: DenizenInterface[];
+  playerItems: ItemDataInterface[][];
+  worldItems: ItemDataInterface[];
+  actionsEventBlocks: bigint[];
+  gameEventBlocks: bigint[];
+  playersEventBlocks: bigint[];
+  denizensEventBlocks: bigint[];
 }
 
 export default function GameBoard(props: GameBoardProps) {
   const ACTUAL_BOARD_SIZE = 11; // TODO: Hardcoded board size, can't use await here
 
   const [numGames, setNumGames] = useState(0);
+
+  // TODO: CompleteGame can replace most of the below
+  const [completeGame, setCompleteGame] = useState<CompleteGame>({
+    game: EmptyGame,
+    board: Array.from({ length: ACTUAL_BOARD_SIZE }, () =>
+      Array.from({ length: ACTUAL_BOARD_SIZE }, () => EmptyTile)
+    ),
+    doors: [],
+    roomTiles: [],
+    characters: [],
+    players: [],
+    denizens: [],
+    playerItems: [],
+    worldItems: [],
+    actionsEventBlocks: [],
+    gameEventBlocks: [],
+    playersEventBlocks: [],
+    denizensEventBlocks: [],
+  });
+
   const [currentGame, setCurrentGame] = useState<GameInterface>(EmptyGame); // TODO: I don't think i need EmptyGame.  Except I do because I get endless null ref errors even on components that can't render unless game exists
   const [roomTiles, setRoomTiles] = useState<RoomTile[]>([]);
   const [gameTiles, setGameTiles] = useState(
@@ -231,150 +267,18 @@ export default function GameBoard(props: GameBoardProps) {
 
   // TODO: These should probably use useContractReads
   useContractRead({
-    address: itemsContract.address,
-    abi: itemsContract.abi,
-    functionName: "getWorldItems",
-    args: [props.currentGameNumber],
-    watch: true,
-    onSettled(data, error) {
-      if (data) {
-        const newWorldItems = data as ItemDataInterface[];
-        setGameWorldItems(newWorldItems);
-
-        // TODO: roomsWithItem should be a set
-        const newRoomsWithItem: Position[] = [];
-        newWorldItems.forEach((item: ItemDataInterface) => {
-          newRoomsWithItem.push(item.position);
-        });
-        setRoomsWithItem(newRoomsWithItem);
-      }
-      if (error) {
-        console.log("error in getWorldItems", error);
-      }
-    },
-  });
-
-  useContractRead({
-    address: itemsContract.address,
-    abi: itemsContract.abi,
-    functionName: "getAllPlayersItems",
-    args: [props.currentGameNumber],
-    watch: true,
-    onSettled(data, error) {
-      if (data) {
-        setCurrentPlayerItems(data as ItemDataInterface[][]);
-      }
-      if (error) {
-        console.log("error in getAllPlayersItems", error);
-      }
-    },
-  });
-
-  useContractRead({
-    address: mapsContract.address,
-    abi: mapsContract.abi,
-    functionName: "extGetBoard",
-    args: [props.currentGameNumber],
-    watch: true,
-    onSettled(data, error) {
-      if (data) {
-        setGameTiles(data as GameTileInterface[][]);
-      }
-      if (error) {
-        console.log("error in extGetBoard", error);
-      }
-    },
-  });
-
-  useContractRead({
-    address: mapsContract.address,
-    abi: mapsContract.abi,
-    functionName: "extGetRoomList", //TODO: Investigate if this is still useful
-    args: [props.currentGameNumber],
-    watch: true, // TODO: Might not need to watch this
-    onSettled(data, error) {
-      if (data) {
-        setRoomTiles(data as RoomTile[]);
-      }
-      if (error) {
-        console.log("error in extGetRoomList", error);
-      }
-    },
-  });
-
-  useContractRead({
     address: gamesContract.address,
     abi: gamesContract.abi,
-    functionName: "extGetCharsInGame",
-    args: [props.currentGameNumber],
-    watch: true, // TODO: Might not need to watch this
-    onSettled(data, error) {
-      if (data) {
-        setChars(data as CharInterface[]);
-      }
-      if (error) {
-        console.log("error in extGetCharsInGame", error);
-      }
-    },
-  });
-
-  useContractRead({
-    address: mapsContract.address,
-    abi: mapsContract.abi,
-    functionName: "extGetDoors",
+    functionName: "extGetFullGameState",
     args: [props.currentGameNumber],
     watch: true,
     onSettled(data, error) {
       if (data) {
-        setDoors(data as DoorInterface[]);
-      }
-      if (error) {
-        console.log("error in extGetDoors", error);
-      }
-    },
-  });
+        const gameData = data as CompleteGame;
 
-  useContractRead({
-    address: gamesContract.address,
-    abi: gamesContract.abi,
-    functionName: "extGetPlayersInGame",
-    args: [props.currentGameNumber],
-    watch: true,
-    onSettled(data, error) {
-      if (data) {
-        setPlayers(data as PlayerInterface[]);
-      }
-      if (error) {
-        console.log("error in extGetPlayersInGame", error);
-      }
-    },
-  });
-
-  useContractRead({
-    address: gamesContract.address,
-    abi: gamesContract.abi,
-    functionName: "extGetNumGames",
-    args: [],
-    watch: true,
-    onSettled(data, error) {
-      if (data) {
-        setNumGames(data as number);
-      }
-      if (error) {
-        console.log("error in extGetNumGames", error);
-      }
-    },
-  });
-
-  useContractRead({
-    address: gamesContract.address,
-    abi: gamesContract.abi,
-    functionName: "extGetGame",
-    args: [props.currentGameNumber],
-    watch: true,
-    onSettled(data, error) {
-      if (data) {
-        const remoteGame = data as GameInterface;
+        setCompleteGame(gameData);
+        // console.log(gameData);
+        const remoteGame = gameData.game;
         if (remoteGame.currentPlayerTurnIndex) {
           setCurrentPlayerPos({
             row: players[remoteGame.currentPlayerTurnIndex].position.row,
@@ -392,9 +296,27 @@ export default function GameBoard(props: GameBoardProps) {
         if (remoteGame.active === false) {
           setDebugGameOver(true);
         }
+
+        setGameTiles(gameData.board);
+        setDoors(gameData.doors);
+        setRoomTiles(gameData.roomTiles);
+        setChars(gameData.characters);
+        setPlayers(gameData.players);
+        setDenizens(gameData.denizens);
+        setCurrentPlayerItems(gameData.playerItems);
+
+        setGameWorldItems(gameData.worldItems);
+        // TODO: roomsWithItem should be a set
+        const newRoomsWithItem: Position[] = [];
+        gameData.worldItems.forEach((item: ItemDataInterface) => {
+          newRoomsWithItem.push(item.position);
+        });
+        setRoomsWithItem(newRoomsWithItem);
+
+        // Block numbers for logs are used from the main completeGame item
       }
       if (error) {
-        console.log("error in games", error);
+        console.log("error in extGetFullGameState", error);
       }
     },
   });
@@ -402,15 +324,15 @@ export default function GameBoard(props: GameBoardProps) {
   useContractRead({
     address: gamesContract.address,
     abi: gamesContract.abi,
-    functionName: "getDenizensInGame",
-    args: [props.currentGameNumber],
-    watch: true,
+    functionName: "extGetNumGames",
+    args: [],
+    // watch: true, // Might need this once, will get after with rest of game data
     onSettled(data, error) {
-      if (data && currentGame.gameId !== -1) {
-        setDenizens(data as DenizenInterface[]);
+      if (data) {
+        setNumGames(data as number);
       }
       if (error) {
-        console.log("error in getDenizensInGame", error);
+        console.log("error in extGetNumGames", error);
       }
     },
   });
@@ -661,7 +583,7 @@ export default function GameBoard(props: GameBoardProps) {
   function handleDenizenTurnClick() {
     processDenizenMoves({
       args: [props.currentGameNumber],
-      // gas: BigInt(10_000_000),
+      // gas: 10_000_000n,
     });
   }
 
@@ -850,8 +772,8 @@ export default function GameBoard(props: GameBoardProps) {
       {renderGameArea()}
       <GameLogs
         currentGameNumber={props.currentGameNumber}
+        completeGame={completeGame}
         setLogs={setRenderedTextLogs}
-        gameTiles={gameTiles}
       />
       <ChatWindow content={[...renderedTextLogs]} />
     </Box>

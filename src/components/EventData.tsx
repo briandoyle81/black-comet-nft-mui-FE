@@ -10,7 +10,7 @@ const MysteryEventDisplayData: EventDataDisplay[] = [];
 const ScavEventDisplayData: EventDataDisplay[] = [];
 const ShipEventDisplayData: EventDataDisplay[] = [];
 
-export function getEventFromId(eventId: BigInt) {
+export function getEventFromId(eventId: bigint) {
   // console.log("GET EVENT FROM ID");
   if (eventId.valueOf() >= 600000) {
     const event = ShipEventDisplayData.filter((bcEvent) => {

@@ -145,7 +145,7 @@ export default function ActionPicker(props: GameInfoInterface) {
         actionIds,
       ],
       value: cost,
-      gas: BigInt(4000000), // TODO: Find a more elegant solution here
+      gas: 4000000n, // TODO: Find a more elegant solution here
       // What is likely happening is that for random numbers
       // the client side simulation picks a cheaper outcome
       // than what actually happens onchain

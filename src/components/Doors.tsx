@@ -7,9 +7,6 @@ import Window from "../assets/img/doors/window.png";
 import { Box, Card, CardMedia, Grid, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-import BreachIcon from "../assets/img/misc/temp-flaticon-breach.png";
-import HackIcon from "../assets/img/misc/temp-flaticon-hack.png";
-
 export enum DoorStatus {
   NO_DOOR = 0,
   CLOSED,
@@ -26,42 +23,19 @@ export interface DoorInterface {
   rotate: boolean;
 }
 
-const Rotated = styled(Card)(({ theme }) => ({
-  transform: `rotate(90deg)`,
-}));
-
-const H_vsHack = styled(Typography)(({ theme }) => ({
-  position: "absolute",
-  top: "0px",
-  left: "6px",
+const HvsHack = styled(Typography)(({ theme }) => ({
   color: "white",
   fontSize: 12,
+  fontWeight: "bold", // To make the text bold
+  textShadow: "1px 1px 0px rgba(0, 0, 0, 0.3)", // 1-pixel drop-shadow
 }));
 
-const H_vsBreach = styled(Typography)(({ theme }) => ({
-  position: "absolute",
-  top: "0px",
-  right: "6px",
+const HvsBreach = styled(Typography)(({ theme }) => ({
   color: "white",
   fontSize: 12,
+  fontWeight: "bold", // To make the text bold
+  textShadow: "1px 1px 0px rgba(0, 0, 0, 0.3)", // 1-pixel drop-shadow
 }));
-
-// TODO: Make text not sideways
-// const V_vsHack = styled(Typography)(({ theme }) => ({
-//   position: 'absolute',
-//   top: '0px',
-//   left: '0px',
-//   color: 'white',
-//   fontSize: 12
-// }));
-
-// const V_vsBreach = styled(Typography)(({ theme }) => ({
-//   position: 'absolute',
-//   bottom: '0px',
-//   right: '0px',
-//   color: 'white',
-//   fontSize: 12
-// }));
 
 const ArtMap = {
   [DoorStatus.NO_DOOR]: Wall,
@@ -74,9 +48,6 @@ const ArtMap = {
 
 export default function Door(props: DoorInterface) {
   function getDoorArt() {
-    // if (props.vsBreach === 0) {
-    //   return Breached;
-    // }
     if (
       props.vsHack === 0 &&
       props.status !== DoorStatus.BREACHED &&
@@ -92,31 +63,50 @@ export default function Door(props: DoorInterface) {
   function renderDoorStats(door: DoorInterface) {
     if (door.status === DoorStatus.OPEN || door.status === DoorStatus.CLOSED) {
       return (
-        <Box>
-          {/* <img
-            src={HackIcon}
-            alt="hack"
-            style={{
-              height: "20%",
-              width: "20%",
-              position: "absolute",
-              top: "0px",
-              left: "0px",
-            }}
-          /> */}
-          <H_vsHack>{props.vsHack}</H_vsHack>
-          <H_vsBreach>{props.vsBreach}</H_vsBreach>
-          {/* <img
-            src={BreachIcon}
-            alt="breach"
-            style={{
-              height: "20%",
-              width: "20%",
-              position: "absolute",
-              bottom: "0px",
-              right: "0px",
-            }}
-          /> */}
+        <Box position="absolute" top={0} left={0} right={0} bottom={0}>
+          <Grid container>
+            <Grid
+              item
+              xs={6}
+              container
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Box
+                style={{
+                  backgroundColor: "blue",
+                  borderRadius: "50%", // To create a circle
+                  width: "60%",
+                  height: "60%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <HvsHack>{props.vsHack}</HvsHack>
+              </Box>
+            </Grid>
+            <Grid
+              item
+              xs={6}
+              container
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Box
+                style={{
+                  backgroundColor: "red",
+                  width: "60%",
+                  height: "60%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <HvsBreach>{props.vsBreach}</HvsBreach>
+              </Box>
+            </Grid>
+          </Grid>
         </Box>
       );
     } else {
@@ -124,8 +114,6 @@ export default function Door(props: DoorInterface) {
     }
   }
 
-  // TODO: DRY/CLEANUP
-  function renderDoor() {}
   // TODO: This method of rotation is adding padding and putting drop shadow in incorrect orientation
   if (props.status === DoorStatus.NO_DOOR) {
     return (

@@ -1,7 +1,30 @@
-import { Card, CardContent, CardHeader, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  Grid,
+  Typography,
+} from "@mui/material";
 import { GameInfoInterface } from "./GamePanel";
 import Player from "./Player";
 import HeartIcon from "../assets/img/misc/round heart token.png";
+
+import { styled } from "@mui/material/styles";
+
+const HvsHack = styled(Typography)(({ theme }) => ({
+  color: "white",
+  // fontSize: 12,
+  fontWeight: "bold", // To make the text bold
+  textShadow: "1px 1px 0px rgba(0, 0, 0, 0.3)", // 1-pixel drop-shadow
+}));
+
+const HvsBreach = styled(Typography)(({ theme }) => ({
+  color: "white",
+  // fontSize: 12,
+  fontWeight: "bold", // To make the text bold
+  textShadow: "1px 1px 0px rgba(0, 0, 0, 0.3)", // 1-pixel drop-shadow
+}));
 
 export default function GameInfo(props: GameInfoInterface) {
   function getTraitColor(charTrait: number, modifiedTrait: number) {
@@ -212,10 +235,26 @@ export default function GameInfo(props: GameInfoInterface) {
                     Vs. Hack:
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
-                  <Typography variant="body1">
-                    {props.currentPlayer.currentTraits.hack}
-                  </Typography>
+                <Grid
+                  item
+                  xs={6}
+                  container
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Box
+                    style={{
+                      backgroundColor: "blue",
+                      borderRadius: "50%", // To create a circle
+                      width: "20%",
+                      height: "80%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <HvsHack>{props.currentPlayer.currentTraits.hack}</HvsHack>
+                  </Box>
                 </Grid>
                 <Grid item xs={6}>
                   <Typography
@@ -229,10 +268,27 @@ export default function GameInfo(props: GameInfoInterface) {
                     Vs. Breach:
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
-                  <Typography variant="body1">
-                    {props.currentPlayer.currentTraits.breach}
-                  </Typography>
+                <Grid
+                  item
+                  xs={6}
+                  container
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Box
+                    style={{
+                      backgroundColor: "red",
+                      width: "15%",
+                      height: "80%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <HvsBreach>
+                      {props.currentPlayer.currentTraits.breach}
+                    </HvsBreach>
+                  </Box>
                 </Grid>
                 <Grid item xs={6}>
                   <Typography
